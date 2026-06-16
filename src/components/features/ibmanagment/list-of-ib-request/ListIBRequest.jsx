@@ -2,13 +2,11 @@
 
 import { useState } from "react";
 import { Check, X } from "lucide-react";
-
 import DataTable from "@/components/common/tables/DataTable";
 import ExportDropdown from "@/components/common/tables/ExportDropdown";
 import TableFooter from "@/components/common/tables/TableFooter";
 import TableSearch from "@/components/common/tables/TableSearch";
 import TableWrapper from "@/components/common/tables/TableWrapper";
-
 import { TableCell, TableRow } from "@/components/ui/table";
 
 import {
@@ -36,10 +34,7 @@ export default function ListIBRequest() {
   });
 
   const { mutate, isPending } = useIBRequestAction();
-
   const rows = data?.data?.response?.records || [];
-
-  console.log("Pending IB List Response:", data);
 
   const handleAccept = (userId) => {
     mutate({

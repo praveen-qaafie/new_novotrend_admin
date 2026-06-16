@@ -1,10 +1,12 @@
 import ProtectedRoute from "@/components/auth/protected/ProtectedRoute";
+import DashboardHistoryGuard from "@/components/auth/protected/DashboardHistoryGuard";
 import Header from "@/components/layout/header/Header";
 import Sidebar from "@/components/layout/sidebar/Sidebar";
 
 export default function DashboardLayout({ children }) {
   return (
     <div className="flex min-h-screen bg-background">
+      <DashboardHistoryGuard />
       {/* Desktop Sidebar */}
       <Sidebar />
       {/* Main Layout */}

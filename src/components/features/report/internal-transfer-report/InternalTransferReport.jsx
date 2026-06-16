@@ -29,8 +29,7 @@ export default function InternalTransferReport() {
     sdate: "",
     edate: "",
   });
-  console.log("Wallet Report Filters", filters);
-
+  
   const { data, isLoading, isError } = useInternalTransferReportQuery({
     limit,
     offset,
@@ -39,14 +38,12 @@ export default function InternalTransferReport() {
     edate: filters.edate,
   });
   const transferData = data?.response?.internal_transfer_history || [];
-  console.log(transferData, "this is internal transfer data");
-  const total = Number(data?.response?.total_records) || 0;
+    const total = Number(data?.response?.total_records) || 0;
   return (
     <>
       <DateInputFilter
         onSubmit={({ sdate, edate }) => {
-          console.log("FILTER CHANGED", { sdate, edate });
-          setOffset(0);
+                    setOffset(0);
           setFilters({
             sdate,
             edate,

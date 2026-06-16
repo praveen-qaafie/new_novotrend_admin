@@ -16,19 +16,16 @@ export const useAddEmployeeMutation = () => {
           successMessage =
             decryptedResult?.data?.result || decryptedResult?.result || successMessage;
         } catch (error) {
-          console.log("Decrypt Error:", error);
-        }
+                  }
       }
       toast.success(successMessage);
       queryClient.invalidateQueries({
         queryKey: ["admin-staff-list"],
       });
-      console.log("ADD EMPLOYEE SUCCESS:", response);
-    },
+          },
     onError: error => {
       toast.error(error?.message || "Something went wrong");
-      console.log("ADD EMPLOYEE ERROR:", error);
-    },
+          },
   });
 };
 
@@ -45,14 +42,12 @@ export const useEditEmployeeMutation = () => {
         if (typeof response?.result === "string") {
           const decryptedResult = decryptData(response.result);
 
-          console.log("DECRYPTED RESULT:", decryptedResult);
-
+          
           successMessage =
             decryptedResult?.data?.result || decryptedResult?.result || successMessage;
         }
       } catch (error) {
-        console.log("RESULT DECRYPT ERROR:", error);
-      }
+              }
 
       toast.success(successMessage);
 
@@ -60,14 +55,12 @@ export const useEditEmployeeMutation = () => {
         queryKey: ["admin-staff-list"],
       });
 
-      console.log("EDIT EMPLOYEE SUCCESS:", response);
-    },
+          },
 
     onError: error => {
       toast.error(error?.message || "Something went wrong");
 
-      console.log("EDIT EMPLOYEE ERROR:", error);
-    },
+          },
   });
 };
 
@@ -83,24 +76,20 @@ export const useDeleteEmployeeMutation = () => {
       try {
         if (typeof response?.result === "string") {
           const decryptedResult = decryptData(response.result);
-          console.log("DECRYPTED RESULT:", decryptedResult);
-          successMessage =
+                    successMessage =
             decryptedResult?.data?.result || decryptedResult?.result || successMessage;
         }
       } catch (error) {
-        console.log("DELETE RESULT DECRYPT ERROR:", error);
-      }
+              }
       toast.success(successMessage);
       queryClient.invalidateQueries({
         queryKey: ["admin-staff-list"],
       });
 
-      console.log("DELETE EMPLOYEE SUCCESS:", response);
-    },
+          },
     onError: error => {
       toast.error(error?.message || "Failed to delete employee");
 
-      console.log("DELETE EMPLOYEE ERROR:", error);
-    },
+          },
   });
 };

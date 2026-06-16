@@ -2,13 +2,16 @@
 
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { sidebarItems } from "@/confiq/sidebar";
+import { useAuth } from "@/context/AuthContext";
 import { usePermissions } from "@/hooks/usePermission";
+import { getAllowedSidebarItems } from "@/lib/sidebarAccess";
 import { cn } from "@/lib/utils";
 import { ChevronDown } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
+import SidebarSkeleton from "./SidebarSkeleton";
 
 export default function Sidebar() {
   const pathname = usePathname();
@@ -18,30 +21,26 @@ export default function Sidebar() {
     setOpenSections(prev => ({ ...prev, [title]: !prev[title] }));
   };
 
+  const { logout } = useAuth();
+
   const handleLogout = () => {
-    localStorage.removeItem("token");
+    logout();
     window.location.href = "/login";
   };
-  const { hasPermission, isLoading } = usePermissions();
+  const { allowedPermissions, isLoading } = usePermissions();
   if (isLoading) {
-    return null;
+    return <SidebarSkeleton />;
   }
-  const filteredSidebarItems = sidebarItems
-    .map(section => ({
-      ...section,
-      items: section.items.filter(item => {
-        if (!item.permission) return true;
-
-        return hasPermission(item.permission);
-      }),
-    }))
-    .filter(section => section.items.length > 0);
+  const filteredSidebarItems = getAllowedSidebarItems(sidebarItems, allowedPermissions);
 
   return (
     <aside className="group/sidebar hidden h-screen w-[280px] flex-col border-r border-border/40 bg-gradient-to-b from-background via-background to-background/95 md:flex sticky top-0 transition-all duration-300">
       {/* Company Logo */}
       <div className="h-[72px] flex items-center justify-center border-b border-border/40 px-4">
-        <div className="relative h-15 w-full overflow-hidden rounded-2xl bg-card/80 flex items-center px-4">
+        <Link
+          href="/dashboard"
+          className="relative h-15 w-full overflow-hidden rounded-2xl bg-card/80 flex items-center px-4"
+        >
           <Image
             src="/darkmode.webp"
             alt="Company Logo"
@@ -50,7 +49,7 @@ export default function Sidebar() {
             className="h-auto w-auto object-contain"
             priority
           />
-        </div>
+        </Link>
       </div>
 
       {/* Navigation - Modern Spacing & Design */}
@@ -67,13 +66,7 @@ export default function Sidebar() {
               </div>
               {/* Section Items */}
               <div className="space-y-1.5">
-                {section.items
-                  .filter(item => {
-                    if (!item.permissionKey) return true;
-
-                    return hasPermission(item.permissionKey);
-                  })
-                  .map((item, itemIdx) => {
+                {section.items.map(item => {
                     // Dropdown with modern design
                     if (item.children) {
                       const isOpen = openSections[item.title] || false;

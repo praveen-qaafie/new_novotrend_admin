@@ -2,50 +2,94 @@
 
 import { authenticator } from "@otplib/preset-default";
 import Image from "next/image";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import QRCode from "qrcode";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useSyncExternalStore } from "react";
 import { useForm } from "react-hook-form";
 
 import { useAuthMutation } from "@/services/auth/auth.mutation";
 
+const AUTH_SNAPSHOT_LOADING = "__auth_snapshot_loading__";
+
+const subscribeToAuthStorage = callback => {
+  window.addEventListener("storage", callback);
+  window.addEventListener("pageshow", callback);
+  queueMicrotask(callback);
+
+  return () => {
+    window.removeEventListener("storage", callback);
+    window.removeEventListener("pageshow", callback);
+  };
+};
+
+const getAuthSnapshot = () => {
+  if (typeof window === "undefined") return AUTH_SNAPSHOT_LOADING;
+
+  return `${localStorage.getItem("token") || ""}|${localStorage.getItem("auth_secret") || ""}|${
+    localStorage.getItem("isLoggedIn") || ""
+  }`;
+};
+
+const getServerAuthSnapshot = () => AUTH_SNAPSHOT_LOADING;
+
 export default function AucationCode() {
   const router = useRouter();
-
-  const [token, setToken] = useState("");
-  const [authSecret, setAuthSecret] = useState("");
+  const authSnapshot = useSyncExternalStore(
+    subscribeToAuthStorage,
+    getAuthSnapshot,
+    getServerAuthSnapshot
+  );
+  const isSnapshotLoading = authSnapshot === AUTH_SNAPSHOT_LOADING;
+  const [token, authSecret, isLoggedIn] = isSnapshotLoading ? ["", "", ""] : authSnapshot.split("|");
   const [qrSecret, setQrSecret] = useState("");
-  const [staffUsername, setStaffUsername] = useState("");
   const [qrCode, setQrCode] = useState("");
 
   const { register, handleSubmit } = useForm();
   const { mutate, isPending } = useAuthMutation();
 
   useEffect(() => {
-    const savedToken = localStorage.getItem("token");
-    const savedAuthSecret = localStorage.getItem("auth_secret");
-    const username = localStorage.getItem("staff_username");
-    if (!savedToken) {
+    if (isSnapshotLoading) return;
+
+    if (token && isLoggedIn === "true") {
+      window.location.replace("/");
+      return;
+    }
+
+    if (!token) {
       router.replace("/login");
       return;
     }
-    setToken(savedToken);
-    setAuthSecret(savedAuthSecret || "");
-    setStaffUsername(username || "");
+
     const generateQr = async () => {
-      if (savedAuthSecret === "0") {
+      if (authSecret === "0") {
         const secret = authenticator.generateSecret();
-        setQrSecret(secret);
-        localStorage.setItem("qr_secret", secret);
-        const otpUrl = authenticator.keyuri(username || "admin", "Novotrend", secret);
+        const otpUrl = authenticator.keyuri("Novo Trend", "Novotrend", secret);
         const qr = await QRCode.toDataURL(otpUrl);
+
+        localStorage.setItem("qr_secret", secret);
+        setQrSecret(secret);
         setQrCode(qr);
       }
     };
+
     generateQr();
-  }, [router]);
+  }, [authSecret, isLoggedIn, isSnapshotLoading, router, token]);
   const showQr = authSecret === "0";
+  const handleBackToLogin = () => {
+    localStorage.removeItem("adminUser");
+    localStorage.removeItem("token");
+    localStorage.removeItem("auth_secret");
+    localStorage.removeItem("qr_secret");
+    localStorage.removeItem("qr_code");
+    localStorage.removeItem("isLoggedIn");
+    localStorage.removeItem("staff_id");
+    localStorage.removeItem("staff_name");
+    localStorage.removeItem("staff_username");
+    localStorage.removeItem("permission");
+
+    window.location.replace("/login");
+  };
+
   const onSubmit = values => {
     const payload = {
       token,
@@ -55,20 +99,19 @@ export default function AucationCode() {
     if (showQr) {
       payload.secret = qrSecret;
     }
-    console.log("VERIFY PAYLOAD:", payload);
-    mutate(payload, {
+        mutate(payload, {
       onSuccess: () => {
         localStorage.setItem("isLoggedIn", "true");
         localStorage.removeItem("qr_secret");
         localStorage.removeItem("qr_code");
-        router.replace("/");
+
+        window.location.replace("/");
       },
       onError: error => {
-        console.log(error);
-      },
+              },
     });
   };
-  if (!token) return null;
+  if (isSnapshotLoading || !token) return null;
 
   return (
     <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-[#020817]">
@@ -132,9 +175,9 @@ export default function AucationCode() {
             >
               {isPending ? "Verifying..." : "Verify & Continue"}
             </button>
-            <Link href="/login" className="block text-center text-primary">
+            <button type="button" onClick={handleBackToLogin} className="block w-full text-center text-primary">
               Back to Login
-            </Link>
+            </button>
           </form>
         </div>
       </div>

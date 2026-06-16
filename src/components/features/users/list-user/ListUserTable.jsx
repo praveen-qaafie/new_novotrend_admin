@@ -9,13 +9,16 @@ import TableSearch from "@/components/common/tables/TableSearch";
 import TableWrapper from "@/components/common/tables/TableWrapper";
 
 import { TableCell, TableRow } from "@/components/ui/table";
-import { useAdminUserActionMutation } from "@/services/users/user.mutation";
+import {
+  useAdminUserActionMutation,
+  useGetUserDetailsMutation,
+} from "@/services/users/user.mutation";
 import { useUsersQuery } from "@/services/users/user.query";
 import { useQueryClient } from "@tanstack/react-query";
 import { CheckCircle2, LogOut } from "lucide-react";
 import { useDebounce } from "use-debounce";
 
-import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 const tableHeaders = [
@@ -32,6 +35,7 @@ const tableHeaders = [
 ];
 
 export default function ListUserTable() {
+  const router = useRouter();
   const [search, setSearch] = useState("");
   const [limit, setLimit] = useState(10);
   const [offset, setOffset] = useState(0);
@@ -46,10 +50,10 @@ export default function ListUserTable() {
 
   const queryClient = useQueryClient();
   const { mutate: userAction } = useAdminUserActionMutation();
+  const { mutate: getUserDetails } = useGetUserDetailsMutation();
   // FINAL USERS ARRAY
   const users = data?.response?.users ?? [];
-  console.log("USERS:", users);
-
+  
   // pagination calculations
   const total = Number(data?.response?.total_records) || users.length;
   const currentPage = Math.floor(offset / limit) + 1;
@@ -57,11 +61,7 @@ export default function ListUserTable() {
   // Active status toggle handler (placeholder)
   const handleToggleStatus = user => {
     const action = user.status === "Active" ? "deactive" : "active";
-    console.log("STATUS ACTION:", {
-      user_id: user.user_id,
-      type: action,
-    });
-    const willBeActive = action === "active";
+        const willBeActive = action === "active";
     const queryKey = ["users", limit, offset, debouncedSearch];
 
     // snapshot for rollback
@@ -82,13 +82,11 @@ export default function ListUserTable() {
       },
       {
         onSuccess: res => {
-          console.log("ACTION SUCCESS:", res);
-          // refresh server data to ensure consistency
+                    // refresh server data to ensure consistency
           queryClient.invalidateQueries(queryKey);
         },
         onError: err => {
-          console.log("ACTION ERROR:", err);
-          // rollback
+                    // rollback
           queryClient.setQueryData(queryKey, previous);
         },
       }
@@ -96,29 +94,38 @@ export default function ListUserTable() {
   };
 
   const handleForceLogout = user => {
-    console.log("LOGOUT USER:", user.user_id);
-    userAction(
+        userAction(
       {
         user_id: user.user_id,
         type: "logout",
       },
       {
         onSuccess: res => {
-          console.log("LOGOUT SUCCESS:", res);
-          // show a simple confirmation message
+                    // show a simple confirmation message
           try {
             alert("User logged out successfully");
           } catch (e) {
-            console.log("LOGOUT ALERT ERROR:", e);
-          }
+                      }
         },
         onError: err => {
-          console.log("LOGOUT ERROR:", err);
-          try {
+                    try {
             alert("Failed to logout user");
           } catch (e) {
-            console.log("ALERT ERROR:", e);
-          }
+                      }
+        },
+      }
+    );
+  };
+
+  const handleUserDetails = user => {
+    getUserDetails(
+      {
+        user_id: user.user_id || user.id,
+      },
+      {
+        onSuccess: response => {
+          sessionStorage.setItem("selectedUserDetails", JSON.stringify(response));
+          router.push("/users/user-details");
         },
       }
     );
@@ -185,7 +192,8 @@ export default function ListUserTable() {
         {users.map((user, index) => (
           <TableRow
             key={`${user.user_id}-${index}`}
-            className="border-b border-border transition-all hover:bg-muted/40"
+            onClick={() => handleUserDetails(user)}
+            className="cursor-pointer border-b border-border transition-all hover:bg-muted/40"
           >
             {/* ID */}
             <TableCell className="px-6 py-5 text-sm font-medium text-muted-foreground">
@@ -194,9 +202,12 @@ export default function ListUserTable() {
 
             {/* Email */}
             <TableCell className="px-6 py-5">
-              <Link href="/users/user-details">
-                <p className="text-sm font-medium text-foreground">{user.email}</p>
-              </Link>
+              <button
+                type="button"
+                className="text-left text-sm font-medium text-foreground hover:text-primary hover:underline"
+              >
+                {user.email}
+              </button>
             </TableCell>
 
             {/* Name */}
@@ -207,7 +218,12 @@ export default function ListUserTable() {
                 </div>
 
                 <div>
-                  <p className="text-sm font-semibold text-foreground">{user.name}</p>
+                  <button
+                    type="button"
+                    className="text-left text-sm font-semibold text-foreground hover:text-primary hover:underline"
+                  >
+                    {user.name}
+                  </button>
                 </div>
               </div>
             </TableCell>
@@ -246,7 +262,10 @@ export default function ListUserTable() {
               <div className="flex items-center gap-2">
                 {/* Activate / Deactivate */}
                 <button
-                  onClick={() => handleToggleStatus(user)}
+                  onClick={event => {
+                    event.stopPropagation();
+                    handleToggleStatus(user);
+                  }}
                   className={`group flex h-10 w-10 items-center justify-center rounded-2xl border transition-all duration-300
       ${
         user.status === "Active"
@@ -263,7 +282,10 @@ export default function ListUserTable() {
 
                 {/* Force Logout */}
                 <button
-                  onClick={() => handleForceLogout(user)}
+                  onClick={event => {
+                    event.stopPropagation();
+                    handleForceLogout(user);
+                  }}
                   className="group flex h-10 w-10 items-center justify-center rounded-2xl border border-orange-500/20 bg-orange-500/10 text-orange-500 transition-all duration-300 hover:scale-105 hover:bg-orange-500 hover:text-white"
                 >
                   <LogOut className="h-5 w-5" />

@@ -35,11 +35,9 @@ export default function AcceptList() {
     offset: 0,
     search: "",
   });
-  console.log("ACCEPTED WALLET RESPONSE:", data);
-  // RESPONSE ARRAY
+    // RESPONSE ARRAY
   const acceptedDeposits = data?.response?.records || [];
-  console.log(acceptedDeposits, "hello deposit");
-
+  
   // pagination calculations
   const total = Number(data?.response?.total_records) || 0;
   const currentPage = Math.floor(offset / limit) + 1;

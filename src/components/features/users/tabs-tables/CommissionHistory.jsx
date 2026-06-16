@@ -6,6 +6,7 @@ import TableFooter from "@/components/common/tables/TableFooter";
 import TableSearch from "@/components/common/tables/TableSearch";
 import TableWrapper from "@/components/common/tables/TableWrapper";
 import { TableCell, TableRow } from "@/components/ui/table";
+import { useClientPagination } from "@/hooks/useClientPagination";
 
 const tableHeaders = [
   { label: "S.No", key: "id" },
@@ -16,26 +17,11 @@ const tableHeaders = [
   { label: "Commission", key: "commission" },
 ];
 
-const dummyData = [
-  {
-    id: 1,
-    mt5Id: "MT50001",
-    date: "10-06-2025",
-    order: "ORD1001",
-    volume: "0.50",
-    commission: "$25",
-  },
-  {
-    id: 2,
-    mt5Id: "MT50002",
-    date: "11-06-2025",
-    order: "ORD1002",
-    volume: "1.20",
-    commission: "$60",
-  },
-];
+export default function CommissionHistory({ userDetails }) {
+  const commissions = userDetails?.commission_history ?? [];
+  const { limit, setLimit, offset, setOffset, total, paginatedItems } =
+    useClientPagination(commissions);
 
-export default function CommissionHistory() {
   return (
     <TableWrapper
       title="Commission History"
@@ -46,23 +32,39 @@ export default function CommissionHistory() {
           <ExportDropdown />
         </>
       }
-      footer={<TableFooter />}
+      footer={
+        <TableFooter
+          limit={limit}
+          setLimit={setLimit}
+          offset={offset}
+          setOffset={setOffset}
+          total={total}
+        />
+      }
     >
       <DataTable headers={tableHeaders}>
-        {dummyData.map(row => (
-          <TableRow key={row.id} className="border-b border-border hover:bg-muted/40">
+        {commissions.length === 0 && (
+          <TableRow>
+            <TableCell colSpan={tableHeaders.length} className="py-8 text-center text-sm text-muted-foreground">
+              No commission history found.
+            </TableCell>
+          </TableRow>
+        )}
+
+        {paginatedItems.map((row, index) => (
+          <TableRow key={`${row.order}-${index}`} className="border-b border-border hover:bg-muted/40">
             {/* # */}
-            <TableCell>{row.id}</TableCell>
+            <TableCell>{offset + index + 1}</TableCell>
 
             {/* MT5 ID */}
-            <TableCell className="font-medium">{row.mt5Id}</TableCell>
+            <TableCell className="font-medium">{row.mt5_id || "-"}</TableCell>
 
             {/* DATE */}
             <TableCell className="whitespace-nowrap">{row.date}</TableCell>
 
             {/* ORDER */}
             <TableCell>
-              <span className="text-muted-foreground font-medium">{row.order}</span>
+              <span className="text-muted-foreground font-medium">{row.order || "-"}</span>
             </TableCell>
 
             {/* VOLUME */}

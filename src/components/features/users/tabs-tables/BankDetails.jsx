@@ -6,37 +6,21 @@ import TableFooter from "@/components/common/tables/TableFooter";
 import TableSearch from "@/components/common/tables/TableSearch";
 import TableWrapper from "@/components/common/tables/TableWrapper";
 import { TableCell, TableRow } from "@/components/ui/table";
+import { useClientPagination } from "@/hooks/useClientPagination";
 
 const tableHeaders = [
   { label: "S.No", key: "id" },
-  { label: "Name", key: "name" },
-  { label: "Email", key: "email" },
-  { label: "Bank Image", key: "bankImage" },
-  { label: "Bank Information", key: "bankInfo" },
-  { label: "Date", key: "date" },
-  { label: "Action", key: "action" },
+  { label: "Bank Name", key: "bankName" },
+  { label: "Account No", key: "accountNo" },
+  { label: "IBAN", key: "iban" },
+  { label: "IFSC", key: "ifsc" },
+  { label: "Status", key: "status" },
 ];
 
-const dummyData = [
-  {
-    id: 1,
-    name: "Gigu Testing",
-    email: "gigu@qaafie.com",
-    bankImage: "https://via.placeholder.com/40",
-    bankInfo: "HDFC Bank - 1234567890 - IFSC: HDFC0001234",
-    date: "10-09-2025 14:18:52",
-  },
-  {
-    id: 2,
-    name: "Praveen Suthar",
-    email: "praveen@qaafie.com",
-    bankImage: "",
-    bankInfo: "SBI Bank - 9876543210 - IFSC: SBIN0005678",
-    date: "11-09-2025 11:10:12",
-  },
-];
+export default function BankDetails({ bankDetails = [] }) {
+  const { limit, setLimit, offset, setOffset, total, paginatedItems } =
+    useClientPagination(bankDetails);
 
-export default function BankDetails() {
   return (
     <TableWrapper
       title="Bank Details"
@@ -47,55 +31,36 @@ export default function BankDetails() {
           <ExportDropdown />
         </>
       }
-      footer={<TableFooter />}
+      footer={
+        <TableFooter
+          limit={limit}
+          setLimit={setLimit}
+          offset={offset}
+          setOffset={setOffset}
+          total={total}
+        />
+      }
     >
       <DataTable headers={tableHeaders}>
-        {dummyData.map(row => (
-          <TableRow key={row.id} className="border-b border-border hover:bg-muted/40">
-            {/* # */}
-            <TableCell>{row.id}</TableCell>
-
-            {/* NAME */}
-            <TableCell className="font-medium">{row.name}</TableCell>
-
-            {/* EMAIL */}
-            <TableCell>{row.email}</TableCell>
-
-            {/* BANK IMAGE */}
-            <TableCell>
-              {row.bankImage ? (
-                <img src={row.bankImage} alt="bank" className="h-10 w-10 rounded-lg object-cover" />
-              ) : (
-                <span className="text-muted-foreground text-xs">No Image</span>
-              )}
+        {bankDetails.length === 0 && (
+          <TableRow>
+            <TableCell colSpan={tableHeaders.length} className="py-8 text-center text-sm text-muted-foreground">
+              No bank details found.
             </TableCell>
+          </TableRow>
+        )}
 
-            {/* BANK INFO */}
-            <TableCell className="max-w-[260px] text-sm text-muted-foreground">
-              {row.bankInfo}
-            </TableCell>
-
-            {/* DATE */}
-            <TableCell className="whitespace-nowrap">{row.date}</TableCell>
-
-            {/* ACTION */}
+        {paginatedItems.map((row, index) => (
+          <TableRow key={`${row.account_no}-${index}`} className="border-b border-border hover:bg-muted/40">
+            <TableCell>{offset + index + 1}</TableCell>
+            <TableCell className="font-medium">{row.bank_name || "-"}</TableCell>
+            <TableCell>{row.account_no || "-"}</TableCell>
+            <TableCell>{row.iban || "-"}</TableCell>
+            <TableCell>{row.ifsc || "-"}</TableCell>
             <TableCell>
-              <div className="flex gap-2">
-                <button
-                  className="
-                    rounded-xl
-                    bg-blue-500/10
-                    px-3
-                    py-1.5
-                    text-xs
-                    font-semibold
-                    text-blue-600
-                    hover:bg-emerald-500/20
-                  "
-                >
-                  Pending
-                </button>
-              </div>
+              <span className="rounded-xl bg-blue-500/10 px-3 py-1.5 text-xs font-semibold text-blue-600">
+                {row.status || "-"}
+              </span>
             </TableCell>
           </TableRow>
         ))}

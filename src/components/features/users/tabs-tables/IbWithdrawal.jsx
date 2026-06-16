@@ -6,42 +6,20 @@ import TableFooter from "@/components/common/tables/TableFooter";
 import TableSearch from "@/components/common/tables/TableSearch";
 import TableWrapper from "@/components/common/tables/TableWrapper";
 import { TableCell, TableRow } from "@/components/ui/table";
-import { Eye } from "lucide-react";
+import { useClientPagination } from "@/hooks/useClientPagination";
 
 const tableHeaders = [
   { label: "S.No", key: "id" },
-  { label: "Name", key: "name" },
-  { label: "Email", key: "email" },
   { label: "Date", key: "date" },
   { label: "Amount", key: "amount" },
   { label: "Remark", key: "remark" },
-  { label: "Action", key: "action" },
+  { label: "Status", key: "status" },
 ];
 
-const dummyData = [
-  {
-    id: 1,
-    name: "Rahul Sharma",
-    email: "rahul@example.com",
-    date: "10-06-2025",
-    amount: "$500",
-    remark: "Approved by admin",
-  },
-  {
-    id: 2,
-    name: "Amit Verma",
-    email: "amit@example.com",
-    date: "12-06-2025",
-    amount: "$1200",
-    remark: "Pending verification",
-  },
-];
-
-export default function IbWithdrawal() {
-  const handleView = row => {
-    console.log("View IB Withdrawal:", row);
-    // later: modal or details page
-  };
+export default function IbWithdrawal({ userDetails }) {
+  const ibWithdrawals = userDetails?.ib_withdraw ?? [];
+  const { limit, setLimit, offset, setOffset, total, paginatedItems } =
+    useClientPagination(ibWithdrawals);
 
   return (
     <TableWrapper
@@ -53,52 +31,43 @@ export default function IbWithdrawal() {
           <ExportDropdown />
         </>
       }
-      footer={<TableFooter />}
+      footer={
+        <TableFooter
+          limit={limit}
+          setLimit={setLimit}
+          offset={offset}
+          setOffset={setOffset}
+          total={total}
+        />
+      }
     >
       <DataTable headers={tableHeaders}>
-        {dummyData.map(row => (
-          <TableRow key={row.id} className="border-b border-border hover:bg-muted/40">
+        {ibWithdrawals.length === 0 && (
+          <TableRow>
+            <TableCell colSpan={tableHeaders.length} className="py-8 text-center text-sm text-muted-foreground">
+              No IB withdrawals found.
+            </TableCell>
+          </TableRow>
+        )}
+
+        {paginatedItems.map((row, index) => (
+          <TableRow key={`${row.date}-${index}`} className="border-b border-border hover:bg-muted/40">
             {/* # */}
-            <TableCell>{row.id}</TableCell>
-
-            {/* NAME */}
-            <TableCell className="font-medium">{row.name}</TableCell>
-
-            {/* EMAIL */}
-            <TableCell>{row.email}</TableCell>
+            <TableCell>{offset + index + 1}</TableCell>
 
             {/* DATE */}
             <TableCell className="whitespace-nowrap">{row.date}</TableCell>
 
             {/* AMOUNT */}
-            <TableCell className="font-semibold text-primary">{row.amount}</TableCell>
+            <TableCell className="font-semibold text-primary">${row.amount}</TableCell>
 
             {/* REMARK */}
             <TableCell className="text-muted-foreground">{row.remark}</TableCell>
 
-            {/* ACTION */}
             <TableCell>
-              <button
-                onClick={() => handleView(row)}
-                className="
-                  inline-flex
-                  items-center
-                  gap-2
-                  rounded-2xl
-                  bg-primary/10
-                  px-4
-                  py-2
-                  text-sm
-                  font-semibold
-                  text-primary
-                  transition-all
-                  hover:bg-primary/15
-                  hover:scale-[1.02]
-                "
-              >
-                <Eye className="h-4 w-4" />
-                View
-              </button>
+              <span className="rounded-xl bg-blue-500/10 px-3 py-1.5 text-xs font-semibold text-blue-600">
+                {row.status || "-"}
+              </span>
             </TableCell>
           </TableRow>
         ))}

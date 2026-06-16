@@ -2,13 +2,16 @@
 
 import { UserX } from "lucide-react";
 import { useState } from "react";
+
 import DeactivateConfirmation from "@/components/common/modals/DeactivateConfirmation";
 import DataTable from "@/components/common/tables/DataTable";
 import ExportDropdown from "@/components/common/tables/ExportDropdown";
 import TableFooter from "@/components/common/tables/TableFooter";
 import TableSearch from "@/components/common/tables/TableSearch";
 import TableWrapper from "@/components/common/tables/TableWrapper";
+
 import { TableCell, TableRow } from "@/components/ui/table";
+
 import { useApprovedIBList } from "@/services/ib-managment/ib-managment.query";
 
 const tableHeaders = [
@@ -72,8 +75,8 @@ export default function ListBecomeIB() {
               Loading...
             </TableCell>
           </TableRow>
-        ) : rows?.length > 0 ? (
-          rows?.map((item, index) => (
+        ) : rows.length > 0 ? (
+          rows.map((item, index) => (
             <TableRow
               key={item.user_id}
               className="border-b border-border transition-all hover:bg-muted/40"

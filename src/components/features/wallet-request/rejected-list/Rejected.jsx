@@ -38,12 +38,10 @@ export default function RejectedList() {
   const total = Number(data?.response?.total_records) || 0;
   const currentPage = Math.floor(offset / limit) + 1;
 
-  console.log("REJECTED WALLET RESPONSE:", data);
-
+  
   // SAFE ARRAY
   const rejectedDeposits = data?.response?.records || [];
-  console.log(rejectedDeposits, "hello deposit");
-
+  
   return (
     <TableWrapper
       title="Rejected Deposit List"

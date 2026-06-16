@@ -6,9 +6,3 @@ export const addBankInfo = async (payload) => {
 
   return response.data;
 };
-
-export const getBankInfo = async () => {
-  const response = await api.get(API_ENDPOINT.BANK_INFO.GET_BANK);
-  // console.log("response34", response)
-  return response.data;
-};

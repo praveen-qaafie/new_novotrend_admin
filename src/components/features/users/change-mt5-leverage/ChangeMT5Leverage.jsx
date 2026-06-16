@@ -44,8 +44,7 @@ export default function ChangeMT5Leverage() {
                 decryptedResult?.data?.result || decryptedResult?.result || successMessage;
             }
           } catch (error) {
-            console.log("DECRYPT ERROR:", error);
-          }
+                      }
           toast.success(successMessage);
           resetVerification();
         },

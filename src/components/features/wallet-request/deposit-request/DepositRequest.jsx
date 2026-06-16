@@ -38,10 +38,8 @@ export default function DepositRequest() {
     offset: 0,
     search: "",
   });
-  console.log("WALLET REQUEST LIST:", data);
-  const depositRequests = data?.response?.records || [];
-  console.log("DEPOSIT REQUESTS:", depositRequests);
-
+    const depositRequests = data?.response?.records || [];
+  
   // pagination calculations
   const total = Number(data?.response?.total_records) || 0;
   const currentPage = Math.floor(offset / limit) + 1;

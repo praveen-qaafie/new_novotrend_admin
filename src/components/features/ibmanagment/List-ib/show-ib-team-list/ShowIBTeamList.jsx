@@ -35,8 +35,7 @@ export default function ShowIBTeamList() {
 
   const rows = data?.data?.response?.data || [];
 
-  console.log("IB TEAM LIST =>", rows);
-
+  
   return (
     <TableWrapper
       title="IB Team List"

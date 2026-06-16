@@ -19,12 +19,10 @@ export const useAddBankAccountMutation = () => {
   return useMutation({
     mutationFn: addBankAccount,
     onSuccess: data => {
-      console.log("ADD Bank Account SUCCESS:", data);
-      toast.success(getSafeSuccessMessage(data, "Bank account added successfully"));
+            toast.success(getSafeSuccessMessage(data, "Bank account added successfully"));
     },
     onError: error => {
-      console.log("ADD Bank Account :", error);
-      toast.error(error?.message || "Unable to add bank account");
+            toast.error(error?.message || "Unable to add bank account");
     },
   });
 };

@@ -65,8 +65,7 @@ export default function NewKyc() {
     search: debouncedSearch,
   });
   const newKycDate = data?.response?.records || [];
-  console.log(newKycDate, "this is new kyc data");
-  const total = Number(data?.response?.total_records) || 0;
+    const total = Number(data?.response?.total_records) || 0;
 
   return (
     <>

@@ -40,10 +40,10 @@ export default function MT5UserList() {
     offset,
     search: debouncedSearch,
   });
-  // backend returns mt5_users as an array directly
-  const users = data?.response?.mt5_users ?? [];
+  const mt5Response = data?.result?.data?.response ?? data?.response ?? {};
+  const users = mt5Response?.mt5_users ?? [];
 
-  const total = Number(data?.response?.total_records) || users.length;
+  const total = Number(mt5Response?.total_records) || users.length;
 
   const handleView = user => {
     setSelectedUser(user);

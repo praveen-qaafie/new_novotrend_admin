@@ -4,8 +4,7 @@ import apiClient from "../../lib/axios/apiClient";
 
 // LOGIN
 export const loginUser = async (payload) => {
-  console.log("LOGIN PAYLOAD:", payload);
-
+  
   const encryptedPayload = encryptData(payload);
 
   const response = await apiClient.post(API_ENDPOINT.AUTH.LOGIN, {
@@ -14,8 +13,7 @@ export const loginUser = async (payload) => {
 
   const decrypted = decryptData(response.data);
 
-  console.log("LOGIN RESPONSE:", decrypted);
-
+  
   if (decrypted?.data?.status !== 200) {
     throw new Error(decrypted?.data?.result || "Invalid Username or Password");
   }
@@ -32,19 +30,15 @@ export const loginUser = async (payload) => {
 // VERIFY AUTH
 export const verifyAuthCode = async (payload) => {
   // BEFORE ENCRYPTION
-  console.log("VERIFY PLAIN PAYLOAD:", payload);
-  const encryptedPayload = encryptData(payload);
+    const encryptedPayload = encryptData(payload);
   // AFTER ENCRYPTION
-  console.log("VERIFY ENCRYPTED:", encryptedPayload);
-  const response = await apiClient.post(API_ENDPOINT.AUTH.VERIFYAUTH, {
+    const response = await apiClient.post(API_ENDPOINT.AUTH.VERIFYAUTH, {
     data: encryptedPayload,
   });
-  console.log("VERIFY RAW RESPONSE:", response.data);
-  const decrypted = decryptData(response.data);
+    const decrypted = decryptData(response.data);
 
   // AFTER DECRYPTION
-  console.log("VERIFY DECRYPTED RESPONSE:", decrypted);
-
+  
   if (decrypted?.data?.status !== 200) {
     throw new Error(decrypted?.data?.result || "Verification Failed");
   }

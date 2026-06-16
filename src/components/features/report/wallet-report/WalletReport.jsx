@@ -29,8 +29,7 @@ export default function WalletReport() {
     sdate: "",
     edate: "",
   });
-  console.log("Wallet Report Filters", filters);
-
+  
   const { data, isLoading, isError } = useWalletReportQuery({
     limit,
     offset,
@@ -39,14 +38,12 @@ export default function WalletReport() {
     edate: filters.edate,
   });
   const walletData = data?.response?.wallet_history || [];
-  console.log(walletData, "this is wallet history data");
-  const total = Number(data?.response?.total_records) || 0;
+    const total = Number(data?.response?.total_records) || 0;
   return (
     <>
       <DateInputFilter
         onSubmit={({ sdate, edate }) => {
-          console.log("FILTER CHANGED", { sdate, edate });
-          setOffset(0);
+                    setOffset(0);
           setFilters({
             sdate,
             edate,

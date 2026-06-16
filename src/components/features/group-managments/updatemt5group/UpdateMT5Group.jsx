@@ -39,8 +39,7 @@ export default function UpdateMT5Group() {
         status: group?.status,
       })) || [];
 
-  console.log("GROUP OPTIONS:", groupOptions);
-
+  
   // VERIFY ACCOUNT
   const { mutate: verifyAccount, isPending: verifying } = useGetUsernameByAccountNoMutation();
 
@@ -54,14 +53,12 @@ export default function UpdateMT5Group() {
       { accno },
       {
         onSuccess: data => {
-          console.log("ACCOUNT VERIFIED:", data);
-          setAccountVerified(true);
+                    setAccountVerified(true);
           setVerifiedUser(data?.response?.user_name || "");
         },
 
         onError: error => {
-          console.log("VERIFY ERROR:", error);
-          setAccountVerified(false);
+                    setAccountVerified(false);
           setVerifiedUser(null);
           toast.error(error?.message || "Invalid MT5 ID");
         },
@@ -79,11 +76,9 @@ export default function UpdateMT5Group() {
       },
       {
         onSuccess: data => {
-          console.log("RAW SUCCESS RESPONSE:", data);
-          // DECRYPT RESULT
+                    // DECRYPT RESULT
           const decryptedResult = decryptData(data.result);
-          console.log("DECRYPTED RESULT:", decryptedResult);
-          toast.success(decryptedResult?.data?.result || "MT5 Group updated successfully");
+                    toast.success(decryptedResult?.data?.result || "MT5 Group updated successfully");
           // RESET FORM
           reset();
           // RESET STATES

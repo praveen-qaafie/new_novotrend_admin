@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { USER_TABS } from "./tab-config";
 
-export default function UserTabs() {
+export default function UserTabs({ userDetails, bankDetails }) {
   const [activeTab, setActiveTab] = useState("trading");
 
   const ActiveComponent = USER_TABS.find(tab => tab.value === activeTab)?.component;
@@ -31,7 +31,9 @@ export default function UserTabs() {
 
       {/* TAB CONTENT AREA */}
       <div className="rounded-3xl border border-border bg-card p-6 shadow-sm">
-        {ActiveComponent ? <ActiveComponent /> : null}
+        {ActiveComponent ? (
+          <ActiveComponent userDetails={userDetails} bankDetails={bankDetails} />
+        ) : null}
       </div>
     </div>
   );

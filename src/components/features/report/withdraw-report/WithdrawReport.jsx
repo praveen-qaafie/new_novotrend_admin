@@ -52,8 +52,7 @@ export default function WithdrawReport() {
   });
   const summary = data?.response?.summary || {};
   const reportData = data?.response?.withdraw_history || [];
-  console.log(reportData, "this is report data");
-  const total = Number(data?.response?.total_records) || 0;
+    const total = Number(data?.response?.total_records) || 0;
 
   const handleChange = (field, value) => {
     setFilters(prev => ({
@@ -62,8 +61,7 @@ export default function WithdrawReport() {
     }));
   };
   const handleFilter = () => {
-    console.log("FILTERS:", filters);
-  };
+      };
   return (
     <div className="space-y-6">
       {/* STATS */}

@@ -40,8 +40,7 @@ export default function WithdrawlRequest() {
     search: debouncedSearch,
   });
   const withdrawalRequests = data?.response?.withdrawal_requests || [];
-  console.log(withdrawalRequests, "this is withdrawal request");
-  // pagination calculations
+    // pagination calculations
   const total = Number(data?.response?.total_records) || 0;
   const currentPage = Math.floor(offset / limit) + 1;
   return (

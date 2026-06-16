@@ -11,11 +11,16 @@ import { ChevronDown, Menu } from "lucide-react";
 
 import { sidebarItems } from "@/confiq/sidebar";
 import { useAuth } from "@/context/AuthContext";
+import { usePermissions } from "@/hooks/usePermission";
+import { getAllowedSidebarItems } from "@/lib/sidebarAccess";
 import { cn } from "@/lib/utils";
 
 export default function MobileSidebar() {
   const pathname = usePathname();
   const { user } = useAuth();
+  const { allowedPermissions, isLoading } = usePermissions();
+
+  const filteredSidebarItems = getAllowedSidebarItems(sidebarItems, allowedPermissions);
 
   return (
     <Sheet>
@@ -44,7 +49,15 @@ export default function MobileSidebar() {
         </div>
         {/* Navigation */}
         <div className="space-y-8 p-4">
-          {sidebarItems.map(section => (
+          {isLoading &&
+            Array.from({ length: 9 }).map((_, index) => (
+              <div key={index} className="flex items-center gap-3 rounded-2xl px-3 py-3">
+                <div className="h-5 w-5 animate-pulse rounded-md bg-muted" />
+                <div className="h-4 w-36 animate-pulse rounded-full bg-muted" />
+              </div>
+            ))}
+
+          {!isLoading && filteredSidebarItems.map(section => (
             <div key={section.title}>
               <h3 className="mb-3 px-3 text-xs font-semibold uppercase text-muted-foreground">
                 {section.title}

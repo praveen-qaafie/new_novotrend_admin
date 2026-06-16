@@ -7,8 +7,7 @@ export const getMT5GroupList = async ({
   offset = 0,
   search = "",
 }) => {
-  console.log("GET GROUP LIST API HIT");
-  const token = localStorage.getItem("token");
+    const token = localStorage.getItem("token");
   if (!token) {
     throw new Error("Session expired");
   }
@@ -19,11 +18,9 @@ export const getMT5GroupList = async ({
     offset,
     search,
   };
-  console.log("GROUP LIST PAYLOAD:", payload);
-  // SECURE API CALL
+    // SECURE API CALL
   const data = await securePost(API_ENDPOINT.GROUPS.LISTGROUP, payload);
-  console.log("GROUP LIST RESPONSE:", data);
-  // VALIDATION
+    // VALIDATION
   if (data?.status !== 200) {
     throw new Error(data?.result || "Unable to fetch groups");
   }
@@ -32,10 +29,8 @@ export const getMT5GroupList = async ({
 
 // group Add
 export const addMT5Group = async ({ groupname, groupnamemt5, leverage }) => {
-  console.log("Add Group API HIT");
-  const token = localStorage.getItem("token");
-  console.log("Token Add:", token);
-  if (!token) {
+    const token = localStorage.getItem("token");
+    if (!token) {
     throw new Error("Session Expired");
   }
   const payload = {
@@ -44,10 +39,8 @@ export const addMT5Group = async ({ groupname, groupnamemt5, leverage }) => {
     groupnamemt5,
     leverage,
   };
-  console.log("Add Group Payload:", payload);
-  const data = await securePost(API_ENDPOINT.GROUPS.CREATE_MT5_GROUP, payload);
-  console.log("Add Group Response:", data);
-  if (data?.status !== 200) {
+    const data = await securePost(API_ENDPOINT.GROUPS.CREATE_MT5_GROUP, payload);
+    if (data?.status !== 200) {
     throw new Error(data?.result || "Unable to create group");
   }
 };
@@ -60,12 +53,10 @@ export const editMT5Group = async ({
   leverage,
   group_status,
 }) => {
-  console.log("EDIT GROUP API HIT");
-
+  
   const token = localStorage.getItem("token");
 
-  console.log("EDIT GROUP TOKEN:", token);
-
+  
   if (!token) {
     throw new Error("Session Expired");
   }
@@ -80,13 +71,11 @@ export const editMT5Group = async ({
     group_status,
   };
 
-  console.log("EDIT GROUP PAYLOAD:", payload);
-
+  
   // SECURE API CALL
   const data = await securePost(API_ENDPOINT.GROUPS.EDIT_MT5_GROUP, payload);
 
-  console.log("EDIT GROUP RESPONSE:", data);
-
+  
   // VALIDATION
   if (data?.status !== 200) {
     throw new Error(data?.result || "Unable to edit group");
@@ -97,11 +86,9 @@ export const editMT5Group = async ({
 
 // UPDATE MT5 GROUP
 export const updateMT5Group = async ({ accno, groupid }) => {
-  console.log("UPDATE GROUP API HIT");
-
+  
   const token = localStorage.getItem("token");
-  console.log("UPDATE GROUP TOKEN:", token);
-  if (!token) {
+    if (!token) {
     throw new Error("Session Expired");
   }
   // PAYLOAD
@@ -110,11 +97,9 @@ export const updateMT5Group = async ({ accno, groupid }) => {
     accno,
     groupid,
   };
-  console.log("UPDATE GROUP PAYLOAD:", payload);
-  // SECURE API CALL
+    // SECURE API CALL
   const data = await securePost(API_ENDPOINT.GROUPS.UPDATE_MT5_GROUP, payload);
-  console.log("UPDATE GROUP RESPONSE:", data);
-  // VALIDATION
+    // VALIDATION
   if (data?.status !== 200) {
     throw new Error(data?.result || "Unable to update group");
   }

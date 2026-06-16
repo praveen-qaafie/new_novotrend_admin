@@ -5,8 +5,7 @@ export const useWalletRequestList = ({ limit, offset, search }) => {
   return useQuery({
     queryKey: ["wallet-request-list", limit, offset, search],
     queryFn: async () => {
-      console.log("QUERY FUNCTION RUNNING");
-      return await getWalletRequestList({
+            return await getWalletRequestList({
         limit,
         offset,
         search,
@@ -20,8 +19,7 @@ export const useAcceptWalletRequestList = ({ limit, offset, search }) => {
   return useQuery({
     queryKey: ["accept-wallet-request-list", limit, offset, search],
     queryFn: async () => {
-      console.log("ACCEPT QUERY FUNCTION RUNNING");
-      return await acceptWalletRequest({
+            return await acceptWalletRequest({
         limit,
         offset,
         search,
@@ -35,8 +33,7 @@ export const useRejectWalletRequestList = ({ limit, offset, search }) => {
   return useQuery({
     queryKey: ["reject-wallet-request-list", limit, offset, search],
     queryFn: async () => {
-      console.log("ACCEPT QUERY FUNCTION RUNNING");
-      return await rejectWalletRequest({
+            return await rejectWalletRequest({
         limit,
         offset,
         search,

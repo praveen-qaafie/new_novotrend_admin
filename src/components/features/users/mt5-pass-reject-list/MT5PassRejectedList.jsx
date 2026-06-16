@@ -32,8 +32,7 @@ export default function MT5PassRejectedList() {
 
   // FINAL USERS ARRAY
   const rejectpasswordlist = data?.response?.data || [];
-  console.log(rejectpasswordlist, "rejectpasswordlist");
-
+  
   // pagination calculations
   const total = Number(data?.response?.total_records) || rejectpasswordlist?.length;
   const currentPage = Math.floor(offset / limit) + 1;

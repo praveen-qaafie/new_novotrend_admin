@@ -42,8 +42,7 @@ export default function ListEmployee() {
 
   const employees = data?.response?.employee_list || [];
 
-  console.log(employees, "employee list data");
-  // pagination calculations
+    // pagination calculations
   const total = Number(data?.response?.total_records) || employees.length;
   const currentPage = Math.floor(offset / limit) + 1;
   const deleteEmployeeMutation = useDeleteEmployeeMutation();

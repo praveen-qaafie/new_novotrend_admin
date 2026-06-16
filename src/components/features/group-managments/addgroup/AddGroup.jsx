@@ -21,18 +21,15 @@ export default function AddGroup() {
       },
       {
         onSuccess: response => {
-          console.log("ADD GROUP SUCCESS:", response);
-          let successMessage = response?.result;
+                    let successMessage = response?.result;
           // DECRYPT RESULT
           try {
             if (typeof response?.result === "string") {
               const decryptedResult = decryptData(response.result);
-              console.log("DECRYPTED RESULT:", decryptedResult);
-              successMessage = decryptedResult?.data?.result || decryptedResult;
+                            successMessage = decryptedResult?.data?.result || decryptedResult;
             }
           } catch (err) {
-            console.log("RESULT DECRYPT FAILED:", err);
-          }
+                      }
           toast.success(successMessage || "Group created successfully");
 
           reset();

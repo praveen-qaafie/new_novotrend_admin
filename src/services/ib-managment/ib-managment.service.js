@@ -1,7 +1,7 @@
 import { API_ENDPOINT } from "@/constants/endpoints";
 import api from "@/utils/axiosInstance";
 
-// IB LIST
+// IB LIST here 
 export const getIBList = async (payload) => {
   const response = await api.post(API_ENDPOINT.IB_MANAGEMENT.IB_LIST, payload);
   return response.data;
@@ -23,8 +23,7 @@ export const getIBLevelList = async (payload) => {
     API_ENDPOINT.IB_MANAGEMENT.IB_LEVEL_LIST,
     payload,
   );
-  console.log("IB Level List Response:", response.data);
-  return response.data;
+    return response.data;
 };
 
 // IB Showdetails
@@ -45,14 +44,12 @@ export const getRejectedIBList = async ({ limit, offset, search }) => {
     search,
   });
 
-  console.log("IB Rejected List Response:", response.data);
   return response.data;
 };
 
 // IB-MOVE
 export const moveIB = async (payload) => {
   const response = await api.post(API_ENDPOINT.IB_MANAGEMENT.IB_MOVE, payload);
-
   return response.data;
 };
 
@@ -88,6 +85,8 @@ export const getPendingIBList = async ({
   });
   return response.data;
 };
+
+// here endpoint 
 
 export const ibRequestAction = async ({ type, user_id, status }) => {
   const response = await api.post(

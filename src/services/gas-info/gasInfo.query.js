@@ -5,8 +5,7 @@ export const useGasInfoQuery = ({ type_chain }) => {
   return useQuery({
     queryKey: ["gas-info", type_chain],
     queryFn: async () => {
-      console.log("Get Gas Info Query Running:", type_chain);
-
+      
       return await getGasInfo({
         type_chain,
       });

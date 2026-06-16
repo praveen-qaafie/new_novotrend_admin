@@ -61,8 +61,7 @@ export default function GasInfoForm({ chain }) {
     type_chain: chain,
   });
 
-  console.log(`${chain} Gas Info Data:`, data);
-
+  
   const gasInfo = getGasInfoData(data);
   const privateKeyValue = getPrivateKey(gasInfo);
   const currentAddress = isLoading ? "Loading..." : isError ? "Unable to load info" : getAddress(gasInfo);

@@ -64,8 +64,7 @@ export default function DepositWallet() {
   const { mutate: addDepositWallet, isPending } = useAddDepositWalletMutation();
   const { data, isLoading, isError } = useDepositWalletQuery();
 
-  console.log("Deposit Wallet Data:", data);
-
+  
   const walletData = getDepositWalletData(data);
   const getCurrentAddress = chain => {
     if (isLoading) {

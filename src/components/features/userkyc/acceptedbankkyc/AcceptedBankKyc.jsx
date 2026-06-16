@@ -71,8 +71,7 @@ export default function AcceptedBankKyc() {
     edate: filters.edate,
   });
   const acceptedBankKyc = data?.response?.records || [];
-  console.log(acceptedBankKyc, "accepted bank kyc data ");
-  const total = Number(data?.response?.total_records) || 0;
+    const total = Number(data?.response?.total_records) || 0;
   return (
     <>
       <DateInputFilter

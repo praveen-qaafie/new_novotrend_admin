@@ -6,11 +6,10 @@ import TableFooter from "@/components/common/tables/TableFooter";
 import TableSearch from "@/components/common/tables/TableSearch";
 import TableWrapper from "@/components/common/tables/TableWrapper";
 import { TableCell, TableRow } from "@/components/ui/table";
+import { useClientPagination } from "@/hooks/useClientPagination";
 
 const tableHeaders = [
   { label: "S.No", key: "id" },
-  { label: "Name", key: "name" },
-  { label: "Email", key: "email" },
   { label: "Date", key: "date" },
   { label: "Amount", key: "amount" },
   { label: "From", key: "from" },
@@ -18,30 +17,11 @@ const tableHeaders = [
   { label: "Note", key: "note" },
 ];
 
-const dummyData = [
-  {
-    id: 1,
-    name: "Gigu Testing",
-    email: "gigu@qaafie.com",
-    date: "10-09-2025 14:18:52",
-    amount: "250.00",
-    from: "Main Wallet",
-    to: "Trading Account",
-    note: "Internal transfer completed",
-  },
-  {
-    id: 2,
-    name: "Praveen Suthar",
-    email: "praveen@qaafie.com",
-    date: "11-09-2025 11:10:12",
-    amount: "500.00",
-    from: "IB Wallet",
-    to: "Main Wallet",
-    note: "Transfer for trading",
-  },
-];
+export default function InternalTransfer({ userDetails }) {
+  const transfers = userDetails?.internal_transfer ?? [];
+  const { limit, setLimit, offset, setOffset, total, paginatedItems } =
+    useClientPagination(transfers);
 
-export default function InternalTransfer() {
   return (
     <TableWrapper
       title="Internal Transfer"
@@ -52,19 +32,29 @@ export default function InternalTransfer() {
           <ExportDropdown />
         </>
       }
-      footer={<TableFooter />}
+      footer={
+        <TableFooter
+          limit={limit}
+          setLimit={setLimit}
+          offset={offset}
+          setOffset={setOffset}
+          total={total}
+        />
+      }
     >
       <DataTable headers={tableHeaders}>
-        {dummyData.map(row => (
-          <TableRow key={row.id} className="border-b border-border hover:bg-muted/40">
+        {transfers.length === 0 && (
+          <TableRow>
+            <TableCell colSpan={tableHeaders.length} className="py-8 text-center text-sm text-muted-foreground">
+              No internal transfers found.
+            </TableCell>
+          </TableRow>
+        )}
+
+        {paginatedItems.map((row, index) => (
+          <TableRow key={`${row.date}-${index}`} className="border-b border-border hover:bg-muted/40">
             {/* # */}
-            <TableCell>{row.id}</TableCell>
-
-            {/* NAME */}
-            <TableCell className="font-medium">{row.name}</TableCell>
-
-            {/* EMAIL */}
-            <TableCell>{row.email}</TableCell>
+            <TableCell>{offset + index + 1}</TableCell>
 
             {/* DATE */}
             <TableCell className="whitespace-nowrap">{row.date}</TableCell>
@@ -75,14 +65,14 @@ export default function InternalTransfer() {
             {/* FROM */}
             <TableCell>
               <span className="rounded-xl bg-blue-500/10 px-3 py-1 text-xs font-medium text-blue-600">
-                {row.from}
+                {row.from_account || "-"}
               </span>
             </TableCell>
 
             {/* TO */}
             <TableCell>
               <span className="rounded-xl bg-emerald-500/10 px-3 py-1 text-xs font-medium text-emerald-600">
-                {row.to}
+                {row.to_account || "-"}
               </span>
             </TableCell>
 

@@ -35,8 +35,7 @@ export default function CancelDiscountList() {
   });
 
   const cancelDiscountList = data?.response.cancel_deposit_list || [];
-  console.log(cancelDiscountList, "cancel list data");
-  // pagination calculations
+    // pagination calculations
   const total = Number(data?.response?.total_records) || cancelDiscountList.length;
   const currentPage = Math.floor(offset / limit) + 1;
   return (

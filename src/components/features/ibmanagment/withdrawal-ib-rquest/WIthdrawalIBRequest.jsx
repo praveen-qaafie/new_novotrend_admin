@@ -229,12 +229,7 @@ export default function WithdrawalIBRequest() {
         actionType={actionStatus}
         isLoading={isPending}
         onSubmit={(remark) => {
-          console.log("Payload:", {
-            status: actionStatus,
-            recordid: selectedRequest?.id,
-            remark,
-          });
-
+          
           withdrawalActionRemark(
             {
               status: actionStatus,
@@ -243,14 +238,12 @@ export default function WithdrawalIBRequest() {
             },
             {
               onSuccess: (response) => {
-                console.log("Success:", response);
-
+                
                 setOpen(false);
               },
 
               onError: (error) => {
-                console.log("Error:", error);
-              },
+                              },
             },
           );
         }}

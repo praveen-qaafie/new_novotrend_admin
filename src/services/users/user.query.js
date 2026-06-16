@@ -1,12 +1,18 @@
 import { useQuery } from "@tanstack/react-query";
-import { getMT5PasswordList, getMT5UserList, getUserList } from "./user.service";
+import {
+  getMT5PasswordList,
+  getMT5UserList,
+  getUserIbDetails,
+  getUserList,
+  getUserLiveTrade,
+  getUserTradingReport,
+} from "./user.service";
 
 export const useUsersQuery = ({ token, limit, offset, search }) => {
   return useQuery({
     queryKey: ["users", limit, offset, search],
     queryFn: async () => {
-      console.log("QUERY FUNCTION RUNNING");
-      return await getUserList({
+            return await getUserList({
         token,
         limit,
         offset,
@@ -27,6 +33,30 @@ export const useMT5UsersQuery = ({ limit, offset, search }) => {
         search,
       }),
     keepPreviousData: true,
+  });
+};
+
+export const useUserIbDetailsQuery = ({ user_id }) => {
+  return useQuery({
+    queryKey: ["user-ib-details", user_id],
+    queryFn: () => getUserIbDetails({ user_id }),
+    enabled: Boolean(user_id),
+  });
+};
+
+export const useUserLiveTradeQuery = ({ user_id, limit = 10, offset = 0 }) => {
+  return useQuery({
+    queryKey: ["user-live-trade", user_id, limit, offset],
+    queryFn: () => getUserLiveTrade({ user_id, limit, offset }),
+    enabled: Boolean(user_id),
+  });
+};
+
+export const useUserTradingReportQuery = ({ user_id }) => {
+  return useQuery({
+    queryKey: ["user-trading-report", user_id],
+    queryFn: () => getUserTradingReport({ user_id }),
+    enabled: Boolean(user_id),
   });
 };
 

@@ -126,8 +126,7 @@ const getSuccessMessage = (response, fallback) => {
       decryptedResult?.message ||
       decryptedResult;
   } catch (err) {
-    console.log("RESULT DECRYPT FAILED:", err);
-  }
+      }
 
   return typeof successMessage === "string" && !successMessage.includes("::")
     ? successMessage

@@ -5,19 +5,19 @@ import Image from "next/image";
 export default function UserInfoCard({ user }) {
   const personalDetails = [
     { label: "Country", value: user?.country || "INDIA" },
-    { label: "City", value: user?.city || "Surat" },
-    { label: "State", value: user?.state || "Gujarat" },
-    { label: "Zip Code", value: user?.zipCode || "395006" },
+    { label: "City", value: user?.city || "-" },
+    { label: "State", value: user?.state || "-" },
+    { label: "Zip Code", value: user?.zip_code || user?.zipCode || "-" },
     { label: "Address", value: user?.address || "-" },
-    { label: "Date of Birth", value: user?.dob || "2025-11-02" },
-    { label: "Registration Date", value: user?.registrationDate || "2025-09-09 10:56:24" },
+    { label: "Date of Birth", value: user?.dob || "-" },
+    { label: "Registration Date", value: user?.registration_date || user?.registrationDate || "-" },
     { label: "Terms and Agreement Accepted", value: user?.termsAccepted || "Accepted" },
     {
       label: "Total Wallet Balance",
-      value: user?.walletBalance ? `$${user.walletBalance}` : "$995.00",
+      value: `$${user?.wallet_balance || user?.walletBalance || "0.00"}`,
     },
-    { label: "Total Deposit", value: user?.totalDeposit ? `$${user.totalDeposit}` : "$1136.00" },
-    { label: "Total Withdrawal", value: user?.totalWithdrawal ?? 3 },
+    { label: "Total Deposit", value: `$${user?.total_deposit || user?.totalDeposit || "0.00"}` },
+    { label: "Total Withdrawal", value: `$${user?.total_withdrawal || user?.totalWithdrawal || "0.00"}` },
   ];
 
   return (
@@ -35,10 +35,10 @@ export default function UserInfoCard({ user }) {
           </div>
           <div>
             <h2 className="text-xl font-semibold text-foreground">
-              {user?.name || "Gigu testing"}
+              {user?.name || "-"}
             </h2>
-            <p className="mt-1 text-sm text-muted-foreground">{user?.email || "gigu@qaafie.com"}</p>
-            <p className="mt-2 text-xs text-muted-foreground">{user?.phone || "1234567483"}</p>
+            <p className="mt-1 text-sm text-muted-foreground">{user?.email || "-"}</p>
+            <p className="mt-2 text-xs text-muted-foreground">{user?.mobile || user?.phone || "-"}</p>
           </div>
         </div>
 

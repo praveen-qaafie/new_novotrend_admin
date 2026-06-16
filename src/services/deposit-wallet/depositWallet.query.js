@@ -5,8 +5,7 @@ export const useDepositWalletQuery = () => {
   return useQuery({
     queryKey: ["deposit-wallet"],
     queryFn: async () => {
-      console.log("Get Deposit Wallet Query Running");
-
+      
       return await getDepositWallet();
     },
   });

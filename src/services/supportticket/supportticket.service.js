@@ -96,8 +96,7 @@ const getApiErrorMessage = data => {
 };
 
 const getSupportTicketList = async ({ endpoint, label, errorMessage, limit, offset, search }) => {
-  console.log(`${label} API HIT`);
-
+  
   const token = localStorage.getItem("token");
 
   if (!token) {
@@ -111,12 +110,10 @@ const getSupportTicketList = async ({ endpoint, label, errorMessage, limit, offs
     search: search?.trim() || "",
   };
 
-  console.log(`${label} PAYLOAD:`, payload);
-
+  
   const data = unwrapNestedEncryptedResult(await securePost(endpoint, payload));
 
-  console.log(`${label} RESPONSE:`, data);
-
+  
   if (data?.status !== 200) {
     throw new Error(data?.result || errorMessage);
   }
@@ -147,8 +144,7 @@ export const getCloseSupportTicketList = ({ limit = 10, offset = 0, search = "" 
 };
 
 export const getSupportTicketDetails = async ({ ticket_id }) => {
-  console.log("GET SUPPORT TICKET DETAILS API HIT");
-
+  
   const token = localStorage.getItem("token");
 
   if (!token) {
@@ -160,14 +156,12 @@ export const getSupportTicketDetails = async ({ ticket_id }) => {
     ticket_id,
   };
 
-  console.log("GET SUPPORT TICKET DETAILS PAYLOAD:", payload);
-
+  
   const data = unwrapNestedEncryptedResult(
     await securePost(API_ENDPOINT.SUPPORT_TICKET.TICKET_DETAILS, payload)
   );
 
-  console.log("GET SUPPORT TICKET DETAILS RESPONSE:", data);
-
+  
   if (data?.status !== 200) {
     throw new Error(data?.result || "Unable to fetch support ticket details");
   }
@@ -176,8 +170,7 @@ export const getSupportTicketDetails = async ({ ticket_id }) => {
 };
 
 export const replySupportTicket = async ({ ticket_id, remark, close_ticket = "0" }) => {
-  console.log("REPLY SUPPORT TICKET API HIT");
-
+  
   const token = localStorage.getItem("token");
 
   if (!token) {
@@ -191,8 +184,7 @@ export const replySupportTicket = async ({ ticket_id, remark, close_ticket = "0"
     close_ticket,
   };
 
-  console.log("REPLY SUPPORT TICKET PAYLOAD:", payload);
-
+  
   let data;
 
   try {
@@ -202,8 +194,7 @@ export const replySupportTicket = async ({ ticket_id, remark, close_ticket = "0"
     throw new Error(getApiErrorMessage(errorData) || error?.message);
   }
 
-  console.log("REPLY SUPPORT TICKET RESPONSE:", data);
-
+  
   if (data?.status !== 200) {
     throw new Error(getApiErrorMessage(data));
   }
@@ -217,8 +208,7 @@ export const replySupportTicketWithAttachment = async ({
   close_ticket = "0",
   attachment,
 }) => {
-  console.log("REPLY SUPPORT TICKET WITH ATTACHMENT API HIT");
-
+  
   const token = localStorage.getItem("token");
 
   if (!token) {
@@ -232,9 +222,7 @@ export const replySupportTicketWithAttachment = async ({
     close_ticket,
   };
 
-  console.log("REPLY SUPPORT TICKET WITH ATTACHMENT PAYLOAD:", payload);
-  console.log("REPLY SUPPORT TICKET ATTACHMENT:", attachment);
-
+    
   const requestBody = new FormData();
   const encryptedPayload = encryptData(payload);
 
@@ -244,11 +232,7 @@ export const replySupportTicketWithAttachment = async ({
     requestBody.append("select_img", attachment, attachment.name);
   }
 
-  console.log("REPLY SUPPORT TICKET WITH ATTACHMENT FORM DATA:", {
-    data: encryptedPayload,
-    select_img: attachment,
-  });
-
+  
   let response;
 
   try {
@@ -264,8 +248,7 @@ export const replySupportTicketWithAttachment = async ({
 
   const data = unwrapNestedEncryptedResult(response.data);
 
-  console.log("REPLY SUPPORT TICKET WITH ATTACHMENT RESPONSE:", data);
-
+  
   if (data?.status !== 200) {
     throw new Error(getApiErrorMessage(data));
   }

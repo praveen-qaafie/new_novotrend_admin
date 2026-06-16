@@ -52,8 +52,7 @@ export default function RejectedBankHistory() {
     search: debouncedSearch,
   });
   const rejectedBankHistory = data?.response?.data || [];
-  console.log(rejectedBankHistory, "Bank rejcted History Data ");
-  const total = Number(data?.response?.total_records) || 0;
+    const total = Number(data?.response?.total_records) || 0;
   return (
     <TableWrapper
       title="Rejected Bank History"

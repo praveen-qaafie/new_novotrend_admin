@@ -64,21 +64,18 @@ export default function CreateMT5Account() {
       },
       {
         onSuccess: response => {
-          console.log("CREATE MT5 ACCOUNT SUCCESS:", response);
-
+          
           let successMessage = response?.result;
 
           try {
             if (typeof response?.result === "string") {
               const decryptedResult = decryptData(response.result);
 
-              console.log("DECRYPTED RESULT:", decryptedResult);
-
+              
               successMessage = decryptedResult?.data?.result || decryptedResult;
             }
           } catch (err) {
-            console.log("RESULT DECRYPT FAILED:", err);
-          }
+                      }
 
           toast.success(successMessage || "MT5 Account created successfully");
 
@@ -87,8 +84,7 @@ export default function CreateMT5Account() {
         },
 
         onError: error => {
-          console.log("CREATE MT5 ACCOUNT ERROR:", error);
-
+          
           toast.error(error?.message || "Failed to create MT5 account");
         },
       }

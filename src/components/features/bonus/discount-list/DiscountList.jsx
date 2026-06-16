@@ -34,8 +34,7 @@ export default function DiscountList() {
   });
 
   const discountList = data?.response?.discount_list || [];
-  console.log(discountList, "discount list data");
-  // pagination calculations
+    // pagination calculations
   const total = Number(data?.response?.total_records) || discountList.length;
   const currentPage = Math.floor(offset / limit) + 1;
   return (

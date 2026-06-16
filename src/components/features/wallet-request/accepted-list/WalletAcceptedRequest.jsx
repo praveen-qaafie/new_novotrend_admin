@@ -21,8 +21,7 @@ export default function WalletAcceptedRequest({ open, onOpenChange, selectedRequ
   const { mutate: walletAction, isPending } = useWalletRequestMutation();
 
   const handleSubmit = () => {
-    console.log("HANDLE SUBMIT CLICKED");
-    if (!remark?.trim()) {
+        if (!remark?.trim()) {
       toast.error("Remark is required");
       return;
     }
@@ -35,14 +34,12 @@ export default function WalletAcceptedRequest({ open, onOpenChange, selectedRequ
       },
       {
         onSuccess: data => {
-          console.log("FULL RESPONSE:", data);
-          let message = "Request updated successfully";
+                    let message = "Request updated successfully";
           try {
             const decryptedResult = decryptData(data?.result);
             message = decryptedResult?.data?.result || decryptedResult?.result || message;
           } catch (error) {
-            console.log("Response is not encrypted");
-            message = data?.result || message;
+                        message = data?.result || message;
           }
           toast.success(message);
 

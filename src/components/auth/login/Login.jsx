@@ -23,7 +23,6 @@
 //     setErrorMessage("");
 //     mutate(data, {
 //       onSuccess: response => {
-//         console.log("LOGIN RESPONSE:", response);
 //         const authData = response?.response || response?.data?.response || response;
 //         if (!authData?.token) {
 //           setErrorMessage("Token not found");
@@ -46,14 +45,10 @@
 //             localStorage.setItem("qr_code", authData.qr_code);
 //           }
 //         }
-//         console.log("TOKEN:", localStorage.getItem("token"));
-//         console.log("AUTH_SECRET:", localStorage.getItem("auth_secret"));
-//         console.log("QR_SECRET:", localStorage.getItem("qr_secret"));
 
 //         router.push("/authcation");
 //       },
 //       onError: error => {
-//         console.log("LOGIN ERROR:", error);
 //         setErrorMessage(error?.message || "Login failed. Please check credentials.");
 //       },
 //     });
@@ -147,16 +142,16 @@
 
 import { useAuth } from "@/context/AuthContext";
 import { useLoginMutation } from "@/services/auth/auth.mutation";
+import { Eye, EyeOff } from "lucide-react";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 
 export default function Login() {
-  const router = useRouter();
   const { login } = useAuth();
 
   const [errorMessage, setErrorMessage] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
 
   const { register, handleSubmit } = useForm({
     defaultValues: {
@@ -172,22 +167,21 @@ export default function Login() {
     const isLoggedIn = localStorage.getItem("isLoggedIn");
 
     if (token && isLoggedIn === "true") {
-      router.replace("/dashboard");
+      window.location.replace("/");
       return;
     }
 
     if (token) {
-      router.replace("/authcation");
+      window.location.replace("/authcation");
     }
-  }, [router]);
+  }, []);
 
   const onSubmit = data => {
     setErrorMessage("");
 
     mutate(data, {
       onSuccess: response => {
-        console.log("LOGIN RESPONSE:", response);
-
+        
         const authData = response?.response || response?.data?.response || response;
 
         if (!authData?.token) {
@@ -198,6 +192,7 @@ export default function Login() {
         // CLEAR OLD AUTH VALUES
         localStorage.removeItem("qr_secret");
         localStorage.removeItem("qr_code");
+        localStorage.removeItem("isLoggedIn");
 
         // SAVE COMPLETE USER DATA IN CONTEXT
         login({
@@ -223,18 +218,12 @@ export default function Login() {
           }
         }
 
-        console.log("AUTH USER SAVED:", {
-          staff_name: authData.staff_name,
-          staff_username: authData.staff_username,
-          permission: authData.permission,
-        });
-
-        router.replace("/authcation");
+        
+        window.location.replace("/authcation");
       },
 
       onError: error => {
-        console.log("LOGIN ERROR:", error);
-
+        
         setErrorMessage(error?.message || "Login failed. Please check credentials.");
       },
     });
@@ -302,12 +291,23 @@ export default function Login() {
               <div>
                 <label className="mb-2 block text-sm text-slate-300">Password</label>
 
-                <input
-                  type="password"
-                  {...register("password")}
-                  placeholder="Enter your password"
-                  className="h-14 w-full rounded-2xl border border-white/10 bg-white/5 px-5 text-white"
-                />
+                <div className="relative">
+                  <input
+                    type={showPassword ? "text" : "password"}
+                    {...register("password")}
+                    placeholder="Enter your password"
+                    className="h-14 w-full rounded-2xl border border-white/10 bg-white/5 px-5 pr-14 text-white"
+                  />
+
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(prev => !prev)}
+                    className="absolute right-4 top-1/2 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-xl text-slate-900 transition-all hover:bg-slate-200 hover:text-black"
+                    aria-label={showPassword ? "Hide password" : "Show password"}
+                  >
+                    {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                  </button>
+                </div>
               </div>
 
               <button

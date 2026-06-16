@@ -41,8 +41,7 @@ export default function AddEditBankKyc() {
       { email },
       {
         onSuccess: data => {
-          console.log("ADD BANK VERIFY USER RESPONSE:", data);
-          setVerifiedUser(data?.response || null);
+                    setVerifiedUser(data?.response || null);
         },
         onError: () => {
           setVerifiedUser(null);

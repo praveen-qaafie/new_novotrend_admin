@@ -2,8 +2,6 @@ import { API_ENDPOINT } from "@/constants/endpoints";
 import { securePost } from "@/lib/axios/secureApi";
 
 export const getAllNotifications = async () => {
-  console.log("GET ALL NOTIFICATIONS API HIT");
-
   const token = localStorage.getItem("token");
 
   if (!token) {
@@ -14,7 +12,9 @@ export const getAllNotifications = async () => {
     token,
   };
 
-  const data = await securePost(API_ENDPOINT.NOTIFICATION.GET_ALL_NOTIFICATION, payload);
+  const data = await securePost(API_ENDPOINT.NOTIFICATION.GET_ALL_NOTIFICATION, payload, {
+    log: false,
+  });
 
   if (data?.status !== 200) {
     throw new Error(data?.result || "Unable to fetch notifications");
@@ -23,9 +23,52 @@ export const getAllNotifications = async () => {
   return data;
 };
 
-export const getUnreadUserLogs = async ({ limit = 10, offset = 0, search = "" }) => {
-  console.log("GET UNREAD USER LOGS API HIT");
+export const markNotificationAsRead = async ({ notification_id }) => {
+  const token = localStorage.getItem("token");
 
+  if (!token) {
+    throw new Error("Session expired");
+  }
+
+  const payload = {
+    token,
+    notification_id: Number(notification_id),
+  };
+
+  const data = await securePost(API_ENDPOINT.NOTIFICATION.READ_NOTIFICATION_BY_ID, payload, {
+    log: false,
+  });
+
+  if (data?.status !== 200) {
+    throw new Error(data?.result || "Unable to mark notification as read");
+  }
+
+  return data;
+};
+
+export const markAllNotificationsAsRead = async () => {
+  const token = localStorage.getItem("token");
+
+  if (!token) {
+    throw new Error("Session expired");
+  }
+
+  const payload = {
+    token,
+  };
+
+  const data = await securePost(API_ENDPOINT.NOTIFICATION.READ_ALL_NOTIFICATION, payload, {
+    log: false,
+  });
+
+  if (data?.status !== 200) {
+    throw new Error(data?.result || "Unable to mark notifications as read");
+  }
+
+  return data;
+};
+
+export const getUnreadUserLogs = async ({ limit = 10, offset = 0, search = "" }) => {
   const token = localStorage.getItem("token");
 
   if (!token) {
@@ -49,8 +92,6 @@ export const getUnreadUserLogs = async ({ limit = 10, offset = 0, search = "" })
 };
 
 export const getReadUserLogs = async ({ limit = 10, offset = 0, search = "" }) => {
-  console.log("GET READ USER LOGS API HIT");
-
   const token = localStorage.getItem("token");
 
   if (!token) {

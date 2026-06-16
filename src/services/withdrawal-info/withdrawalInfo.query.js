@@ -5,8 +5,7 @@ export const useWithdrawInfoQuery = ({ type_chain }) => {
   return useQuery({
     queryKey: ["withdraw-info", type_chain],
     queryFn: async () => {
-      console.log("Get Withdraw Info Query Running:", type_chain);
-
+      
       return await getWithdrawInfo({
         type_chain,
       });

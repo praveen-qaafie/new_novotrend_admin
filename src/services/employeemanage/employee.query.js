@@ -8,9 +8,11 @@ export const useAdminStaffListQuery = () => {
   });
 };
 
-export const useAdminPermissionListQuery = () => {
+export const useAdminPermissionListQuery = (options = {}) => {
   return useQuery({
     queryKey: ["admin-permission-list"],
     queryFn: getAdminAllPermission,
+    staleTime: 5 * 60 * 1000,
+    ...options,
   });
 };

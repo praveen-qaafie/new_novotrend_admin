@@ -6,36 +6,23 @@ import TableFooter from "@/components/common/tables/TableFooter";
 import TableSearch from "@/components/common/tables/TableSearch";
 import TableWrapper from "@/components/common/tables/TableWrapper";
 import { TableCell, TableRow } from "@/components/ui/table";
-import Image from "next/image";
+import { useClientPagination } from "@/hooks/useClientPagination";
 
 const tableHeaders = [
   { label: "S.No", key: "id" },
-  { label: "Name", key: "name" },
-  { label: "Email", key: "email" },
   { label: "Date", key: "date" },
   { label: "Amount", key: "amount" },
-  { label: "Image", key: "image" },
   { label: "Deposit Method", key: "method" },
   { label: "Transaction ID", key: "transaction" },
   { label: "Remark", key: "remark" },
-  { label: "Action", key: "action" },
+  { label: "Status", key: "status" },
 ];
 
-const dummyData = [
-  {
-    id: 1,
-    name: "Gigu testing",
-    email: "gigu@qaafie.com",
-    date: "09-09-2025 14:18:52",
-    amount: "10.00",
-    image: "",
-    method: "Cash",
-    transaction: "-",
-    remark: "tessss",
-  },
-];
+export default function DepositList({ userDetails }) {
+  const deposits = userDetails?.deposits ?? [];
+  const { limit, setLimit, offset, setOffset, total, paginatedItems } =
+    useClientPagination(deposits);
 
-export default function DepositList() {
   return (
     <TableWrapper
       title="Deposit List"
@@ -46,19 +33,29 @@ export default function DepositList() {
           <ExportDropdown />
         </>
       }
-      footer={<TableFooter />}
+      footer={
+        <TableFooter
+          limit={limit}
+          setLimit={setLimit}
+          offset={offset}
+          setOffset={setOffset}
+          total={total}
+        />
+      }
     >
       <DataTable headers={tableHeaders}>
-        {dummyData.map(row => (
-          <TableRow key={row.id} className="border-b border-border hover:bg-muted/40">
+        {deposits.length === 0 && (
+          <TableRow>
+            <TableCell colSpan={tableHeaders.length} className="py-8 text-center text-sm text-muted-foreground">
+              No deposits found.
+            </TableCell>
+          </TableRow>
+        )}
+
+        {paginatedItems.map((row, index) => (
+          <TableRow key={`${row.transaction_id}-${index}`} className="border-b border-border hover:bg-muted/40">
             {/* # */}
-            <TableCell>{row.id}</TableCell>
-
-            {/* NAME */}
-            <TableCell className="font-medium">{row.name}</TableCell>
-
-            {/* EMAIL */}
-            <TableCell>{row.email}</TableCell>
+            <TableCell>{offset + index + 1}</TableCell>
 
             {/* DATE */}
             <TableCell className="whitespace-nowrap">{row.date}</TableCell>
@@ -66,49 +63,23 @@ export default function DepositList() {
             {/* AMOUNT */}
             <TableCell className="font-semibold text-primary">${row.amount}</TableCell>
 
-            {/* IMAGE */}
-            <TableCell>
-              {row.image ? (
-                <Image
-                  src={row.image}
-                  alt="deposit"
-                  className="h-10 w-10 rounded-lg object-cover"
-                />
-              ) : (
-                "-"
-              )}
-            </TableCell>
-
             {/* METHOD */}
             <TableCell>
               <span className="rounded-xl bg-blue-500/10 px-3 py-1 text-xs font-medium text-blue-600">
-                {row.method}
+                {row.method || "-"}
               </span>
             </TableCell>
 
             {/* TRANSACTION */}
-            <TableCell>{row.transaction}</TableCell>
+            <TableCell>{row.transaction_id || "-"}</TableCell>
 
             {/* REMARK */}
-            <TableCell>{row.remark}</TableCell>
+            <TableCell>{row.remark || "-"}</TableCell>
 
-            {/* ACTION */}
             <TableCell>
-              <button
-                className="
-                  rounded-xl
-                  bg-emerald-500/10
-                  px-4
-                  py-2
-                  text-sm
-                  font-semibold
-                  text-emerald-600
-                  transition
-                  hover:bg-emerald-500/20
-                "
-              >
-                Accept
-              </button>
+              <span className="rounded-xl bg-emerald-500/10 px-3 py-1 text-xs font-medium text-emerald-600">
+                {row.status || "-"}
+              </span>
             </TableCell>
           </TableRow>
         ))}

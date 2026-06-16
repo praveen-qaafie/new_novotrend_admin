@@ -6,6 +6,8 @@ import TableFooter from "@/components/common/tables/TableFooter";
 import TableSearch from "@/components/common/tables/TableSearch";
 import TableWrapper from "@/components/common/tables/TableWrapper";
 import { TableCell, TableRow } from "@/components/ui/table";
+import { useClientPagination } from "@/hooks/useClientPagination";
+import { useUserIbDetailsQuery } from "@/services/users/user.query";
 import { ArrowRight } from "lucide-react";
 
 const tableHeaders = [
@@ -21,35 +23,16 @@ const tableHeaders = [
   { label: "Action", key: "action" },
 ];
 
-const dummyData = [
-  {
-    id: 1,
-    name: "Rahul Sharma",
-    email: "rahul@example.com",
-    mobile: "9876543210",
-    country: "India",
-    date: "10-06-2025",
-    ibName: "IB Master 01",
-    totalCommission: "$1200",
-    totalVolume: "35.50",
-  },
-  {
-    id: 2,
-    name: "Amit Verma",
-    email: "amit@example.com",
-    mobile: "9123456780",
-    country: "UAE",
-    date: "12-06-2025",
-    ibName: "IB Master 02",
-    totalCommission: "$980",
-    totalVolume: "22.10",
-  },
-];
+export default function IBDetails({ userDetails }) {
+  const { data } = useUserIbDetailsQuery({
+    user_id: userDetails?.user?.user_id,
+  });
+  const ibDetails = Array.isArray(data?.response) ? data.response : [];
+  const { limit, setLimit, offset, setOffset, total, paginatedItems } =
+    useClientPagination(ibDetails);
 
-export default function IBDetails() {
   const handleDownline = row => {
-    console.log("Open Downline:", row);
-    // later: navigate or modal open
+        // later: navigate or modal open
   };
 
   return (
@@ -62,13 +45,29 @@ export default function IBDetails() {
           <ExportDropdown />
         </>
       }
-      footer={<TableFooter />}
+      footer={
+        <TableFooter
+          limit={limit}
+          setLimit={setLimit}
+          offset={offset}
+          setOffset={setOffset}
+          total={total}
+        />
+      }
     >
       <DataTable headers={tableHeaders}>
-        {dummyData.map(row => (
-          <TableRow key={row.id} className="border-b border-border hover:bg-muted/40">
+        {ibDetails.length === 0 && (
+          <TableRow>
+            <TableCell colSpan={tableHeaders.length} className="py-8 text-center text-sm text-muted-foreground">
+              No data found.
+            </TableCell>
+          </TableRow>
+        )}
+
+        {paginatedItems.map((row, index) => (
+          <TableRow key={`${row.email}-${index}`} className="border-b border-border hover:bg-muted/40">
             {/* # */}
-            <TableCell>{row.id}</TableCell>
+            <TableCell>{offset + index + 1}</TableCell>
 
             {/* NAME */}
             <TableCell className="font-medium">{row.name}</TableCell>
@@ -86,13 +85,13 @@ export default function IBDetails() {
             <TableCell className="whitespace-nowrap">{row.date}</TableCell>
 
             {/* IB NAME */}
-            <TableCell className="font-medium text-primary">{row.ibName}</TableCell>
+            <TableCell className="font-medium text-primary">{row.ib_name || row.ibName || "-"}</TableCell>
 
             {/* TOTAL COMMISSION */}
-            <TableCell className="font-semibold text-green-600">{row.totalCommission}</TableCell>
+            <TableCell className="font-semibold text-green-600">{row.total_commission || row.totalCommission || "-"}</TableCell>
 
             {/* TOTAL VOLUME */}
-            <TableCell>{row.totalVolume}</TableCell>
+            <TableCell>{row.total_volume || row.totalVolume || "-"}</TableCell>
 
             {/* ACTION */}
             <TableCell>

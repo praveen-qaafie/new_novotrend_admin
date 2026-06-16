@@ -5,10 +5,8 @@ export const useAddWithdrawInfoMutation = () => {
   return useMutation({
     mutationFn: addWithdrawInfo,
     onSuccess: data => {
-      console.log("ADD WITHDRAW INFO SUCCESS:", data);
-    },
+          },
     onError: error => {
-      console.log("ADD WITHDRAW INFO ERROR:", error);
-    },
+          },
   });
 };

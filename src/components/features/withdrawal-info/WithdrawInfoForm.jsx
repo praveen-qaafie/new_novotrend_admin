@@ -61,8 +61,7 @@ export default function WithdrawInfoForm({ chain }) {
     type_chain: chain,
   });
 
-  console.log(`${chain} Withdraw Info Data:`, data);
-
+  
   const withdrawInfo = getWithdrawInfoData(data);
   const privateKeyValue = getPrivateKey(withdrawInfo);
   const currentAddress = isLoading ? "Loading..." : isError ? "Unable to load info" : getAddress(withdrawInfo);

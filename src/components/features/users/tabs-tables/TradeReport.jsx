@@ -6,6 +6,8 @@ import TableFooter from "@/components/common/tables/TableFooter";
 import TableSearch from "@/components/common/tables/TableSearch";
 import TableWrapper from "@/components/common/tables/TableWrapper";
 import { TableCell, TableRow } from "@/components/ui/table";
+import { useClientPagination } from "@/hooks/useClientPagination";
+import { useUserTradingReportQuery } from "@/services/users/user.query";
 
 const tableHeaders = [
   { label: "S.No", key: "id" },
@@ -23,40 +25,14 @@ const tableHeaders = [
   { label: "Swapcharge", key: "swapcharge" },
 ];
 
-const dummyData = [
-  {
-    id: 1,
-    symbol: "XAUUSD",
-    type: "BUY",
-    openingTime: "12-09-2025 09:10:00",
-    closingTime: "12-09-2025 11:40:00",
-    openingPrice: "2310.50",
-    closingPrice: "2325.10",
-    volume: "0.20",
-    profit: "290.00",
-    orderId: "TRD10001",
-    mt5Id: "MT5010",
-    commission: "4.00",
-    swapcharge: "0.90",
-  },
-  {
-    id: 2,
-    symbol: "BTCUSD",
-    type: "SELL",
-    openingTime: "12-09-2025 10:00:00",
-    closingTime: "12-09-2025 12:00:00",
-    openingPrice: "65000",
-    closingPrice: "64500",
-    volume: "0.05",
-    profit: "250.00",
-    orderId: "TRD10002",
-    mt5Id: "MT5011",
-    commission: "6.00",
-    swapcharge: "1.50",
-  },
-];
+export default function TradeReport({ userDetails }) {
+  const { data } = useUserTradingReportQuery({
+    user_id: userDetails?.user?.user_id,
+  });
+  const trades = data?.response?.trades ?? [];
+  const { limit, setLimit, offset, setOffset, total, paginatedItems } =
+    useClientPagination(trades);
 
-export default function TradeReport() {
   return (
     <TableWrapper
       title="Trade Report"
@@ -67,13 +43,29 @@ export default function TradeReport() {
           <ExportDropdown />
         </>
       }
-      footer={<TableFooter />}
+      footer={
+        <TableFooter
+          limit={limit}
+          setLimit={setLimit}
+          offset={offset}
+          setOffset={setOffset}
+          total={total}
+        />
+      }
     >
       <DataTable headers={tableHeaders}>
-        {dummyData.map(row => (
-          <TableRow key={row.id} className="border-b border-border hover:bg-muted/40">
+        {trades.length === 0 && (
+          <TableRow>
+            <TableCell colSpan={tableHeaders.length} className="py-8 text-center text-sm text-muted-foreground">
+              No data found.
+            </TableCell>
+          </TableRow>
+        )}
+
+        {paginatedItems.map((row, index) => (
+          <TableRow key={`${row.orderId || row.order_id}-${index}`} className="border-b border-border hover:bg-muted/40">
             {/* # */}
-            <TableCell>{row.id}</TableCell>
+            <TableCell>{offset + index + 1}</TableCell>
 
             {/* SYMBOL */}
             <TableCell className="font-semibold">{row.symbol}</TableCell>
@@ -94,16 +86,16 @@ export default function TradeReport() {
             </TableCell>
 
             {/* OPENING TIME */}
-            <TableCell className="whitespace-nowrap">{row.openingTime}</TableCell>
+            <TableCell className="whitespace-nowrap">{row.openingTime || row.opening_time || "-"}</TableCell>
 
             {/* CLOSING TIME */}
-            <TableCell className="whitespace-nowrap">{row.closingTime}</TableCell>
+            <TableCell className="whitespace-nowrap">{row.closingTime || row.closing_time || "-"}</TableCell>
 
             {/* OPEN PRICE */}
-            <TableCell>{row.openingPrice}</TableCell>
+            <TableCell>{row.openingPrice || row.opening_price || "-"}</TableCell>
 
             {/* CLOSE PRICE */}
-            <TableCell>{row.closingPrice}</TableCell>
+            <TableCell>{row.closingPrice || row.closing_price || "-"}</TableCell>
 
             {/* VOLUME */}
             <TableCell>{row.volume}</TableCell>
@@ -112,10 +104,10 @@ export default function TradeReport() {
             <TableCell className="font-semibold text-primary">{row.profit}</TableCell>
 
             {/* ORDER ID */}
-            <TableCell className="text-muted-foreground">{row.orderId}</TableCell>
+            <TableCell className="text-muted-foreground">{row.orderId || row.order_id || "-"}</TableCell>
 
             {/* MT5 ID */}
-            <TableCell>{row.mt5Id}</TableCell>
+            <TableCell>{row.mt5Id || row.mt5_id || "-"}</TableCell>
 
             {/* COMMISSION */}
             <TableCell>{row.commission}</TableCell>

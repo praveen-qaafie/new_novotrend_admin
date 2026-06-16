@@ -1,7 +1,6 @@
 import { useMutation } from "@tanstack/react-query";
-import { useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { addBankInfo, getBankInfo } from "./bank-info.query";
+import { addBankInfo } from "./bank-info.query";
 
 export const useAddBankInfoMutation = () => {
   return useMutation({
@@ -18,14 +17,5 @@ export const useAddBankInfoMutation = () => {
           "Something went wrong",
       );
     },
-  });
-};
-
-export const BANK_INFO_QUERY_KEY = ["bankInfo"];
-
-export const useGetBankInfoQuery = () => {
-  return useQuery({
-    queryKey: BANK_INFO_QUERY_KEY,
-    queryFn: getBankInfo,
   });
 };

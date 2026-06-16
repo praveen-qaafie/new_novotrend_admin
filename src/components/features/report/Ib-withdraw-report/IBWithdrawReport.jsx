@@ -113,8 +113,7 @@ export default function IBWithdrawReport() {
   const tableData = data?.response?.withdraw_history || [];
   const total = Number(data?.response?.total_records) || 0;
 
-  console.log("IB Withdrawals:", tableData);
-
+  
   return (
     <div className="space-y-6">
       {/* ---------------- STATS ---------------- */}

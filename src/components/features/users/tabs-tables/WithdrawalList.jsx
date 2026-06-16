@@ -6,43 +6,22 @@ import TableFooter from "@/components/common/tables/TableFooter";
 import TableSearch from "@/components/common/tables/TableSearch";
 import TableWrapper from "@/components/common/tables/TableWrapper";
 import { TableCell, TableRow } from "@/components/ui/table";
+import { useClientPagination } from "@/hooks/useClientPagination";
 
 const tableHeaders = [
   { label: "S.No", key: "id" },
-  { label: "Name", key: "name" },
-  { label: "Email", key: "email" },
   { label: "Date", key: "date" },
   { label: "Amount", key: "amount" },
-  { label: "Method", key: "method" },
-  { label: "Payment Details", key: "paymentDetails" },
+  { label: "Type", key: "type" },
   { label: "Remark", key: "remark" },
-  { label: "Action", key: "action" },
+  { label: "Status", key: "status" },
 ];
 
-const dummyData = [
-  {
-    id: 1,
-    name: "Gigu Testing",
-    email: "gigu@qaafie.com",
-    date: "09-09-2025 14:18:52",
-    amount: "150.00",
-    method: "Bank",
-    paymentDetails: "HDFC **** 1234",
-    remark: "Processed successfully",
-  },
-  {
-    id: 2,
-    name: "Praveen Suthar",
-    email: "praveen@qaafie.com",
-    date: "10-09-2025 10:20:10",
-    amount: "200.00",
-    method: "Crypto",
-    paymentDetails: "0x8dF...9A21",
-    remark: "Pending approval",
-  },
-];
+export default function WithdrawalList({ userDetails }) {
+  const withdrawals = userDetails?.withdrawals ?? [];
+  const { limit, setLimit, offset, setOffset, total, paginatedItems } =
+    useClientPagination(withdrawals);
 
-export default function WithdrawalList() {
   return (
     <TableWrapper
       title="Withdrawal List"
@@ -53,19 +32,29 @@ export default function WithdrawalList() {
           <ExportDropdown />
         </>
       }
-      footer={<TableFooter />}
+      footer={
+        <TableFooter
+          limit={limit}
+          setLimit={setLimit}
+          offset={offset}
+          setOffset={setOffset}
+          total={total}
+        />
+      }
     >
       <DataTable headers={tableHeaders}>
-        {dummyData.map(row => (
-          <TableRow key={row.id} className="border-b border-border hover:bg-muted/40">
+        {withdrawals.length === 0 && (
+          <TableRow>
+            <TableCell colSpan={tableHeaders.length} className="py-8 text-center text-sm text-muted-foreground">
+              No withdrawals found.
+            </TableCell>
+          </TableRow>
+        )}
+
+        {paginatedItems.map((row, index) => (
+          <TableRow key={`${row.date}-${index}`} className="border-b border-border hover:bg-muted/40">
             {/* # */}
-            <TableCell>{row.id}</TableCell>
-
-            {/* NAME */}
-            <TableCell className="font-medium">{row.name}</TableCell>
-
-            {/* EMAIL */}
-            <TableCell>{row.email}</TableCell>
+            <TableCell>{offset + index + 1}</TableCell>
 
             {/* DATE */}
             <TableCell className="whitespace-nowrap">{row.date}</TableCell>
@@ -73,37 +62,19 @@ export default function WithdrawalList() {
             {/* AMOUNT */}
             <TableCell className="font-semibold text-primary">${row.amount}</TableCell>
 
-            {/* METHOD */}
             <TableCell>
               <span className="rounded-xl bg-blue-500/10 px-3 py-1 text-xs font-medium text-blue-600">
-                {row.method}
+                {row.type || "-"}
               </span>
             </TableCell>
 
-            {/* PAYMENT DETAILS */}
-            <TableCell className="max-w-[200px] truncate">{row.paymentDetails}</TableCell>
-
             {/* REMARK */}
-            <TableCell>{row.remark}</TableCell>
+            <TableCell>{row.remark || "-"}</TableCell>
 
-            {/* ACTION */}
             <TableCell>
-              <div className="flex gap-2">
-                <button
-                  className="
-                    rounded-xl
-                    bg-emerald-500/10
-                    px-3
-                    py-1.5
-                    text-xs
-                    font-semibold
-                    text-emerald-600
-                    hover:bg-emerald-500/20
-                  "
-                >
-                  Approve
-                </button>
-              </div>
+              <span className="rounded-xl bg-emerald-500/10 px-3 py-1.5 text-xs font-semibold text-emerald-600">
+                {row.status || "-"}
+              </span>
             </TableCell>
           </TableRow>
         ))}

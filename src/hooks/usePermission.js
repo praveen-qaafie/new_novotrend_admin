@@ -5,11 +5,13 @@ import { useAdminPermissionListQuery } from "@/services/employeemanage/employee.
 import { useMemo } from "react";
 
 export const usePermissions = () => {
-  const { user } = useAuth();
+  const { user, isAuthLoading } = useAuth();
 
-  const { data, isLoading } = useAdminPermissionListQuery();
+  const adminPermissionIds = useMemo(() => (user?.permission || []).map(String), [user?.permission]);
 
-  const adminPermissionIds = (user?.permission || []).map(String);
+  const { data, isLoading } = useAdminPermissionListQuery({
+    enabled: !isAuthLoading && Boolean(user?.token) && adminPermissionIds.length > 0,
+  });
 
   const allowedPermissions = useMemo(() => {
     const permissions = data?.response || [];
@@ -26,6 +28,6 @@ export const usePermissions = () => {
   return {
     hasPermission,
     allowedPermissions,
-    isLoading,
+    isLoading: isAuthLoading || isLoading,
   };
 };

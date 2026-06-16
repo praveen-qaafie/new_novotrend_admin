@@ -48,6 +48,85 @@ export const adminUserAction = async ({ user_id, type }) => {
 
   return data;
 };
+
+// GET USER DETAILS
+export const getUserDetails = async ({ user_id }) => {
+  const token = localStorage.getItem("token");
+
+  if (!token) {
+    throw new Error("Session expired. Please login again.");
+  }
+
+  const payload = {
+    token,
+    user_id: Number(user_id),
+  };
+
+  const data = await securePost(API_ENDPOINT.USERS.GET_USER_DETAILS, payload, {
+    logName: "GET USER DETAILS",
+  });
+
+  if (data?.status !== 200) {
+    throw new Error(data?.result || "Unable to fetch user details");
+  }
+
+  return data;
+};
+
+const getUserDetailTabData = async ({ endpoint, logName, user_id, limit, offset }) => {
+  const token = localStorage.getItem("token");
+
+  if (!token) {
+    throw new Error("Session expired. Please login again.");
+  }
+
+  const payload = {
+    token,
+    user_id: Number(user_id),
+  };
+
+  if (limit !== undefined) {
+    payload.limit = limit;
+  }
+
+  if (offset !== undefined) {
+    payload.offset = offset;
+  }
+
+  const data = await securePost(endpoint, payload, {
+    logName,
+  });
+
+  if (data?.status !== 200 && data?.status !== 404) {
+    throw new Error(data?.result || "Unable to fetch user detail data");
+  }
+
+  return data;
+};
+
+export const getUserIbDetails = ({ user_id }) =>
+  getUserDetailTabData({
+    endpoint: API_ENDPOINT.USERS.IB_DETAILS,
+    logName: "GET USER IB DETAILS",
+    user_id,
+  });
+
+export const getUserLiveTrade = ({ user_id, limit = 10, offset = 0 }) =>
+  getUserDetailTabData({
+    endpoint: API_ENDPOINT.USERS.LIVE_TRADE,
+    logName: "GET USER LIVE TRADE",
+    user_id,
+    limit,
+    offset,
+  });
+
+export const getUserTradingReport = ({ user_id }) =>
+  getUserDetailTabData({
+    endpoint: API_ENDPOINT.USERS.TRADING_REPORT,
+    logName: "GET USER TRADING REPORT",
+    user_id,
+  });
+
 // GET MT5 USER LIST
 export const getMT5UserList = async ({ limit = 10, offset = 0, search = "" }) => {
   const token = localStorage.getItem("token");
@@ -63,7 +142,9 @@ export const getMT5UserList = async ({ limit = 10, offset = 0, search = "" }) =>
     search: search?.trim(),
   };
 
-  const data = await securePost(API_ENDPOINT.USERS.LISTMT5USER, payload);
+  const data = await securePost(API_ENDPOINT.USERS.LISTMT5USER, payload, {
+    logName: "LIST ALL MT5 USER",
+  });
 
   // VALIDATION
   if (data?.status !== 200) {
@@ -211,8 +292,7 @@ export const changeMT5Leverage = async ({ accno, leverage }) => {
   };
 
   const data = await securePost(API_ENDPOINT.USERS.CHANGE_MT5_LEVERAGE, payload);
-  console.log("PLAIN TEXT RESPONSE:", JSON.stringify(data, null, 2));
-  // VALIDATION
+    // VALIDATION
   if (data?.status !== 200) {
     throw new Error(data?.result || "Unable to change leverage");
   }
@@ -229,10 +309,8 @@ export const sendVerificationMailMT5 = async ({ accountno }) => {
     token,
     accountno,
   };
-  console.log("SEND MT5 MAIL PAYLOAD:", payload);
-  const data = await securePost(API_ENDPOINT.USERS.SEND_VERIFICATION_MAIL_MT5, payload);
-  console.log("SEND MT5 MAIL RESPONSE:", data);
-  if (data?.status !== 200) {
+    const data = await securePost(API_ENDPOINT.USERS.SEND_VERIFICATION_MAIL_MT5, payload);
+    if (data?.status !== 200) {
     throw new Error(data?.result || "Unable to send verification mail");
   }
   return data;

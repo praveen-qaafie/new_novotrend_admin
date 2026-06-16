@@ -5,8 +5,7 @@ export const useGetMT5GroupListQuery = ({ limit = 10, offset = 0, search = "" } 
   return useQuery({
     queryKey: ["mt5-group-list", limit, offset, search],
     queryFn: async () => {
-      console.log("QUERY FUNCTION RUNNING");
-      return await getMT5GroupList({
+            return await getMT5GroupList({
         limit,
         offset,
         search,

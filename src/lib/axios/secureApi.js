@@ -27,43 +27,69 @@ const normalizePlainResponse = responseData => {
   }
 };
 
-export const securePost = async (url, payload) => {
+const decryptNestedResult = data => {
+  if (typeof data?.result !== "string") {
+    return data;
+  }
+
   try {
-    console.log("PLAIN PAYLOAD:", payload);
+    return {
+      ...data,
+      result: decryptData(data.result),
+    };
+  } catch {
+    return data;
+  }
+};
+
+export const securePost = async (url, payload, options = {}) => {
+  const logName = options.logName;
+
+  try {
+    if (logName) {
+      console.log(`${logName} PAYLOAD:`, payload);
+    }
+
     // ENCRYPT PAYLOAD
     const encryptedPayload = encryptData(payload);
     const requestBody = {
       data: encryptedPayload,
     };
-    console.log("FINAL REQUEST BODY:", requestBody);
+
+    if (logName) {
+      console.log(`${logName} ENCRYPTED PAYLOAD:`, requestBody);
+      console.log(`${logName} DECRYPTED PAYLOAD:`, decryptData(encryptedPayload));
+    }
 
     // API CALL
     const response = await apiClient.post(url, requestBody);
 
-    console.log("RAW RESPONSE:", response);
+    if (logName) {
+      console.log(`${logName} ENCRYPTED RESPONSE:`, response.data);
+    }
 
     // DECRYPT RESPONSE
     try {
       const decrypted = decryptData(response.data);
 
       // DECRYPTED RESPONSE
-      console.log("DECRYPTED RESPONSE:", decrypted);
+      if (logName) {
+        console.log(`${logName} DECRYPTED RESPONSE:`, decryptNestedResult(decrypted.data));
+      }
 
-      // PLAIN TEXT RESPONSE
-      console.log("PLAIN TEXT RESPONSE:", JSON.stringify(decrypted, null, 2));
-
-      return decrypted.data;
+      return decryptNestedResult(decrypted.data);
     } catch {
       // NORMAL RESPONSE
       const plainResponse = normalizePlainResponse(response.data);
+      const decryptedPlainResponse = decryptNestedResult(plainResponse);
 
-      console.log("PLAIN RESPONSE:", plainResponse);
+      if (logName) {
+        console.log(`${logName} DECRYPTED RESPONSE:`, decryptedPlainResponse);
+      }
 
-      return plainResponse;
+      return decryptedPlainResponse;
     }
   } catch (error) {
-    console.log("SECURE API ERROR:", error);
-
     throw error;
   }
 };

@@ -91,6 +91,7 @@ import TableFooter from "@/components/common/tables/TableFooter";
 import TableSearch from "@/components/common/tables/TableSearch";
 import TableWrapper from "@/components/common/tables/TableWrapper";
 import { TableCell, TableRow } from "@/components/ui/table";
+import { useClientPagination } from "@/hooks/useClientPagination";
 import Image from "next/image";
 
 const tableHeaders = [
@@ -106,24 +107,12 @@ const tableHeaders = [
   { label: "Action", key: "action" },
 ];
 
-const dummyData = [
-  {
-    id: 1,
-    name: "Rahul Sharma",
-    email: "rahul@example.com",
-    docType: "Aadhar Card",
-    idFront: "/demo/id-front.jpg",
-    idBack: "/demo/id-back.jpg",
-    addressFront: "/demo/address-front.jpg",
-    addressBack: "/demo/address-back.jpg",
-    uploaded: "12-06-2025",
-  },
-];
+const imageUrl = value => value || "";
 
-export default function KycDocument() {
-  const handleView = row => {
-    console.log("View KYC:", row);
-  };
+export default function KycDocument({ userDetails }) {
+  const documents = userDetails?.kyc_doc ?? [];
+  const { limit, setLimit, offset, setOffset, total, paginatedItems } =
+    useClientPagination(documents);
 
   return (
     <TableWrapper
@@ -135,31 +124,47 @@ export default function KycDocument() {
           <ExportDropdown />
         </>
       }
-      footer={<TableFooter />}
+      footer={
+        <TableFooter
+          limit={limit}
+          setLimit={setLimit}
+          offset={offset}
+          setOffset={setOffset}
+          total={total}
+        />
+      }
     >
       <DataTable headers={tableHeaders}>
-        {dummyData.map(row => (
-          <TableRow key={row.id} className="border-b border-border hover:bg-muted/40">
+        {documents.length === 0 && (
+          <TableRow>
+            <TableCell colSpan={tableHeaders.length} className="py-8 text-center text-sm text-muted-foreground">
+              No KYC documents found.
+            </TableCell>
+          </TableRow>
+        )}
+
+        {paginatedItems.map((row, index) => (
+          <TableRow key={`${row.date}-${index}`} className="border-b border-border hover:bg-muted/40">
             {/* # */}
-            <TableCell>{row.id}</TableCell>
+            <TableCell>{offset + index + 1}</TableCell>
 
             {/* NAME */}
-            <TableCell className="font-medium">{row.name}</TableCell>
+            <TableCell className="font-medium">{userDetails?.user?.name || "-"}</TableCell>
 
             {/* EMAIL */}
-            <TableCell>{row.email}</TableCell>
+            <TableCell>{userDetails?.user?.email || "-"}</TableCell>
 
             {/* DOC TYPE */}
             <TableCell>
               <span className="rounded-xl bg-blue-500/10 px-3 py-1 text-xs font-semibold text-blue-600">
-                {row.docType}
+                {row.doc_type || "-"}
               </span>
             </TableCell>
 
             {/* ID FRONT */}
             <TableCell>
               <Image
-                src={row.idFront}
+                src={imageUrl(row.front)}
                 alt="id-front"
                 width={50}
                 height={50}
@@ -170,7 +175,7 @@ export default function KycDocument() {
             {/* ID BACK */}
             <TableCell>
               <Image
-                src={row.idBack}
+                src={imageUrl(row.back)}
                 alt="id-back"
                 width={50}
                 height={50}
@@ -181,7 +186,7 @@ export default function KycDocument() {
             {/* ADDRESS FRONT */}
             <TableCell>
               <Image
-                src={row.addressFront}
+                src={imageUrl(row.address_front)}
                 alt="address-front"
                 width={50}
                 height={50}
@@ -192,7 +197,7 @@ export default function KycDocument() {
             {/* ADDRESS BACK */}
             <TableCell>
               <Image
-                src={row.addressBack}
+                src={imageUrl(row.address_back)}
                 alt="address-back"
                 width={50}
                 height={50}
@@ -202,7 +207,7 @@ export default function KycDocument() {
 
             {/* UPLOADED DATE */}
             <TableCell className="whitespace-nowrap text-muted-foreground">
-              {row.uploaded}
+              {row.date || "-"}
             </TableCell>
 
             {/* ACTION */}
@@ -221,7 +226,7 @@ export default function KycDocument() {
                     hover:bg-green-500/20
                   "
                 >
-                  Accept
+                  {row.status || "-"}
                 </button>
               </div>
             </TableCell>

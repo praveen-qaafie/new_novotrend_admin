@@ -65,8 +65,7 @@ export default function RejectedKycHistory() {
     search: debouncedSearch,
   });
   const rejectedKyc = data?.response?.records || [];
-  console.log(rejectedKyc, "rejected bank kyc data ");
-  const total = Number(data?.response?.total_records) || 0;
+    const total = Number(data?.response?.total_records) || 0;
 
   return (
     <>

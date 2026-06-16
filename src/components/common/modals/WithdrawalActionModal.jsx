@@ -22,8 +22,7 @@ export default function WithdrawalActionModal({ open, onOpenChange, selectedRequ
   const { mutate: withdrawalAction, isPending } = useWithdrawalActionMutation();
 
   const handleSubmit = () => {
-    console.log("HANDLE SUBMIT CLICKED");
-    if (!remark?.trim()) {
+        if (!remark?.trim()) {
       toast.error("Remark is required");
       return;
     }
@@ -40,8 +39,7 @@ export default function WithdrawalActionModal({ open, onOpenChange, selectedRequ
             const decryptedResult = decryptData(data?.response?.result);
             message = decryptedResult?.data?.result || decryptedResult?.result || message;
           } catch (error) {
-            console.log("Response is not encrypted");
-            message = data?.result || message;
+                        message = data?.result || message;
           }
           toast.success(message);
           setRemark("");

@@ -6,11 +6,9 @@ export const useAddMT5GroupMutation = () => {
   return useMutation({
     mutationFn: addMT5Group,
     onSuccess: data => {
-      console.log("ADD GROUP SUCCESS:", data);
-    },
+          },
     onError: error => {
-      console.log("ADD GROUP ERROR:", error);
-    },
+          },
   });
 };
 
@@ -20,12 +18,10 @@ export const useEditMT5GroupMutation = () => {
     mutationFn: editMT5Group,
 
     onSuccess: data => {
-      console.log("EDIT GROUP SUCCESS:", data);
-    },
+          },
 
     onError: error => {
-      console.log("EDIT GROUP ERROR:", error);
-    },
+          },
   });
 };
 
@@ -34,10 +30,8 @@ export const useUpdateMT5GroupMutation = () => {
   return useMutation({
     mutationFn: updateMT5Group,
     onSuccess: data => {
-      console.log("UPDATE GROUP SUCCESS:", data);
-    },
+          },
     onError: error => {
-      console.log("UPDATE GROUP ERROR:", error);
-    },
+          },
   });
 };

@@ -10,14 +10,36 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useAuth } from "@/context/AuthContext";
 import { useNotifications } from "@/hooks/useNotifications";
+import {
+  useMarkAllNotificationsAsReadMutation,
+  useMarkNotificationAsReadMutation,
+} from "@/services/notification/notification.mutation";
 import MobileSidebar from "../sidebar/MobileSidebar";
 
 export default function Header() {
   const { notifications, unreadCount } = useNotifications();
+  const markNotificationAsReadMutation = useMarkNotificationAsReadMutation();
+  const markAllNotificationsAsReadMutation = useMarkAllNotificationsAsReadMutation();
   const { user } = useAuth();
   const initials = user?.staff_name?.substring(0, 2).toUpperCase() || "Uk";
 
-  console.log(user, "user name");
+  const handleReadNotification = notification => {
+    if (!notification?.id || !notification.unread || markNotificationAsReadMutation.isPending) {
+      return;
+    }
+
+    markNotificationAsReadMutation.mutate({
+      notification_id: notification.id,
+    });
+  };
+
+  const handleReadAllNotifications = () => {
+    if (!unreadCount || markAllNotificationsAsReadMutation.isPending) {
+      return;
+    }
+
+    markAllNotificationsAsReadMutation.mutate();
+  };
 
   return (
     <header className="sticky top-0 z-40 flex h-[72px] items-center justify-between border-b border-border/40 bg-background/95 backdrop-blur-xl supports-[backdrop-filter]:bg-background/60 px-4 md:px-8">
@@ -75,8 +97,13 @@ export default function Header() {
                 </p>
               </div>
 
-              <button className="text-xs font-medium text-primary hover:underline">
-                Mark all as read
+              <button
+                type="button"
+                disabled={!unreadCount || markAllNotificationsAsReadMutation.isPending}
+                onClick={handleReadAllNotifications}
+                className="text-xs font-medium text-primary hover:underline disabled:pointer-events-none disabled:text-muted-foreground"
+              >
+                {markAllNotificationsAsReadMutation.isPending ? "Marking..." : "Mark all as read"}
               </button>
             </div>
 
@@ -86,8 +113,15 @@ export default function Header() {
                 notifications.map((notification) => (
                   <DropdownMenuItem
                     key={notification.id}
-                    className={`relative flex items-start gap-3 rounded-none border-b border-border/20 px-4 py-4 cursor-pointer transition-all
-            ${notification.unread ? "bg-primary/5 hover:bg-primary/10" : "hover:bg-muted/40"}`}
+                    onSelect={event => {
+                      event.preventDefault();
+                      handleReadNotification(notification);
+                    }}
+                    className={`relative flex items-start gap-3 rounded-none border-b border-border/20 px-4 py-4 cursor-pointer transition-all ${
+                      notification.unread
+                        ? "bg-primary/5 hover:bg-primary/10"
+                        : "bg-white hover:bg-muted/40"
+                    }`}
                   >
                     {/* Icon */}
                     <div
@@ -122,21 +156,11 @@ export default function Header() {
                 <div className="flex flex-col items-center justify-center py-10 text-center">
                   <Bell className="mb-3 h-10 w-10 text-muted-foreground/40" />
                   <p className="text-sm font-medium">No notifications</p>
-                  <p className="text-xs text-muted-foreground">
-                    {"You're"} all caught up.
-                  </p>
+                  <p className="text-xs text-muted-foreground">You&apos;re all caught up.</p>
                 </div>
               )}
             </div>
 
-            {/* Footer */}
-            {notifications?.length > 0 && (
-              <div className="border-t border-border/40 p-3">
-                <button className="w-full rounded-xl bg-muted/50 px-4 py-2.5 text-sm font-medium transition-all hover:bg-primary/10 hover:text-primary">
-                  View all notifications
-                </button>
-              </div>
-            )}
           </DropdownMenuContent>
         </DropdownMenu>
         {/* Profile Dropdown - Premium Version */}

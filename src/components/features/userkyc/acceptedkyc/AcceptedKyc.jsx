@@ -73,8 +73,7 @@ export default function AcceptedKyc() {
     edate: filters.edate,
   });
   const acceptedKyc = data?.response?.records || [];
-  console.log(acceptedKyc, "this is new kyc Accept data");
-  const total = Number(data?.response?.total_records) || 0;
+    const total = Number(data?.response?.total_records) || 0;
 
   return (
     <>

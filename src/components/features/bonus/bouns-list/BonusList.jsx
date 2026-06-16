@@ -35,8 +35,7 @@ export default function BonusList() {
   });
 
   const bonusList = data?.response.bonus_list || [];
-  console.log(bonusList, "Bouns list data");
-  // pagination calculations
+    // pagination calculations
   const total = Number(data?.response?.total_records) || bonusList.length;
   const currentPage = Math.floor(offset / limit) + 1;
   return (

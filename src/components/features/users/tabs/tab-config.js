@@ -62,7 +62,6 @@ export const USER_TABS = [
     value: "ib",
     component: IBDetails,
   },
-
   {
     label: "Commission History",
     value: "commission",
