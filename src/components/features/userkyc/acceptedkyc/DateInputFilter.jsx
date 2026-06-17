@@ -10,8 +10,26 @@ import { useState } from "react";
 export default function DateInputFilter({ onSubmit }) {
   const [startDate, setStartDate] = useState();
   const [endDate, setEndDate] = useState();
+  const today = new Date();
+  today.setHours(23, 59, 59, 999);
+
+  const isFutureDate = date => date > today;
+  const isInvalidRange = startDate && endDate && endDate < startDate;
+  const isSubmitDisabled = !startDate || !endDate || isInvalidRange;
+
+  const handleStartDateSelect = date => {
+    setStartDate(date);
+
+    if (date && endDate && endDate < date) {
+      setEndDate(undefined);
+    }
+  };
 
   const handleSubmit = () => {
+    if (isSubmitDisabled) {
+      return;
+    }
+
     onSubmit?.({
       sdate: startDate ? format(startDate, "yyyy-MM-dd") : "",
       edate: endDate ? format(endDate, "yyyy-MM-dd") : "",
@@ -40,7 +58,13 @@ export default function DateInputFilter({ onSubmit }) {
               align="start"
               className="w-auto rounded-3xl border border-border p-0 shadow-2xl"
             >
-              <Calendar mode="single" selected={startDate} onSelect={setStartDate} initialFocus />
+              <Calendar
+                mode="single"
+                selected={startDate}
+                onSelect={handleStartDateSelect}
+                disabled={isFutureDate}
+                initialFocus
+              />
             </PopoverContent>
           </Popover>
         </div>
@@ -64,16 +88,29 @@ export default function DateInputFilter({ onSubmit }) {
               align="start"
               className="w-auto rounded-3xl border border-border p-0 shadow-2xl"
             >
-              <Calendar mode="single" selected={endDate} onSelect={setEndDate} initialFocus />
+              <Calendar
+                mode="single"
+                selected={endDate}
+                onSelect={setEndDate}
+                disabled={date => isFutureDate(date) || (startDate ? date < startDate : false)}
+                initialFocus
+              />
             </PopoverContent>
           </Popover>
         </div>
       </div>
 
+      {isInvalidRange && (
+        <p className="mt-3 text-sm font-medium text-red-500">
+          End date start date se chhoti nahi ho sakti.
+        </p>
+      )}
+
       <div className="mt-8">
         <button
           onClick={handleSubmit}
-          className="flex h-12 items-center justify-center rounded-2xl bg-primary px-8 text-sm font-semibold text-white transition-all hover:opacity-90"
+          disabled={isSubmitDisabled}
+          className="flex h-12 items-center justify-center rounded-2xl bg-primary px-8 text-sm font-semibold text-white transition-all hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
         >
           Submit
         </button>

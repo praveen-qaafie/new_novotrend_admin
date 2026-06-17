@@ -7,6 +7,7 @@ import ExportDropdown from "@/components/common/tables/ExportDropdown";
 import TableFooter from "@/components/common/tables/TableFooter";
 import TableSearch from "@/components/common/tables/TableSearch";
 import TableWrapper from "@/components/common/tables/TableWrapper";
+import TruncatedCell from "@/components/common/TruncatedCell";
 import { TableCell, TableRow } from "@/components/ui/table";
 import { useWithdrawalRequestHistoryIBQuery } from "@/services/report/report.query";
 import { useState } from "react";
@@ -113,7 +114,6 @@ export default function IBWithdrawReport() {
   const tableData = data?.response?.withdraw_history || [];
   const total = Number(data?.response?.total_records) || 0;
 
-  
   return (
     <div className="space-y-6">
       {/* ---------------- STATS ---------------- */}
@@ -191,7 +191,7 @@ export default function IBWithdrawReport() {
           ) : tableData.length > 0 ? (
             tableData.map((row, index) => (
               <TableRow key={row.id || index} className="border-b border-border">
-                <TableCell className="px-6 py-5">{index + 1}</TableCell>
+                <TableCell className="px-6 py-5">{offset + index + 1}</TableCell>
                 <TableCell className="px-6 py-5 font-medium">{row.name}</TableCell>
                 <TableCell className="px-6 py-5">{row.email}</TableCell>
                 <TableCell className="px-6 py-5">{row.date}</TableCell>
@@ -205,7 +205,9 @@ export default function IBWithdrawReport() {
 
                 <TableCell className="px-6 py-5 max-w-[220px] break-all">{row.wallet}</TableCell>
 
-                <TableCell className="px-6 py-5">{row.remark}</TableCell>
+                <TableCell className="px-6 py-5">
+                  <TruncatedCell text={row.remark} maxLength={50} />
+                </TableCell>
                 <TableCell className="px-6 py-5">{row.acceptedBy}</TableCell>
 
                 <TableCell className="px-6 py-5">

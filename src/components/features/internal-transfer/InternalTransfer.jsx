@@ -1,23 +1,19 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
+import { useDebounce } from "use-debounce";
 
 import FormInput from "@/components/common/forms/FormInput";
 import FormSection from "@/components/common/forms/FormSection";
 import FormSubmit from "@/components/common/forms/FormSubmit";
 
-import { internalTransferSchema } from "@/services/internal-transfer/internal-transfer.validation";
+import { useVerifyUserEmail } from "@/hooks/useVerifyUserEmail";
 import { useCreateInternalTransferMutation } from "@/services/internal-transfer/internal-transfer.query";
-import { useGetUsernameByEmailMutation } from "@/services/users/user.mutation";
+import { internalTransferSchema } from "@/services/internal-transfer/internal-transfer.validation";
 
 export default function InternalTransfer() {
   const [errors, setErrors] = useState({});
-  const [senderVerified, setSenderVerified] = useState(null);
-  const [receiverVerified, setReceiverVerified] = useState(null);
-
-  const [senderVerifyError, setSenderVerifyError] = useState("");
-  const [receiverVerifyError, setReceiverVerifyError] = useState("");
 
   const [formData, setFormData] = useState({
     sender: "",
@@ -27,61 +23,50 @@ export default function InternalTransfer() {
   });
 
   const transferMutation = useCreateInternalTransferMutation();
-  const senderVerifyMutation = useGetUsernameByEmailMutation();
-  const receiverVerifyMutation = useGetUsernameByEmailMutation();
 
-  const handleChange = (e) => {
+  // Sender email verification
+  const {
+    verifiedUser: senderVerifiedUser,
+    emailVerified: senderEmailVerified,
+    verifyEmail: verifySenderEmail,
+    isPending: senderVerifying,
+    resetVerification: resetSenderVerification,
+  } = useVerifyUserEmail();
+
+  // Receiver email verification
+  const {
+    verifiedUser: receiverVerifiedUser,
+    emailVerified: receiverEmailVerified,
+    verifyEmail: verifyReceiverEmail,
+    isPending: receiverVerifying,
+    resetVerification: resetReceiverVerification,
+  } = useVerifyUserEmail();
+
+  const [debouncedSender] = useDebounce(formData.sender, 600);
+  const [debouncedReceiver] = useDebounce(formData.receiver, 600);
+
+  // Auto-verify sender email
+  useEffect(() => {
+    verifySenderEmail(debouncedSender);
+  }, [debouncedSender]);
+
+  // Auto-verify receiver email
+  useEffect(() => {
+    verifyReceiverEmail(debouncedReceiver);
+  }, [debouncedReceiver]);
+
+  const handleChange = e => {
     const { name, value } = e.target;
 
-    setFormData((prev) => ({
+    setFormData(prev => ({
       ...prev,
       [name]: value,
     }));
 
-    setErrors((prev) => ({
+    setErrors(prev => ({
       ...prev,
       [name]: "",
     }));
-
-    if (name === "sender") {
-      setSenderVerified(null);
-      setSenderVerifyError("");
-    }
-
-    if (name === "receiver") {
-      setReceiverVerified(null);
-      setReceiverVerifyError("");
-    }
-  };
-
-  const handleVerifySender = async () => {
-    if (!formData.sender?.trim()) return;
-
-    try {
-      setSenderVerifyError("");
-      const response = await senderVerifyMutation.mutateAsync({
-        email: formData.sender,
-      });
-      setSenderVerified(response);
-    } catch (error) {
-      setSenderVerified(null);
-      setSenderVerifyError(error?.message || "Sender not found");
-    }
-  };
-
-  const handleVerifyReceiver = async () => {
-    if (!formData.receiver?.trim()) return;
-
-    try {
-      setReceiverVerifyError("");
-      const response = await receiverVerifyMutation.mutateAsync({
-        email: formData.receiver,
-      });
-      setReceiverVerified(response);
-    } catch (error) {
-      setReceiverVerified(null);
-      setReceiverVerifyError(error?.message || "Receiver not found");
-    }
   };
 
   const handleSubmit = async () => {
@@ -92,7 +77,7 @@ export default function InternalTransfer() {
     if (!validation.success) {
       const fieldErrors = {};
 
-      validation.error.issues.forEach((issue) => {
+      validation.error.issues.forEach(issue => {
         fieldErrors[issue.path[0]] = issue.message;
       });
 
@@ -100,21 +85,27 @@ export default function InternalTransfer() {
       return;
     }
 
-    if (!senderVerified) {
-      setSenderVerifyError("Please verify sender email");
+    if (senderEmailVerified !== true) {
+      setErrors(prev => ({
+        ...prev,
+        sender: "Please verify sender email",
+      }));
       return;
     }
 
-    if (!receiverVerified) {
-      setReceiverVerifyError("Please verify receiver email");
+    if (receiverEmailVerified !== true) {
+      setErrors(prev => ({
+        ...prev,
+        receiver: "Please verify receiver email",
+      }));
       return;
     }
 
-    if (
-      formData.sender.trim().toLowerCase() ===
-      formData.receiver.trim().toLowerCase()
-    ) {
-      setReceiverVerifyError("Sender and Receiver cannot be same");
+    if (formData.sender.trim().toLowerCase() === formData.receiver.trim().toLowerCase()) {
+      setErrors(prev => ({
+        ...prev,
+        receiver: "Sender and Receiver cannot be same",
+      }));
       return;
     }
 
@@ -129,10 +120,8 @@ export default function InternalTransfer() {
       });
 
       setErrors({});
-      setSenderVerified(null);
-      setReceiverVerified(null);
-      setSenderVerifyError("");
-      setReceiverVerifyError("");
+      resetSenderVerification();
+      resetReceiverVerification();
     } catch (error) {
       toast.error(error?.message || "Failed to create internal transfer");
     }
@@ -148,18 +137,13 @@ export default function InternalTransfer() {
             name="sender"
             value={formData.sender}
             onChange={handleChange}
-            onBlur={handleVerifySender}
-            error={errors.sender || senderVerifyError}
+            error={errors.sender || (senderEmailVerified === false ? "Invalid Email" : "")}
           />
 
-          {senderVerifyMutation.isPending && (
-            <p className="mt-1 text-xs text-blue-500">Verifying sender...</p>
-          )}
+          {senderVerifying && <p className="mt-1 text-xs text-blue-500">Verifying sender...</p>}
 
-          {senderVerified && (
-            <p className="mt-1 text-xs text-green-600">
-              {senderVerified?.response?.user_name}
-            </p>
+          {senderEmailVerified === true && (
+            <p className="mt-1 text-xs font-medium text-green-600">✓ {senderVerifiedUser}</p>
           )}
         </div>
 
@@ -170,25 +154,20 @@ export default function InternalTransfer() {
             name="receiver"
             value={formData.receiver}
             onChange={handleChange}
-            onBlur={handleVerifyReceiver}
-            error={errors.receiver || receiverVerifyError}
+            error={errors.receiver || (receiverEmailVerified === false ? "Invalid Email" : "")}
           />
 
-          {receiverVerifyMutation.isPending && (
-            <p className="mt-1 text-xs text-blue-500">Verifying receiver...</p>
-          )}
+          {receiverVerifying && <p className="mt-1 text-xs text-blue-500">Verifying receiver...</p>}
 
-          {receiverVerified && (
-            <p className="mt-1 text-xs text-green-600">
-              {receiverVerified?.response?.user_name}
-            </p>
+          {receiverEmailVerified === true && (
+            <p className="mt-1 text-xs font-medium text-green-600">✓ {receiverVerifiedUser}</p>
           )}
         </div>
 
         <FormInput
           label="Amount"
           min="0"
-          onWheel={(e) => e.target.blur()}
+          onWheel={e => e.target.blur()}
           placeholder="Enter Amount"
           name="amount"
           type="number"
@@ -211,11 +190,7 @@ export default function InternalTransfer() {
         <FormSubmit
           title={transferMutation.isPending ? "Submitting..." : "Submit"}
           onClick={handleSubmit}
-          disabled={
-            transferMutation.isPending ||
-            senderVerifyMutation.isPending ||
-            receiverVerifyMutation.isPending
-          }
+          disabled={transferMutation.isPending || senderVerifying || receiverVerifying}
         />
       </div>
     </FormSection>

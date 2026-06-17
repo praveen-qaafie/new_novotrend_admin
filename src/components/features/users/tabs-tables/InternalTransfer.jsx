@@ -9,7 +9,9 @@ import { TableCell, TableRow } from "@/components/ui/table";
 import { useClientPagination } from "@/hooks/useClientPagination";
 
 const tableHeaders = [
-  { label: "S.No", key: "id" },
+  { label: "#", key: "id" },
+  { label: "Name", key: "name" },
+  { label: "Email", key: "email" },
   { label: "Date", key: "date" },
   { label: "Amount", key: "amount" },
   { label: "From", key: "from" },
@@ -19,6 +21,7 @@ const tableHeaders = [
 
 export default function InternalTransfer({ userDetails }) {
   const transfers = userDetails?.internal_transfer ?? [];
+  const selectedUser = userDetails?.user ?? {};
   const { limit, setLimit, offset, setOffset, total, paginatedItems } =
     useClientPagination(transfers);
 
@@ -53,31 +56,29 @@ export default function InternalTransfer({ userDetails }) {
 
         {paginatedItems.map((row, index) => (
           <TableRow key={`${row.date}-${index}`} className="border-b border-border hover:bg-muted/40">
-            {/* # */}
-            <TableCell>{offset + index + 1}</TableCell>
+            <TableCell className="px-6 py-5">{offset + index + 1}</TableCell>
 
-            {/* DATE */}
-            <TableCell className="whitespace-nowrap">{row.date}</TableCell>
+            <TableCell className="px-6 py-5">{selectedUser?.name || "-"}</TableCell>
 
-            {/* AMOUNT */}
-            <TableCell className="font-semibold text-primary">${row.amount}</TableCell>
+            <TableCell className="px-6 py-5">{selectedUser?.email || "-"}</TableCell>
 
-            {/* FROM */}
-            <TableCell>
+            <TableCell className="whitespace-nowrap px-6 py-5">{row.date}</TableCell>
+
+            <TableCell className="px-6 py-5 font-semibold text-primary">${row.amount}</TableCell>
+
+            <TableCell className="px-6 py-5">
               <span className="rounded-xl bg-blue-500/10 px-3 py-1 text-xs font-medium text-blue-600">
                 {row.from_account || "-"}
               </span>
             </TableCell>
 
-            {/* TO */}
-            <TableCell>
+            <TableCell className="px-6 py-5">
               <span className="rounded-xl bg-emerald-500/10 px-3 py-1 text-xs font-medium text-emerald-600">
                 {row.to_account || "-"}
               </span>
             </TableCell>
 
-            {/* NOTE */}
-            <TableCell className="max-w-[220px] truncate">{row.note}</TableCell>
+            <TableCell className="max-w-[220px] truncate px-6 py-5">{row.note}</TableCell>
           </TableRow>
         ))}
       </DataTable>

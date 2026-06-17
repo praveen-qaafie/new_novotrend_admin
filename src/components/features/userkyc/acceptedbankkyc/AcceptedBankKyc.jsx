@@ -2,41 +2,21 @@
 
 import { X } from "lucide-react";
 
+import {
+  KycFilePreviewDialog,
+  KycFileThumbnail as KycThumbnail,
+} from "@/components/common/KycFilePreview";
 import UserActionKycModal from "@/components/common/modals/UserActionKycModal";
 import DataTable from "@/components/common/tables/DataTable";
 import ExportDropdown from "@/components/common/tables/ExportDropdown";
 import TableFooter from "@/components/common/tables/TableFooter";
 import TableSearch from "@/components/common/tables/TableSearch";
 import TableWrapper from "@/components/common/tables/TableWrapper";
-import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { TableCell, TableRow } from "@/components/ui/table";
 import { useBankKycAcceptedListQuery } from "@/services/userkyc/userkyc.query";
-import Image from "next/image";
 import { useState } from "react";
 import { useDebounce } from "use-debounce";
 import DateInputFilter from "../acceptedkyc/DateInputFilter";
-
-const KycThumbnail = ({ src, alt, onPreview }) => {
-  if (!src) {
-    return (
-      <div className="flex h-16 w-24 items-center justify-center rounded-2xl border border-dashed border-border bg-muted/30 text-xs font-medium text-muted-foreground">
-        No image
-      </div>
-    );
-  }
-
-  return (
-    <button onClick={onPreview} className="overflow-hidden rounded-2xl border border-border">
-      <Image
-        src={src}
-        alt={alt}
-        width={96}
-        height={64}
-        className="h-16 w-24 object-cover transition-all hover:scale-105"
-      />
-    </button>
-  );
-};
 
 const tableHeaders = [
   { label: "Name", key: "name", sortable: true },
@@ -71,7 +51,7 @@ export default function AcceptedBankKyc() {
     edate: filters.edate,
   });
   const acceptedBankKyc = data?.response?.records || [];
-    const total = Number(data?.response?.total_records) || 0;
+  const total = Number(data?.response?.total_records) || 0;
   return (
     <>
       <DateInputFilter
@@ -253,20 +233,12 @@ export default function AcceptedBankKyc() {
           type="bankKyc"
         />
 
-        <Dialog open={imageOpen} onOpenChange={setImageOpen}>
-          <DialogContent className="max-w-5xl rounded-3xl border border-border bg-background p-4 overflow-hidden">
-            <DialogTitle className="sr-only">KYC Image Preview</DialogTitle>
-            <div className="overflow-hidden rounded-2xl">
-              {selectedImage && (
-                <Image
-                  src={selectedImage}
-                  alt="KYC Preview"
-                  className="max-h-[80vh] w-full rounded-2xl object-cover"
-                />
-              )}
-            </div>
-          </DialogContent>
-        </Dialog>
+        <KycFilePreviewDialog
+          open={imageOpen}
+          onOpenChange={setImageOpen}
+          selectedFile={selectedImage}
+          fileName="Bank KYC Document Preview"
+        />
       </TableWrapper>
     </>
   );

@@ -3,8 +3,8 @@ import { securePost } from "../../lib/axios/secureApi";
 
 // GET WALLET REQUEST LIST
 export const getWalletRequestList = async ({ limit = 10, offset = 0, search = "" }) => {
-    const token = localStorage.getItem("token");
-    if (!token) {
+  const token = localStorage.getItem("token");
+  if (!token) {
     throw new Error("Session Expired");
   }
   const payload = {
@@ -13,8 +13,8 @@ export const getWalletRequestList = async ({ limit = 10, offset = 0, search = ""
     offset,
     search,
   };
-    const data = await securePost(API_ENDPOINT.WALLET_REQUEST.LIST_WALLET_REQUEST, payload);
-    if (data?.status !== 200) {
+  const data = await securePost(API_ENDPOINT.WALLET_REQUEST.LIST_WALLET_REQUEST, payload);
+  if (data?.status !== 200) {
     throw new Error(data?.result || "Unable to fetch wallet requests");
   }
   return data;
@@ -22,8 +22,8 @@ export const getWalletRequestList = async ({ limit = 10, offset = 0, search = ""
 
 // ACCEPT WALLET REQUEST
 export const acceptWalletRequest = async ({ limit = 10, offset = 0, search = "" }) => {
-    const token = localStorage.getItem("token");
-    if (!token) {
+  const token = localStorage.getItem("token");
+  if (!token) {
     throw new Error("Session Expired");
   }
   const payload = {
@@ -32,16 +32,16 @@ export const acceptWalletRequest = async ({ limit = 10, offset = 0, search = "" 
     offset,
     search,
   };
-    const data = await securePost(API_ENDPOINT.WALLET_REQUEST.WALLET_ACCEPT_LIST, payload);
-    if (data?.status !== 200) {
+  const data = await securePost(API_ENDPOINT.WALLET_REQUEST.WALLET_ACCEPT_LIST, payload);
+  if (data?.status !== 200) {
     throw new Error(data?.result || "Unable to accept wallet request");
   }
   return data;
 };
 // rejected list
 export const rejectWalletRequest = async ({ limit = 10, offset = 0, search = "" }) => {
-    const token = localStorage.getItem("token");
-    if (!token) {
+  const token = localStorage.getItem("token");
+  if (!token) {
     throw new Error("Session Expired");
   }
   const payload = {
@@ -50,8 +50,11 @@ export const rejectWalletRequest = async ({ limit = 10, offset = 0, search = "" 
     offset,
     search,
   };
-    const data = await securePost(API_ENDPOINT.WALLET_REQUEST.WALLET_REJECT_LIST, payload);
-    if (data?.status !== 200) {
+  const data = await securePost(API_ENDPOINT.WALLET_REQUEST.WALLET_REJECT_LIST, payload, {
+    logName: "REJECT WALLET REQUEST LIST",
+  });
+  console.log("REJECT WALLET REQUEST LIST RESPONSE:", data);
+  if (data?.status !== 200) {
     throw new Error(data?.result || "Unable to rejected wallet request");
   }
   return data;
@@ -59,7 +62,7 @@ export const rejectWalletRequest = async ({ limit = 10, offset = 0, search = "" 
 
 // Wallet action (Accept , Reject)
 export const walletActionRemark = async ({ id, status, remark, transid }) => {
-    const token = localStorage.getItem("token");
+  const token = localStorage.getItem("token");
   if (!token) {
     throw new Error("Session Expired");
   }
@@ -70,8 +73,12 @@ export const walletActionRemark = async ({ id, status, remark, transid }) => {
     remark,
     transid,
   };
-    const data = await securePost(API_ENDPOINT.WALLET_REQUEST.WALLET_ACTION, payload);
-    if (data?.status !== 200) {
+  console.log("WALLET REQUEST ACTION PAYLOAD:", payload);
+  const data = await securePost(API_ENDPOINT.WALLET_REQUEST.WALLET_ACTION, payload, {
+    logName: "WALLET REQUEST ACTION",
+  });
+  console.log("WALLET REQUEST ACTION DECRYPTED RESPONSE:", data);
+  if (data?.status !== 200) {
     throw new Error(data?.result || "Unable to process wallet request");
   }
   return data;

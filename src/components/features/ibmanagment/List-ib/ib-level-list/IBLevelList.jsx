@@ -66,7 +66,7 @@ export default function IBLevelList() {
               className="border-b border-border transition-all hover:bg-muted/40"
             >
               <TableCell className="px-6 py-5 text-sm font-medium text-muted-foreground">
-                {String(index + 1).padStart(2, "0")}
+                {String(offset + index + 1).padStart(2, "0")}
               </TableCell>
 
               <TableCell className="px-6 py-5">
@@ -82,7 +82,7 @@ export default function IBLevelList() {
               <TableCell className="px-6 py-5">
                 <Link
                   href={`/ib-managment/list-ib/show-ib-team-list?encodedIds=${encodeURIComponent(
-                    item.encoded_ids,
+                    item.encoded_ids
                   )}`}
                 >
                   <button className="inline-flex items-center gap-2 rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-white transition-all hover:opacity-90">
@@ -95,10 +95,7 @@ export default function IBLevelList() {
           ))
         ) : (
           <TableRow>
-            <TableCell
-              colSpan={4}
-              className="py-10 text-center text-muted-foreground"
-            >
+            <TableCell colSpan={4} className="py-10 text-center text-muted-foreground">
               No levels found
             </TableCell>
           </TableRow>

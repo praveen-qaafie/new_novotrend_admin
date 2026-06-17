@@ -53,7 +53,7 @@ export default function ListUserTable() {
   const { mutate: getUserDetails } = useGetUserDetailsMutation();
   // FINAL USERS ARRAY
   const users = data?.response?.users ?? [];
-  
+
   // pagination calculations
   const total = Number(data?.response?.total_records) || users.length;
   const currentPage = Math.floor(offset / limit) + 1;
@@ -61,7 +61,7 @@ export default function ListUserTable() {
   // Active status toggle handler (placeholder)
   const handleToggleStatus = user => {
     const action = user.status === "Active" ? "deactive" : "active";
-        const willBeActive = action === "active";
+    const willBeActive = action === "active";
     const queryKey = ["users", limit, offset, debouncedSearch];
 
     // snapshot for rollback
@@ -82,11 +82,11 @@ export default function ListUserTable() {
       },
       {
         onSuccess: res => {
-                    // refresh server data to ensure consistency
+          // refresh server data to ensure consistency
           queryClient.invalidateQueries(queryKey);
         },
         onError: err => {
-                    // rollback
+          // rollback
           queryClient.setQueryData(queryKey, previous);
         },
       }
@@ -94,24 +94,22 @@ export default function ListUserTable() {
   };
 
   const handleForceLogout = user => {
-        userAction(
+    userAction(
       {
         user_id: user.user_id,
         type: "logout",
       },
       {
         onSuccess: res => {
-                    // show a simple confirmation message
+          // show a simple confirmation message
           try {
             alert("User logged out successfully");
-          } catch (e) {
-                      }
+          } catch (e) {}
         },
         onError: err => {
-                    try {
+          try {
             alert("Failed to logout user");
-          } catch (e) {
-                      }
+          } catch (e) {}
         },
       }
     );
@@ -197,7 +195,7 @@ export default function ListUserTable() {
           >
             {/* ID */}
             <TableCell className="px-6 py-5 text-sm font-medium text-muted-foreground">
-              {String(index + 1).padStart(2, "0")}
+              {String(offset + index + 1).padStart(2, "0")}
             </TableCell>
 
             {/* Email */}

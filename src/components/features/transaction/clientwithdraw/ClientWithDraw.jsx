@@ -1,19 +1,19 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
 import FormInput from "@/components/common/forms/FormInput";
 import FormSection from "@/components/common/forms/FormSection";
 import FormSelect from "@/components/common/forms/FormSelect";
 import FormSubmit from "@/components/common/forms/FormSubmit";
-import { withdrawalSchema } from "@/services/transaction/transaction.validation";
+import { useVerifyUserEmail } from "@/hooks/useVerifyUserEmail";
 import { useCreateClientWithdrawalMutation } from "@/services/transaction/transaction.query";
-import { useGetUsernameByEmailMutation } from "@/services/users/user.mutation";
+import { withdrawalSchema } from "@/services/transaction/transaction.validation";
+import { useDebounce } from "use-debounce";
 
 export default function ClientWithDraw() {
   const [errors, setErrors] = useState({});
-  const [verifiedUser, setVerifiedUser] = useState(null);
   const [emailVerificationError, setEmailVerificationError] = useState("");
 
   const [formData, setFormData] = useState({
@@ -25,66 +25,61 @@ export default function ClientWithDraw() {
     wallet_address: "",
   });
 
+  const {
+    verifyEmail,
+    verifiedUser: verifiedEmailUser,
+    emailVerified,
+    isPending: verifying,
+    resetVerification,
+  } = useVerifyUserEmail();
   const withdrawalMutation = useCreateClientWithdrawalMutation();
-  const verifyEmailMutation = useGetUsernameByEmailMutation();
 
-  const handleChange = (e) => {
+  const [debouncedUsercode] = useDebounce(formData.usercode, 600);
+
+  useEffect(() => {
+    verifyEmail(debouncedUsercode);
+  }, [debouncedUsercode]);
+
+  const handleChange = e => {
     const { name, value } = e.target;
-    setFormData((prev) => ({
+    setFormData(prev => ({
       ...prev,
       [name]: value,
     }));
 
-    setErrors((prev) => ({
+    setErrors(prev => ({
       ...prev,
       [name]: "",
     }));
 
     if (name === "usercode") {
-      setVerifiedUser(null);
+      resetVerification();
       setEmailVerificationError("");
     }
   };
 
-  const handlePaymentMethod = (value) => {
-    setFormData((prev) => ({
+  const handlePaymentMethod = value => {
+    setFormData(prev => ({
       ...prev,
       paymethod: value,
     }));
 
-    setErrors((prev) => ({
+    setErrors(prev => ({
       ...prev,
       paymethod: "",
     }));
   };
 
-  const handleChainChange = (value) => {
-    setFormData((prev) => ({
+  const handleChainChange = value => {
+    setFormData(prev => ({
       ...prev,
       chainname: value,
     }));
 
-    setErrors((prev) => ({
+    setErrors(prev => ({
       ...prev,
       chainname: "",
     }));
-  };
-
-  const handleVerifyEmail = async () => {
-    if (!formData.usercode?.trim()) return;
-    try {
-      setEmailVerificationError("");
-      const response = await verifyEmailMutation.mutateAsync({
-        email: formData.usercode,
-      });
-
-      setVerifiedUser(response);
-      toast.success("Email verified successfully");
-    } catch (error) {
-      setVerifiedUser(null);
-
-      setEmailVerificationError(error?.message || "User not found");
-    }
   };
 
   const handleSubmit = async () => {
@@ -93,14 +88,14 @@ export default function ClientWithDraw() {
 
     if (!validation.success) {
       const fieldErrors = {};
-      validation.error.issues.forEach((issue) => {
+      validation.error.issues.forEach(issue => {
         fieldErrors[issue.path[0]] = issue.message;
       });
       setErrors(fieldErrors);
       return;
     }
 
-    if (!verifiedUser) {
+    if (!verifiedEmailUser) {
       setEmailVerificationError("Please verify email before submitting");
       return;
     }
@@ -118,7 +113,7 @@ export default function ClientWithDraw() {
       });
 
       setErrors({});
-      setVerifiedUser(null);
+      resetVerification();
       setEmailVerificationError("");
     } catch (error) {
       toast.error(error?.message || "Failed to create withdrawal request");
@@ -126,10 +121,7 @@ export default function ClientWithDraw() {
   };
 
   return (
-    <FormSection
-      title="Generate Client Withdraw"
-      description="Create new MT5 trading group"
-    >
+    <FormSection title="Generate Client Withdraw" description="Create new MT5 trading group">
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
         <div>
           <FormInput
@@ -139,18 +131,16 @@ export default function ClientWithDraw() {
             type="email"
             value={formData.usercode}
             onChange={handleChange}
-            onBlur={handleVerifyEmail}
-            error={errors.usercode || emailVerificationError}
+            error={
+              errors.usercode ||
+              (emailVerified === false ? "Invalid Email" : emailVerificationError)
+            }
           />
 
-          {verifyEmailMutation.isPending && (
-            <p className="mt-1 text-xs text-blue-500">Verifying email...</p>
-          )}
+          {verifying && <p className="mt-1 text-xs text-blue-500">Verifying email...</p>}
 
-          {verifiedUser && (
-            <p className="mt-1 text-xs text-green-600">
-              Email verified successfully
-            </p>
+          {verifiedEmailUser && (
+            <p className="mt-1 text-xs text-green-600">✓ {verifiedEmailUser}</p>
           )}
         </div>
 
@@ -160,7 +150,7 @@ export default function ClientWithDraw() {
           name="amount"
           type="number"
           min="0"
-          onWheel={(e) => e.target.blur()}
+          onWheel={e => e.target.blur()}
           value={formData.amount}
           onChange={handleChange}
           error={errors.amount}
@@ -216,9 +206,7 @@ export default function ClientWithDraw() {
         <FormSubmit
           title={withdrawalMutation.isPending ? "Submitting..." : "Submit"}
           onClick={handleSubmit}
-          disabled={
-            withdrawalMutation.isPending || verifyEmailMutation.isPending
-          }
+          disabled={!verifiedEmailUser || withdrawalMutation.isPending || verifying}
         />
       </div>
     </FormSection>

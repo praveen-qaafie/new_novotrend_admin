@@ -107,7 +107,36 @@ const tableHeaders = [
   { label: "Action", key: "action" },
 ];
 
-const imageUrl = value => value || "";
+const getFileUrl = value => (typeof value === "string" ? value.trim() : "");
+
+const isPdfFile = value => getFileUrl(value).toLowerCase().split("?")[0].endsWith(".pdf");
+
+const DocumentPreview = ({ src, alt }) => {
+  const fileUrl = getFileUrl(src);
+
+  if (!fileUrl) {
+    return <span className="text-xs text-muted-foreground">No Image</span>;
+  }
+
+  if (isPdfFile(fileUrl)) {
+    return (
+      <a
+        href={fileUrl}
+        target="_blank"
+        rel="noreferrer"
+        className="inline-flex h-10 items-center rounded-xl bg-primary/10 px-3 text-xs font-semibold text-primary hover:bg-primary/20"
+      >
+        View PDF
+      </a>
+    );
+  }
+
+  return (
+    <a href={fileUrl} target="_blank" rel="noreferrer" className="inline-flex overflow-hidden rounded-lg border border-border">
+      <Image src={fileUrl} alt={alt} width={56} height={40} className="h-10 w-14 object-cover" />
+    </a>
+  );
+};
 
 export default function KycDocument({ userDetails }) {
   const documents = userDetails?.kyc_doc ?? [];
@@ -161,48 +190,20 @@ export default function KycDocument({ userDetails }) {
               </span>
             </TableCell>
 
-            {/* ID FRONT */}
             <TableCell>
-              <Image
-                src={imageUrl(row.front)}
-                alt="id-front"
-                width={50}
-                height={50}
-                className="h-10 w-14 rounded-lg object-cover "
-              />
+              <DocumentPreview src={row.front} alt="id-front" />
             </TableCell>
 
-            {/* ID BACK */}
             <TableCell>
-              <Image
-                src={imageUrl(row.back)}
-                alt="id-back"
-                width={50}
-                height={50}
-                className="h-10 w-14 rounded-lg object-cover "
-              />
+              <DocumentPreview src={row.back} alt="id-back" />
             </TableCell>
 
-            {/* ADDRESS FRONT */}
             <TableCell>
-              <Image
-                src={imageUrl(row.address_front)}
-                alt="address-front"
-                width={50}
-                height={50}
-                className="h-10 w-14 rounded-lg object-cover "
-              />
+              <DocumentPreview src={row.address_front} alt="address-front" />
             </TableCell>
 
-            {/* ADDRESS BACK */}
             <TableCell>
-              <Image
-                src={imageUrl(row.address_back)}
-                alt="address-back"
-                width={50}
-                height={50}
-                className="h-10 w-14 rounded-lg object-cover "
-              />
+              <DocumentPreview src={row.address_back} alt="address-back" />
             </TableCell>
 
             {/* UPLOADED DATE */}

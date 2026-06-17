@@ -7,7 +7,7 @@ export const dashboardCards = [
     value: "24,892",
     valueKey: "total_user",
     icon: Users,
-    href: "/users",
+    href: "/users/list-user",
   },
   {
     category: "overview",
@@ -15,7 +15,7 @@ export const dashboardCards = [
     value: "1,240",
     valueKey: "total_ib",
     icon: Landmark,
-    href: "/ib",
+    href: "/ib-managment/list-become-ib",
   },
   {
     category: "overview",
@@ -24,7 +24,7 @@ export const dashboardCards = [
     valueKey: "daily_deposit",
     valueType: "currency",
     icon: Wallet,
-    href: "/deposits",
+    href: "/report/deposit-report",
   },
   {
     category: "overview",
@@ -33,7 +33,7 @@ export const dashboardCards = [
     valueKey: "weekly_deposit",
     valueType: "currency",
     icon: BadgeDollarSign,
-    href: "/deposits",
+    href: "/report/deposit-report",
   },
 
   // Deposits
@@ -44,7 +44,7 @@ export const dashboardCards = [
     valueKey: "monthly_deposit",
     valueType: "currency",
     icon: Wallet,
-    href: "/deposits",
+    href: "/report/deposit-report",
   },
   {
     category: "deposits",
@@ -53,7 +53,7 @@ export const dashboardCards = [
     valueKey: "total_deposit",
     valueType: "currency",
     icon: CreditCard,
-    href: "/deposits",
+    href: "/report/deposit-report",
   },
   {
     category: "deposits",
@@ -61,7 +61,7 @@ export const dashboardCards = [
     value: "42",
     valueKey: "pending_deposit",
     icon: Wallet,
-    href: "/deposits",
+    href: "/userkyc/new-kyc",
   },
 
   // Withdrawals
@@ -72,7 +72,7 @@ export const dashboardCards = [
     valueKey: "daily_withdraw",
     valueType: "currency",
     icon: Wallet,
-    href: "/withdrawals",
+    href: "/report/withdrawal-report",
   },
   {
     category: "withdrawals",
@@ -81,7 +81,7 @@ export const dashboardCards = [
     valueKey: "weekly_withdraw",
     valueType: "currency",
     icon: Wallet,
-    href: "/withdrawals",
+    href: "/report/withdrawal-report",
   },
   {
     category: "withdrawals",
@@ -90,7 +90,7 @@ export const dashboardCards = [
     valueKey: "monthly_withdraw",
     valueType: "currency",
     icon: Wallet,
-    href: "/withdrawals",
+    href: "/report/withdrawal-report",
   },
   {
     category: "withdrawals",
@@ -99,7 +99,7 @@ export const dashboardCards = [
     valueKey: "total_withdraw",
     valueType: "currency",
     icon: CreditCard,
-    href: "/withdrawals",
+    href: "/report/withdrawal-report",
   },
   {
     category: "withdrawals",
@@ -107,7 +107,7 @@ export const dashboardCards = [
     value: "19",
     valueKey: "pending_withdraw",
     icon: Wallet,
-    href: "/withdrawals",
+    href: "/withdrawal/withdrawal-request",
   },
 
   // IB
@@ -116,28 +116,28 @@ export const dashboardCards = [
     title: "Daily IB Withdraw",
     value: "$1,200",
     icon: Landmark,
-    href: "/ib",
+    href: "/report/ib-withdrawal-report",
   },
   {
     category: "ib",
     title: "Weekly IB Withdraw",
     value: "$8,400",
     icon: Landmark,
-    href: "/ib",
+    href: "/report/ib-withdrawal-report",
   },
   {
     category: "ib",
     title: "Monthly IB Withdraw",
     value: "$24,000",
     icon: Landmark,
-    href: "/ib",
+    href: "/report/ib-withdrawal-report",
   },
   {
     category: "ib",
     title: "Total IB Withdraw",
     value: "$120K",
     icon: BadgeDollarSign,
-    href: "/ib",
+    href: "/report/ib-withdrawal-report",
   },
   {
     category: "ib",
@@ -145,7 +145,7 @@ export const dashboardCards = [
     value: "12",
     valueKey: "pending_ib_request",
     icon: Landmark,
-    href: "/ib",
+    href: "/ib-managment/list-ib-request",
   },
 
   // Registrations
@@ -155,7 +155,7 @@ export const dashboardCards = [
     value: "182",
     valueKey: "daily_registration",
     icon: UserPlus,
-    href: "/registrations",
+    href: "/users/list-user",
   },
   {
     category: "registrations",
@@ -163,7 +163,7 @@ export const dashboardCards = [
     value: "4,820",
     valueKey: "monthly_registration",
     icon: Users,
-    href: "/registrations",
+    href: "/users/list-user",
   },
 
   // MT5
@@ -173,7 +173,7 @@ export const dashboardCards = [
     value: "54",
     valueKey: "daily_mt5_id",
     icon: CreditCard,
-    href: "/mt5",
+    href: "/users/mt5-user-list",
   },
   {
     category: "mt5",
@@ -181,6 +181,6 @@ export const dashboardCards = [
     value: "1,340",
     valueKey: "monthly_mt5_id",
     icon: CreditCard,
-    href: "/mt5",
+    href: "/users/mt5-user-list",
   },
 ];

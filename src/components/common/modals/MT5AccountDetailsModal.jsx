@@ -9,19 +9,51 @@ import {
 } from "@/components/ui/dialog";
 
 export default function MT5AccountDetailsModal({ open, onOpenChange, user }) {
+  const apiDetails = user?.mt5AccountDetails;
+  const mt5User =
+    apiDetails?.result?.data?.response?.mt5_users?.[0] ||
+    apiDetails?.data?.response?.mt5_users?.[0] ||
+    apiDetails?.response?.mt5_users?.[0] ||
+    apiDetails?.mt5_users?.[0] ||
+    {};
+
+  const getValue = keys => {
+    for (const key of keys) {
+      const value = mt5User?.[key] ?? user?.[key];
+
+      if (value !== undefined && value !== null && value !== "") {
+        return value;
+      }
+    }
+
+    return " - ";
+  };
+
+  const formatValue = value => {
+    if (value === undefined || value === null || value === "") {
+      return " - ";
+    }
+
+    if (typeof value === "object") {
+      return JSON.stringify(value);
+    }
+
+    return value;
+  };
+
   const accountDetails = [
-    { label: "Login", value: user?.mt5_id || " - " },
-    { label: "Currency Digits", value: "0" },
-    { label: "Created At", value: user?.generate_date || " - " },
-    { label: "Balance", value: "0" },
-    { label: "Margin Leverage", value: user?.leverages || "0" },
-    { label: "Leverage", value: user?.leverages || "0" },
-    { label: "Credit", value: "0" },
-    { label: "Profit", value: "0" },
-    { label: "Assets", value: "0" },
-    { label: "Margin", value: "0" },
-    { label: "Equity", value: "0" },
-    { label: "Equity Prev Day", value: user?.wallet_balance || 0 },
+    { label: "Login", value: getValue(["Login", "login", "mt5_id", "account", "account_number"]) },
+    { label: "Currency Digits", value: getValue(["CurrencyDigits", "currency_digits"]) },
+    { label: "Created At", value: getValue(["CreatedAt", "created_at", "generate_date"]) },
+    { label: "Balance", value: getValue(["Balance", "balance", "wallet_balance"]) },
+    { label: "Margin Leverage", value: getValue(["MarginLeverage", "margin_leverage", "leverages"]) },
+    { label: "Leverage", value: getValue(["Leverage", "leverage", "leverages"]) },
+    { label: "Credit", value: getValue(["Credit", "credit"]) },
+    { label: "Profit", value: getValue(["Profit", "profit"]) },
+    { label: "Assets", value: getValue(["Assets", "assets"]) },
+    { label: "Margin", value: getValue(["Margin", "margin"]) },
+    { label: "Equity", value: getValue(["Equity", "equity"]) },
+    { label: "Equity Prev Day", value: getValue(["mt5balance", "EquityPrevDay", "equity_prev_day"]) },
   ];
 
   return (

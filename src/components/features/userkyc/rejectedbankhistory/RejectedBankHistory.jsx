@@ -1,13 +1,12 @@
 "use client";
 
-import Image from "next/image";
-
+import { KycFileThumbnail as KycThumbnail } from "@/components/common/KycFilePreview";
 import DataTable from "@/components/common/tables/DataTable";
 import ExportDropdown from "@/components/common/tables/ExportDropdown";
 import TableFooter from "@/components/common/tables/TableFooter";
 import TableSearch from "@/components/common/tables/TableSearch";
 import TableWrapper from "@/components/common/tables/TableWrapper";
-
+import TruncatedCell from "@/components/common/TruncatedCell";
 import { TableCell, TableRow } from "@/components/ui/table";
 import { useBankRejectedHistoryListQuery } from "@/services/userkyc/userkyc.query";
 import { useState } from "react";
@@ -52,7 +51,7 @@ export default function RejectedBankHistory() {
     search: debouncedSearch,
   });
   const rejectedBankHistory = data?.response?.data || [];
-    const total = Number(data?.response?.total_records) || 0;
+  const total = Number(data?.response?.total_records) || 0;
   return (
     <TableWrapper
       title="Rejected Bank History"
@@ -129,15 +128,14 @@ export default function RejectedBankHistory() {
 
                 <TableCell className="px-6 py-5">
                   {bankImageSrc ? (
-                    <div className="overflow-hidden rounded-2xl border border-border">
-                      <Image
-                        src={bankImageSrc}
-                        alt="Bank Proof"
-                        width={120}
-                        height={80}
-                        className="h-20 w-32 object-cover"
-                      />
-                    </div>
+                    <KycThumbnail
+                      src={bankImageSrc}
+                      alt="Bank Proof"
+                      onPreview={() => {
+                        setSelectedImage(bankImageSrc);
+                        setImageOpen(true);
+                      }}
+                    />
                   ) : (
                     <div className="flex h-20 w-32 items-center justify-center rounded-2xl border border-dashed border-border bg-muted/30 text-xs font-medium text-muted-foreground">
                       No image
@@ -171,7 +169,7 @@ export default function RejectedBankHistory() {
                 <TableCell className="px-6 py-5">
                   <div>
                     <p className="text-sm font-medium leading-6 text-red-500">
-                      {item.remark || "-"}
+                      <TruncatedCell text={item.remark} maxLength={50} className="!text-red-500" />
                     </p>
                   </div>
                 </TableCell>

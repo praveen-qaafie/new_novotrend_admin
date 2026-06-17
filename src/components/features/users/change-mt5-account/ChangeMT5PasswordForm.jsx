@@ -9,8 +9,10 @@ import {
   useChangeMT5PasswordMutation,
   useGetMT5AccountByEmailMutation,
 } from "@/services/users/user.mutation";
+import { Eye, EyeOff } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 import { useDebounce } from "use-debounce";
 
 const typeOptions = ["Both", "Main Password", "Investor Password"];
@@ -19,6 +21,9 @@ export default function ChangeMT5PasswordForm() {
   const [mt5Accounts, setMT5Accounts] = useState([]);
   const [selectedAccount, setSelectedAccount] = useState("");
   const [selectedType, setSelectedType] = useState("");
+  const [formError, setFormError] = useState("");
+  const [showMainPassword, setShowMainPassword] = useState(false);
+  const [showInvestorPassword, setShowInvestorPassword] = useState(false);
   const { register, watch, handleSubmit, reset } = useForm();
   const email = watch("email");
   const [debouncedEmail] = useDebounce(email, 600);
@@ -70,6 +75,23 @@ export default function ChangeMT5PasswordForm() {
   const { mutate: changePassword, isPending: changingPassword } = useChangeMT5PasswordMutation();
 
   const handleChangePassword = data => {
+    setFormError("");
+
+    if (selectedType === "Both" && (!data.mainpassword || !data.investorpassword)) {
+      setFormError("Please enter both passwords.");
+      return;
+    }
+
+    if (selectedType === "Main Password" && !data.mainpassword) {
+      setFormError("Please enter main password.");
+      return;
+    }
+
+    if (selectedType === "Investor Password" && !data.investorpassword) {
+      setFormError("Please enter investor password.");
+      return;
+    }
+
     changePassword(
       {
         accountnumber: selectedAccount,
@@ -80,14 +102,43 @@ export default function ChangeMT5PasswordForm() {
       },
       {
         onSuccess: () => {
+          toast.success("Password changed successfully");
+          reset();
           resetVerification();
           setMT5Accounts([]);
           setSelectedAccount("");
           setSelectedType("");
+          setFormError("");
+        },
+        onError: error => {
+          const message = error?.message || "Failed to change password";
+          setFormError(message);
         },
       }
     );
   };
+
+  const mainPasswordToggle = (
+    <button
+      type="button"
+      onClick={() => setShowMainPassword(prev => !prev)}
+      className="flex h-8 w-8 items-center justify-center rounded-xl text-muted-foreground transition-all hover:bg-muted hover:text-foreground"
+      aria-label={showMainPassword ? "Hide main password" : "Show main password"}
+    >
+      {showMainPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+    </button>
+  );
+
+  const investorPasswordToggle = (
+    <button
+      type="button"
+      onClick={() => setShowInvestorPassword(prev => !prev)}
+      className="flex h-8 w-8 items-center justify-center rounded-xl text-muted-foreground transition-all hover:bg-muted hover:text-foreground"
+      aria-label={showInvestorPassword ? "Hide investor password" : "Show investor password"}
+    >
+      {showInvestorPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+    </button>
+  );
 
   return (
     <div className="mx-auto max-w-5xl">
@@ -127,56 +178,86 @@ export default function ChangeMT5PasswordForm() {
               options={mt5Accounts}
               disabled={!emailVerified || accountLoading}
               value={selectedAccount}
-              onValueChange={setSelectedAccount}
+              onValueChange={value => {
+                setSelectedAccount(value);
+                setFormError("");
+              }}
             />
             <FormSelect
               label="Select Type"
               placeholder="Choose password type"
               options={typeOptions}
               value={selectedType}
-              onValueChange={setSelectedType}
+              onValueChange={value => {
+                setSelectedType(value);
+                setFormError("");
+              }}
             />
             {selectedType === "Both" && (
               <>
                 <FormInput
                   label="Main Password"
-                  type="password"
+                  type={showMainPassword ? "text" : "password"}
                   placeholder="Enter main password"
-                  {...register("mainpassword")}
+                  rightElement={mainPasswordToggle}
+                  {...register("mainpassword", {
+                    onChange: () => setFormError(""),
+                  })}
                 />
 
                 <FormInput
                   label="Investor Password"
-                  type="password"
+                  type={showInvestorPassword ? "text" : "password"}
                   placeholder="Enter investor password"
-                  {...register("investorpassword")}
+                  rightElement={investorPasswordToggle}
+                  {...register("investorpassword", {
+                    onChange: () => setFormError(""),
+                  })}
                 />
               </>
             )}
             {selectedType === "Main Password" && (
               <FormInput
                 label="Main Password"
-                type="password"
+                type={showMainPassword ? "text" : "password"}
                 placeholder="Enter main password"
-                {...register("mainpassword")}
+                rightElement={mainPasswordToggle}
+                {...register("mainpassword", {
+                  onChange: () => setFormError(""),
+                })}
               />
             )}
             {selectedType === "Investor Password" && (
               <FormInput
                 label="Investor Password"
-                type="password"
+                type={showInvestorPassword ? "text" : "password"}
                 placeholder="Enter investor password"
-                {...register("investorpassword")}
+                rightElement={investorPasswordToggle}
+                {...register("investorpassword", {
+                  onChange: () => setFormError(""),
+                })}
               />
             )}
           </div>
-          <div className="mt-8 flex justify-end">
-            <div className="mt-8 flex justify-end">
-              <FormSubmit
-                title={changingPassword ? "Changing..." : "Change Password"}
-                disabled={!emailVerified || !selectedAccount || !selectedType}
-              />
+
+          {changingPassword && (
+            <div className="mt-6 flex items-center gap-3 rounded-2xl border border-primary/20 bg-primary/5 px-4 py-3 text-primary">
+              <span className="h-4 w-4 animate-spin rounded-full border-2 border-primary/20 border-t-primary" />
+              <span className="text-sm font-semibold">Changing password...</span>
             </div>
+          )}
+
+          {formError && (
+            <div className="mt-6 rounded-2xl border border-red-500/20 bg-red-500/10 px-4 py-3 text-sm font-medium text-red-500">
+              {formError}
+            </div>
+          )}
+
+          <div className="mt-8 flex justify-end">
+            <FormSubmit
+              title={changingPassword ? "Changing..." : "Change Password"}
+              disabled={!emailVerified || !selectedAccount || !selectedType || changingPassword}
+            />
           </div>
         </form>
       </FormSection>

@@ -12,6 +12,7 @@ import TableWrapper from "@/components/common/tables/TableWrapper";
 import { TableCell, TableRow } from "@/components/ui/table";
 import { useWalletRequestList } from "@/services/walletrequest/wallet.query";
 import { useState } from "react";
+import { useDebounce } from "use-debounce";
 import WalletAcceptedRequest from "../accepted-list/WalletAcceptedRequest";
 
 const tableHeaders = [
@@ -33,16 +34,20 @@ export default function DepositRequest() {
   const [remarkModalOpen, setRemarkModalOpen] = useState(false);
   const [selectedRequest, setSelectedRequest] = useState(null);
   const [actionType, setActionType] = useState("");
+  const [debouncedSearch] = useDebounce(search, 500);
   const { data, isLoading } = useWalletRequestList({
-    limit: 10,
-    offset: 0,
-    search: "",
+    limit,
+    offset,
+    search: debouncedSearch,
   });
-    const depositRequests = data?.response?.records || [];
-  
+  const depositRequests = data?.response?.records || [];
+
   // pagination calculations
   const total = Number(data?.response?.total_records) || 0;
-  const currentPage = Math.floor(offset / limit) + 1;
+  const handleSearchChange = value => {
+    setSearch(value);
+    setOffset(0);
+  };
 
   return (
     <>
@@ -51,7 +56,7 @@ export default function DepositRequest() {
         description="Manage and review all deposit requests"
         actions={
           <>
-            <TableSearch value={search} onChange={setSearch} />
+            <TableSearch value={search} onChange={handleSearchChange} />
             <ExportDropdown />
           </>
         }
@@ -80,7 +85,7 @@ export default function DepositRequest() {
               >
                 {/* ID */}
                 <TableCell className="px-6 py-5 text-sm font-medium text-muted-foreground">
-                  {String(index + 1).padStart(2, "0")}
+                  {String(offset + index + 1).padStart(2, "0")}
                 </TableCell>
 
                 {/* USER */}

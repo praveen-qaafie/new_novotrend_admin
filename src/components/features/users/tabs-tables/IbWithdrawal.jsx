@@ -5,6 +5,7 @@ import ExportDropdown from "@/components/common/tables/ExportDropdown";
 import TableFooter from "@/components/common/tables/TableFooter";
 import TableSearch from "@/components/common/tables/TableSearch";
 import TableWrapper from "@/components/common/tables/TableWrapper";
+import TruncatedCell from "@/components/common/TruncatedCell";
 import { TableCell, TableRow } from "@/components/ui/table";
 import { useClientPagination } from "@/hooks/useClientPagination";
 
@@ -44,14 +45,20 @@ export default function IbWithdrawal({ userDetails }) {
       <DataTable headers={tableHeaders}>
         {ibWithdrawals.length === 0 && (
           <TableRow>
-            <TableCell colSpan={tableHeaders.length} className="py-8 text-center text-sm text-muted-foreground">
+            <TableCell
+              colSpan={tableHeaders.length}
+              className="py-8 text-center text-sm text-muted-foreground"
+            >
               No IB withdrawals found.
             </TableCell>
           </TableRow>
         )}
 
         {paginatedItems.map((row, index) => (
-          <TableRow key={`${row.date}-${index}`} className="border-b border-border hover:bg-muted/40">
+          <TableRow
+            key={`${row.date}-${index}`}
+            className="border-b border-border hover:bg-muted/40"
+          >
             {/* # */}
             <TableCell>{offset + index + 1}</TableCell>
 
@@ -62,7 +69,9 @@ export default function IbWithdrawal({ userDetails }) {
             <TableCell className="font-semibold text-primary">${row.amount}</TableCell>
 
             {/* REMARK */}
-            <TableCell className="text-muted-foreground">{row.remark}</TableCell>
+            <TableCell className="text-muted-foreground">
+              <TruncatedCell text={row.remark} maxLength={50} />
+            </TableCell>
 
             <TableCell>
               <span className="rounded-xl bg-blue-500/10 px-3 py-1.5 text-xs font-semibold text-blue-600">

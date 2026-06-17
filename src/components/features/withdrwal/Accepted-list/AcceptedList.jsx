@@ -89,7 +89,7 @@ export default function AcceptedList() {
                   className="border-b border-border transition-all hover:bg-muted/40"
                 >
                   <TableCell className="px-6 py-5 text-sm font-medium text-muted-foreground">
-                    {String(index + 1).padStart(2, "0")}
+                    {String(offset + index + 1).padStart(2, "0")}
                   </TableCell>
 
                   <TableCell className="px-6 py-5">

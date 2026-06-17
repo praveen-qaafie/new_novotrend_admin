@@ -1,25 +1,34 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
+import { useDebounce } from "use-debounce";
 
 import FormInput from "@/components/common/forms/FormInput";
 import FormSection from "@/components/common/forms/FormSection";
 import FormSelect from "@/components/common/forms/FormSelect";
 import FormSubmit from "@/components/common/forms/FormSubmit";
 
+import { useVerifyUserEmail } from "@/hooks/useVerifyUserEmail";
 import { useCountryListQuery } from "@/services/country/conuntry.query";
 import { useAddBankAccountMutation } from "@/services/userkyc/userkyc.mutation";
-import { useGetUsernameByEmailMutation } from "@/services/users/user.mutation";
 
 export default function AddEditBankKyc() {
-  const [verifiedUser, setVerifiedUser] = useState(null);
+  const [verifiedUserData, setVerifiedUserData] = useState(null);
   const [selectedCountry, setSelectedCountry] = useState("");
   const [bankImage, setBankImage] = useState(null);
+  const {
+    verifyEmail,
+    verifiedUser,
+    emailVerified,
+    isPending: verifying,
+    resetVerification,
+  } = useVerifyUserEmail();
 
   const { register, watch, handleSubmit, reset } = useForm();
 
   const email = watch("email");
+  const [debouncedEmail] = useDebounce(email, 600);
 
   const { data } = useCountryListQuery();
 
@@ -30,31 +39,26 @@ export default function AddEditBankKyc() {
     value: String(country.country_id),
   }));
 
-  const { mutate: verifyEmail } = useGetUsernameByEmailMutation();
-
   const { mutate: addBankAccountMutation, isPending } = useAddBankAccountMutation();
 
-  const handleVerifyEmail = () => {
-    if (!email?.trim()) return;
+  useEffect(() => {
+    setVerifiedUserData(null);
+    verifyEmail(debouncedEmail, response => {
+      setVerifiedUserData(response?.response || null);
+    });
+  }, [debouncedEmail]);
 
-    verifyEmail(
-      { email },
-      {
-        onSuccess: data => {
-                    setVerifiedUser(data?.response || null);
-        },
-        onError: () => {
-          setVerifiedUser(null);
-        },
-      }
-    );
-  };
+  useEffect(() => {
+    if (emailVerified === false) {
+      setVerifiedUserData(null);
+    }
+  }, [emailVerified]);
 
   const onSubmit = values => {
     const formData = new FormData();
     const userId =
-      typeof verifiedUser === "object"
-        ? verifiedUser?.user_id || verifiedUser?.id || verifiedUser?.userid || ""
+      typeof verifiedUserData === "object"
+        ? verifiedUserData?.user_id || verifiedUserData?.id || verifiedUserData?.userid || ""
         : "";
 
     formData.append("user_id", userId);
@@ -74,8 +78,9 @@ export default function AddEditBankKyc() {
       onSuccess: () => {
         reset();
         setSelectedCountry("");
-        setVerifiedUser(null);
+        setVerifiedUserData(null);
         setBankImage(null);
+        resetVerification();
       },
     });
   };
@@ -90,18 +95,18 @@ export default function AddEditBankKyc() {
               type="email"
               placeholder="Enter user email"
               {...register("email")}
-              onBlur={handleVerifyEmail}
             />
 
-            {verifiedUser && (
+            {verifying && <p className="mt-2 text-sm text-primary">Checking email...</p>}
+
+            {emailVerified === true && (
               <p className="mt-2 text-sm font-medium text-green-500">
-                {typeof verifiedUser === "string"
-                  ? verifiedUser
-                  : verifiedUser.user_name ||
-                    verifiedUser.name ||
-                    verifiedUser.email ||
-                    "User verified"}
+                ✓ {verifiedUser || verifiedUserData?.user_name || "User verified"}
               </p>
+            )}
+
+            {emailVerified === false && (
+              <p className="mt-2 text-sm font-medium text-red-500">Invalid Email</p>
             )}
           </div>
           <FormInput
@@ -160,7 +165,7 @@ export default function AddEditBankKyc() {
         <div className="mt-8 flex justify-end">
           <FormSubmit
             type="submit"
-            disabled={isPending}
+            disabled={isPending || !emailVerified}
             title={isPending ? "Submitting..." : "Submit"}
           />
         </div>

@@ -4,7 +4,6 @@ import {
   BellRing,
   Building2,
   CombineIcon,
-  Edit2Icon,
   FileBarChart2,
   Gift,
   Landmark,
@@ -310,12 +309,12 @@ export const sidebarItems = [
           },
         ],
       },
-      {
-        title: "Exchanger Edit",
-        href: "/exchange-edit",
-        icon: Edit2Icon,
-        permission: "Exchanger Edit",
-      },
+      // {
+      //   title: "Exchanger Edit",
+      //   href: "/exchange-edit",
+      //   icon: Edit2Icon,
+      //   permission: "Exchanger Edit",
+      // },
       {
         title: "Bank information",
         href: "/bank-info",

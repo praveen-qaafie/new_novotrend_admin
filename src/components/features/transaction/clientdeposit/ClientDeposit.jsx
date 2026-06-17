@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
 import FormInput from "@/components/common/forms/FormInput";
@@ -8,14 +8,14 @@ import FormSection from "@/components/common/forms/FormSection";
 import FormSelect from "@/components/common/forms/FormSelect";
 import FormSubmit from "@/components/common/forms/FormSubmit";
 import { depositSchema } from "@/services/transaction/transaction.validation";
+import { useDebounce } from "use-debounce";
 
+import { useVerifyUserEmail } from "@/hooks/useVerifyUserEmail";
 import { useCreateClientDepositMutation } from "@/services/transaction/transaction.query";
-import { useGetUsernameByEmailMutation } from "@/services/users/user.mutation";
 
 export default function ClientDeposit() {
   const [errors, setErrors] = useState({});
   const [emailVerificationError, setEmailVerificationError] = useState("");
-  const [verifiedUser, setVerifiedUser] = useState(null);
 
   const [formData, setFormData] = useState({
     usercode: "",
@@ -25,62 +25,50 @@ export default function ClientDeposit() {
     transid: "",
   });
 
-  const depositMutation = useCreateClientDepositMutation();
-  const verifyEmailMutation = useGetUsernameByEmailMutation();
+  const {
+    verifyEmail,
+    verifiedUser,
+    emailVerified,
+    isPending: verifying,
+    resetVerification,
+  } = useVerifyUserEmail();
 
-  const handleChange = (e) => {
+  const depositMutation = useCreateClientDepositMutation();
+
+  const [debouncedUsercode] = useDebounce(formData.usercode, 600);
+
+  useEffect(() => {
+    verifyEmail(debouncedUsercode);
+  }, [debouncedUsercode]);
+
+  const handleChange = e => {
     const { name, value } = e.target;
-    setFormData((prev) => ({
+    setFormData(prev => ({
       ...prev,
       [name]: value,
     }));
 
-    setErrors((prev) => ({
+    setErrors(prev => ({
       ...prev,
       [name]: "",
     }));
 
     if (name === "usercode") {
-      setVerifiedUser(null);
+      resetVerification();
       setEmailVerificationError("");
     }
   };
 
-  const handlePaymentMethod = (value) => {
-    setFormData((prev) => ({
+  const handlePaymentMethod = value => {
+    setFormData(prev => ({
       ...prev,
       paymethod: value,
     }));
 
-    setErrors((prev) => ({
+    setErrors(prev => ({
       ...prev,
       paymethod: "",
     }));
-  };
-
-  const handleVerifyEmail = async () => {
-    if (!formData.usercode) return;
-    const emailValidation = depositSchema.shape.usercode.safeParse(
-      formData.usercode,
-    );
-
-    if (!emailValidation.success) {
-      return;
-    }
-
-    try {
-      setEmailVerificationError("");
-      const response = await verifyEmailMutation.mutateAsync({
-        email: formData.usercode,
-      });
-      setVerifiedUser(response);
-
-      toast.success("Email verified successfully");
-    } catch (error) {
-      setVerifiedUser(null);
-
-      setEmailVerificationError(error?.message || "User not found");
-    }
   };
 
   const handleSubmit = async () => {
@@ -88,7 +76,7 @@ export default function ClientDeposit() {
 
     if (!validation.success) {
       const fieldErrors = {};
-      validation.error.issues.forEach((issue) => {
+      validation.error.issues.forEach(issue => {
         fieldErrors[issue.path[0]] = issue.message;
       });
       setErrors(fieldErrors);
@@ -112,7 +100,7 @@ export default function ClientDeposit() {
       });
 
       setErrors({});
-      setVerifiedUser(null);
+      resetVerification();
       setEmailVerificationError("");
     } catch (error) {
       toast.error(error?.message || "Failed to create deposit");
@@ -120,10 +108,7 @@ export default function ClientDeposit() {
   };
 
   return (
-    <FormSection
-      title="Generate Client Deposit"
-      description="Create new MT5 trading group"
-    >
+    <FormSection title="Generate Client Deposit" description="Create new MT5 trading group">
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
         <div>
           <FormInput
@@ -132,19 +117,15 @@ export default function ClientDeposit() {
             name="usercode"
             value={formData.usercode}
             onChange={handleChange}
-            onBlur={handleVerifyEmail}
-            error={errors.usercode || emailVerificationError}
+            error={
+              errors.usercode ||
+              (emailVerified === false ? "Invalid Email" : emailVerificationError)
+            }
           />
 
-          {verifyEmailMutation.isPending && (
-            <p className="mt-1 text-xs text-blue-500">Verifying email...</p>
-          )}
+          {verifying && <p className="mt-1 text-xs text-blue-500">Verifying email...</p>}
 
-          {verifiedUser && (
-            <p className="mt-1 text-xs text-green-600">
-              Email verified successfully
-            </p>
-          )}
+          {verifiedUser && <p className="mt-1 text-xs text-green-600">✓ {verifiedUser}</p>}
         </div>
 
         <FormInput
@@ -153,7 +134,7 @@ export default function ClientDeposit() {
           name="amount"
           type="number"
           min="0"
-          onWheel={(e) => e.target.blur()}
+          onWheel={e => e.target.blur()}
           value={formData.amount}
           onChange={handleChange}
           error={errors.amount}
@@ -195,7 +176,7 @@ export default function ClientDeposit() {
         <FormSubmit
           title={depositMutation.isPending ? "Submitting..." : "Submit"}
           onClick={handleSubmit}
-          disabled={depositMutation.isPending || verifyEmailMutation.isPending}
+          disabled={!verifiedUser || depositMutation.isPending || verifying}
         />
       </div>
     </FormSection>

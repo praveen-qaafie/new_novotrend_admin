@@ -29,15 +29,19 @@ export const loginUser = async (payload) => {
 
 // VERIFY AUTH
 export const verifyAuthCode = async (payload) => {
-  // BEFORE ENCRYPTION
-    const encryptedPayload = encryptData(payload);
-  // AFTER ENCRYPTION
-    const response = await apiClient.post(API_ENDPOINT.AUTH.VERIFYAUTH, {
+  console.log("OTP VERIFY PAYLOAD:", payload);
+
+  const encryptedPayload = encryptData(payload);
+  console.log("OTP VERIFY ENCRYPTED PAYLOAD:", encryptedPayload);
+
+  const response = await apiClient.post(API_ENDPOINT.AUTH.VERIFYAUTH, {
     data: encryptedPayload,
   });
-    const decrypted = decryptData(response.data);
 
-  // AFTER DECRYPTION
+  console.log("OTP VERIFY ENCRYPTED RESPONSE:", response.data);
+
+  const decrypted = decryptData(response.data);
+  console.log("OTP VERIFY DECRYPTED RESPONSE:", decrypted);
   
   if (decrypted?.data?.status !== 200) {
     throw new Error(decrypted?.data?.result || "Verification Failed");

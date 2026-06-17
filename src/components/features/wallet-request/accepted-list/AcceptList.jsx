@@ -12,6 +12,7 @@ import { TableCell, TableRow } from "@/components/ui/table";
 
 import { useAcceptWalletRequestList } from "@/services/walletrequest/wallet.query";
 import { useState } from "react";
+import { useDebounce } from "use-debounce";
 
 const tableHeaders = [
   { label: "S.No", key: "id", sortable: false },
@@ -28,19 +29,22 @@ export default function AcceptList() {
   const [search, setSearch] = useState("");
   const [limit, setLimit] = useState(10);
   const [offset, setOffset] = useState(0);
-  const [rejectOpen, setRejectOpen] = useState(false);
+  const [debouncedSearch] = useDebounce(search, 500);
   // API FETCH
   const { data, isLoading, error } = useAcceptWalletRequestList({
-    limit: 10,
-    offset: 0,
-    search: "",
+    limit,
+    offset,
+    search: debouncedSearch,
   });
-    // RESPONSE ARRAY
+  // RESPONSE ARRAY
   const acceptedDeposits = data?.response?.records || [];
-  
+
   // pagination calculations
   const total = Number(data?.response?.total_records) || 0;
-  const currentPage = Math.floor(offset / limit) + 1;
+  const handleSearchChange = value => {
+    setSearch(value);
+    setOffset(0);
+  };
 
   return (
     <TableWrapper
@@ -48,7 +52,7 @@ export default function AcceptList() {
       description="Manage and review all accepted deposit requests"
       actions={
         <>
-          <TableSearch value={search} onChange={setSearch} />
+          <TableSearch value={search} onChange={handleSearchChange} />
           <ExportDropdown />
         </>
       }
@@ -95,7 +99,7 @@ export default function AcceptList() {
             >
               {/* ID */}
               <TableCell className="px-6 py-5 text-sm font-medium text-muted-foreground">
-                {String(index + 1).padStart(2, "0")}
+                {String(offset + index + 1).padStart(2, "0")}
               </TableCell>
 
               {/* NAME */}

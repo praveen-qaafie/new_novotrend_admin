@@ -3,9 +3,9 @@
 import DataTable from "@/components/common/tables/DataTable";
 import ExportDropdown from "@/components/common/tables/ExportDropdown";
 import TableFooter from "@/components/common/tables/TableFooter";
-import TableWrapper from "@/components/common/tables/TableWrapper";
-
 import TableSearch from "@/components/common/tables/TableSearch";
+import TableWrapper from "@/components/common/tables/TableWrapper";
+import TruncatedCell from "@/components/common/TruncatedCell";
 import { TableCell, TableRow } from "@/components/ui/table";
 import { useInternalTransferReportQuery } from "@/services/report/report.query";
 import { useState } from "react";
@@ -29,7 +29,7 @@ export default function InternalTransferReport() {
     sdate: "",
     edate: "",
   });
-  
+
   const { data, isLoading, isError } = useInternalTransferReportQuery({
     limit,
     offset,
@@ -38,12 +38,12 @@ export default function InternalTransferReport() {
     edate: filters.edate,
   });
   const transferData = data?.response?.internal_transfer_history || [];
-    const total = Number(data?.response?.total_records) || 0;
+  const total = Number(data?.response?.total_records) || 0;
   return (
     <>
       <DateInputFilter
         onSubmit={({ sdate, edate }) => {
-                    setOffset(0);
+          setOffset(0);
           setFilters({
             sdate,
             edate,
@@ -139,7 +139,7 @@ export default function InternalTransferReport() {
 
                 {/* Remark */}
                 <TableCell className="px-6 py-5 text-sm text-foreground">
-                  {row.remark || "-"}
+                  <TruncatedCell text={row.remark} maxLength={50} />
                 </TableCell>
 
                 {/* Transfer By */}

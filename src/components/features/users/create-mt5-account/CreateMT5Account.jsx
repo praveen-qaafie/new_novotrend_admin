@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect } from "react";
+import { Eye, EyeOff } from "lucide-react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { useDebounce } from "use-debounce";
@@ -19,6 +20,9 @@ import { useCreateMT5AccountMutation } from "@/services/users/user.mutation";
 const leverageOptions = ["10", "50", "100", "200", "300", "400", "500", "1000"];
 
 export default function CreateMT5Account() {
+  const [showMainPassword, setShowMainPassword] = useState(false);
+  const [showInvestorPassword, setShowInvestorPassword] = useState(false);
+
   const {
     verifyEmail,
     verifiedUser,
@@ -144,18 +148,46 @@ export default function CreateMT5Account() {
             {/* MAIN PASSWORD */}
             <FormInput
               label="Enter Main Password"
-              type="password"
+              type={showMainPassword ? "text" : "password"}
               placeholder="Enter main password"
               disabled={!verifiedUser}
+              rightElement={
+                <button
+                  type="button"
+                  onClick={() => setShowMainPassword(prev => !prev)}
+                  className="flex h-8 w-8 items-center justify-center rounded-xl text-muted-foreground transition-all hover:bg-muted hover:text-foreground disabled:cursor-not-allowed disabled:opacity-50"
+                  disabled={!verifiedUser}
+                  aria-label={showMainPassword ? "Hide main password" : "Show main password"}
+                >
+                  {showMainPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                </button>
+              }
               {...register("mainpassword")}
             />
 
             {/* INVESTOR PASSWORD */}
             <FormInput
               label="Enter Investor Password"
-              type="password"
+              type={showInvestorPassword ? "text" : "password"}
               placeholder="Enter investor password"
               disabled={!verifiedUser}
+              rightElement={
+                <button
+                  type="button"
+                  onClick={() => setShowInvestorPassword(prev => !prev)}
+                  className="flex h-8 w-8 items-center justify-center rounded-xl text-muted-foreground transition-all hover:bg-muted hover:text-foreground disabled:cursor-not-allowed disabled:opacity-50"
+                  disabled={!verifiedUser}
+                  aria-label={
+                    showInvestorPassword ? "Hide investor password" : "Show investor password"
+                  }
+                >
+                  {showInvestorPassword ? (
+                    <EyeOff className="h-4 w-4" />
+                  ) : (
+                    <Eye className="h-4 w-4" />
+                  )}
+                </button>
+              }
               {...register("investorpassword")}
             />
           </div>

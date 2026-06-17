@@ -29,7 +29,7 @@ export default function WalletReport() {
     sdate: "",
     edate: "",
   });
-  
+
   const { data, isLoading, isError } = useWalletReportQuery({
     limit,
     offset,
@@ -38,12 +38,12 @@ export default function WalletReport() {
     edate: filters.edate,
   });
   const walletData = data?.response?.wallet_history || [];
-    const total = Number(data?.response?.total_records) || 0;
+  const total = Number(data?.response?.total_records) || 0;
   return (
     <>
       <DateInputFilter
         onSubmit={({ sdate, edate }) => {
-                    setOffset(0);
+          setOffset(0);
           setFilters({
             sdate,
             edate,
@@ -77,7 +77,7 @@ export default function WalletReport() {
             >
               {/* Index */}
               <TableCell className="px-6 py-5 text-sm text-muted-foreground">
-                {String(index + 1).padStart(2, "0")}
+                {String(offset + index + 1).padStart(2, "0")}
               </TableCell>
 
               {/* Name */}

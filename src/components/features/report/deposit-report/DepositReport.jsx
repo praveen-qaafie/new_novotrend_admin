@@ -7,6 +7,7 @@ import ExportDropdown from "@/components/common/tables/ExportDropdown";
 import TableFooter from "@/components/common/tables/TableFooter";
 import TableSearch from "@/components/common/tables/TableSearch";
 import TableWrapper from "@/components/common/tables/TableWrapper";
+import TruncatedCell from "@/components/common/TruncatedCell";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { TableCell, TableRow } from "@/components/ui/table";
 import { useWalletRequestHistoryQuery } from "@/services/report/report.query";
@@ -216,7 +217,7 @@ export default function DepositReport() {
           ) : tableData.length > 0 ? (
             tableData.map((row, index) => (
               <TableRow key={row.id || index} className="border-b border-border">
-                <TableCell className="px-6 py-5">{index + 1}</TableCell>
+                <TableCell className="px-6 py-5">{offset + index + 1}</TableCell>
                 <TableCell className="px-6 py-5">{row.name}</TableCell>
                 <TableCell className="px-6 py-5">{row.email}</TableCell>
                 <TableCell className="px-6 py-5">{row.date}</TableCell>
@@ -247,7 +248,9 @@ export default function DepositReport() {
 
                 <TableCell className="px-6 py-5">{row.transaction_id}</TableCell>
                 <TableCell className="px-6 py-5">{row.accepted_by}</TableCell>
-                <TableCell className="px-6 py-5">{row.remark}</TableCell>
+                <TableCell className="px-6 py-5">
+                  <TruncatedCell text={row.remark} maxLength={50} />
+                </TableCell>
                 <TableCell className="px-6 py-5">{row.accepted_date}</TableCell>
               </TableRow>
             ))

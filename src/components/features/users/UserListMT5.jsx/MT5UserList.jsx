@@ -13,7 +13,9 @@ import TableWrapper from "@/components/common/tables/TableWrapper";
 import { TableCell, TableRow } from "@/components/ui/table";
 
 import MT5AccountDetailsModal from "@/components/common/modals/MT5AccountDetailsModal";
+import { useGetMT5AccountDetailsMutation } from "@/services/users/user.mutation";
 import { useMT5UsersQuery } from "@/services/users/user.query";
+import { toast } from "sonner";
 
 const tableHeaders = [
   { label: "S.No", key: "id" },
@@ -34,7 +36,10 @@ export default function MT5UserList() {
   const [limit, setLimit] = useState(10);
   const [offset, setOffset] = useState(0);
   const [selectedUser, setSelectedUser] = useState(null);
+  const [loadingAccountId, setLoadingAccountId] = useState("");
   const [debouncedSearch] = useDebounce(search, 500);
+  const { mutate: getMT5AccountDetails, isPending: loadingAccountDetails } =
+    useGetMT5AccountDetailsMutation();
   const { data, isLoading, error } = useMT5UsersQuery({
     limit,
     offset,
@@ -46,8 +51,27 @@ export default function MT5UserList() {
   const total = Number(mt5Response?.total_records) || users.length;
 
   const handleView = user => {
-    setSelectedUser(user);
-    setOpenDetailsModal(true);
+    const accno = user?.mt5_id || user?.accno || "";
+    setLoadingAccountId(accno);
+    getMT5AccountDetails(
+      { accno },
+      {
+        onSuccess: response => {
+          const details = response?.response || response?.data?.response || response;
+          setSelectedUser({
+            ...user,
+            mt5AccountDetails: details,
+          });
+          setOpenDetailsModal(true);
+        },
+        onError: error => {
+          toast.error(error?.message || "Failed to fetch MT5 account details");
+        },
+        onSettled: () => {
+          setLoadingAccountId("");
+        },
+      }
+    );
   };
 
   return (
@@ -136,9 +160,14 @@ export default function MT5UserList() {
               <TableCell className="px-6 py-5">
                 <button
                   onClick={() => handleView(user)}
-                  className="flex h-10 w-10 items-center justify-center rounded-xl "
+                  disabled={loadingAccountDetails && loadingAccountId === user.mt5_id}
+                  className="flex h-10 w-10 items-center justify-center rounded-xl disabled:opacity-60"
                 >
-                  <Eye className="h-4 w-4" />
+                  {loadingAccountDetails && loadingAccountId === user.mt5_id ? (
+                    <span className="h-4 w-4 animate-spin rounded-full border-2 border-primary/20 border-t-primary" />
+                  ) : (
+                    <Eye className="h-4 w-4" />
+                  )}
                 </button>
               </TableCell>
             </TableRow>

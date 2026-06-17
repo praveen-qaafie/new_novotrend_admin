@@ -82,7 +82,7 @@ export default function GroupList() {
                 key={group.id}
                 className="border-b border-border transition-all hover:bg-muted/40"
               >
-                <TableCell className="px-6 py-5">{index + 1}</TableCell>
+                <TableCell className="px-6 py-5">{offset + index + 1}</TableCell>
 
                 <TableCell className="px-6 py-5 font-semibold">{group.name}</TableCell>
 

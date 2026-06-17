@@ -7,8 +7,8 @@ import TableSearch from "@/components/common/tables/TableSearch";
 import TableWrapper from "@/components/common/tables/TableWrapper";
 import { TableCell, TableRow } from "@/components/ui/table";
 
-import { useSearchParams } from "next/navigation";
 import { useIBLevelWiseUserDetail } from "@/services/ib-managment/ib-managment.query";
+import { useSearchParams } from "next/navigation";
 
 const tableHeaders = [
   { label: "S.No", key: "id", sortable: false },
@@ -35,7 +35,6 @@ export default function ShowIBTeamList() {
 
   const rows = data?.data?.response?.data || [];
 
-  
   return (
     <TableWrapper
       title="IB Team List"
@@ -70,7 +69,7 @@ export default function ShowIBTeamList() {
               className="border-b border-border transition-all hover:bg-muted/40"
             >
               <TableCell className="px-6 py-5 text-sm font-medium text-muted-foreground">
-                {String(index + 1).padStart(2, "0")}
+                {String(offset + index + 1).padStart(2, "0")}
               </TableCell>
 
               <TableCell className="px-6 py-5">
@@ -80,9 +79,7 @@ export default function ShowIBTeamList() {
                   </div>
 
                   <div>
-                    <p className="text-sm font-semibold text-foreground">
-                      {item?.name || "-"}
-                    </p>
+                    <p className="text-sm font-semibold text-foreground">{item?.name || "-"}</p>
 
                     <p className="text-xs text-muted-foreground">Team Member</p>
                   </div>
@@ -128,10 +125,7 @@ export default function ShowIBTeamList() {
           ))
         ) : (
           <TableRow>
-            <TableCell
-              colSpan={9}
-              className="py-10 text-center text-muted-foreground"
-            >
+            <TableCell colSpan={9} className="py-10 text-center text-muted-foreground">
               No team members found
             </TableCell>
           </TableRow>

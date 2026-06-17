@@ -1,13 +1,14 @@
 "use client";
 
-import { useState } from "react";
 import DataTable from "@/components/common/tables/DataTable";
 import ExportDropdown from "@/components/common/tables/ExportDropdown";
 import TableFooter from "@/components/common/tables/TableFooter";
-import { useRejectedIBListRequest } from "@/services/ib-managment/ib-managment.query";
 import TableSearch from "@/components/common/tables/TableSearch";
 import TableWrapper from "@/components/common/tables/TableWrapper";
+import TruncatedCell from "@/components/common/TruncatedCell";
 import { TableCell, TableRow } from "@/components/ui/table";
+import { useRejectedIBListRequest } from "@/services/ib-managment/ib-managment.query";
+import { useState } from "react";
 
 const tableHeaders = [
   { label: "S.No", key: "id", sortable: false },
@@ -41,7 +42,7 @@ export default function RejectedIBRequest() {
         <>
           <TableSearch
             value={search}
-            onChange={(value) => {
+            onChange={value => {
               setSearch(value);
               setOffset(0);
             }}
@@ -62,10 +63,7 @@ export default function RejectedIBRequest() {
       <DataTable headers={tableHeaders}>
         {isLoading ? (
           <TableRow>
-            <TableCell
-              colSpan={7}
-              className="py-10 text-center text-muted-foreground"
-            >
+            <TableCell colSpan={7} className="py-10 text-center text-muted-foreground">
               Loading rejected withdrawal requests...
             </TableCell>
           </TableRow>
@@ -86,13 +84,9 @@ export default function RejectedIBRequest() {
                   </div>
 
                   <div>
-                    <p className="text-sm font-semibold text-foreground">
-                      {item?.name || "-"}
-                    </p>
+                    <p className="text-sm font-semibold text-foreground">{item?.name || "-"}</p>
 
-                    <p className="text-xs text-muted-foreground">
-                      Rejected IB User
-                    </p>
+                    <p className="text-xs text-muted-foreground">Rejected IB User</p>
                   </div>
                 </div>
               </TableCell>
@@ -107,9 +101,7 @@ export default function RejectedIBRequest() {
 
               <TableCell className="px-6 py-5">
                 <span className="rounded-xl bg-red-500/10 px-3 py-1.5 text-sm font-semibold text-red-500">
-                  {item?.amount
-                    ? `$${Number(item.amount).toFixed(2)}`
-                    : "$0.00"}
+                  {item?.amount ? `$${Number(item.amount).toFixed(2)}` : "$0.00"}
                 </span>
               </TableCell>
 
@@ -119,17 +111,14 @@ export default function RejectedIBRequest() {
 
               <TableCell className="px-6 py-5">
                 <span className="inline-flex rounded-xl bg-red-500/10 px-3 py-1.5 text-xs font-semibold text-red-500">
-                  {item?.remark || "-"}
+                  <TruncatedCell text={item?.remark} maxLength={30} className="!text-red-500" />
                 </span>
               </TableCell>
             </TableRow>
           ))
         ) : (
           <TableRow>
-            <TableCell
-              colSpan={7}
-              className="py-10 text-center text-muted-foreground"
-            >
+            <TableCell colSpan={7} className="py-10 text-center text-muted-foreground">
               No rejected IB withdrawal requests found.
             </TableCell>
           </TableRow>

@@ -1,14 +1,14 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { Check, Trash2 } from "lucide-react";
+import { useEffect, useState } from "react";
 
 import DataTable from "@/components/common/tables/DataTable";
 import ExportDropdown from "@/components/common/tables/ExportDropdown";
 import TableFooter from "@/components/common/tables/TableFooter";
 import TableSearch from "@/components/common/tables/TableSearch";
 import TableWrapper from "@/components/common/tables/TableWrapper";
-
+import TruncatedCell from "@/components/common/TruncatedCell";
 import { TableCell, TableRow } from "@/components/ui/table";
 
 import {
@@ -53,7 +53,7 @@ export default function WithdrawalIBRequest() {
     setOpen(true);
   };
 
-  const handleSubmit = (remark) => {
+  const handleSubmit = remark => {
     mutate(
       {
         status: actionStatus,
@@ -66,7 +66,7 @@ export default function WithdrawalIBRequest() {
           setSelectedRequest(null);
           setActionStatus(null);
         },
-      },
+      }
     );
   };
 
@@ -159,13 +159,9 @@ export default function WithdrawalIBRequest() {
                     </div>
 
                     <div>
-                      <p className="text-sm font-semibold text-foreground">
-                        {item?.name || "-"}
-                      </p>
+                      <p className="text-sm font-semibold text-foreground">{item?.name || "-"}</p>
 
-                      <p className="text-xs text-muted-foreground">
-                        IB Withdrawal User
-                      </p>
+                      <p className="text-xs text-muted-foreground">IB Withdrawal User</p>
                     </div>
                   </div>
                 </TableCell>
@@ -190,7 +186,11 @@ export default function WithdrawalIBRequest() {
 
                 <TableCell className="px-6 py-5">
                   <span className="inline-flex rounded-xl bg-yellow-500/10 px-3 py-1.5 text-xs font-semibold text-yellow-600">
-                    {item?.remark || "-"}
+                    <TruncatedCell
+                      text={item?.remark}
+                      maxLength={30}
+                      className="!text-yellow-600"
+                    />
                   </span>
                 </TableCell>
 
@@ -228,8 +228,7 @@ export default function WithdrawalIBRequest() {
         onOpenChange={setOpen}
         actionType={actionStatus}
         isLoading={isPending}
-        onSubmit={(remark) => {
-          
+        onSubmit={remark => {
           withdrawalActionRemark(
             {
               status: actionStatus,
@@ -237,14 +236,12 @@ export default function WithdrawalIBRequest() {
               remark,
             },
             {
-              onSuccess: (response) => {
-                
+              onSuccess: response => {
                 setOpen(false);
               },
 
-              onError: (error) => {
-                              },
-            },
+              onError: error => {},
+            }
           );
         }}
       />

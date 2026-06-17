@@ -90,6 +90,13 @@ export const securePost = async (url, payload, options = {}) => {
       return decryptedPlainResponse;
     }
   } catch (error) {
+    if (logName) {
+      console.error(`${logName} ERROR RESPONSE:`, {
+        status: error?.response?.status,
+        data: error?.response?.data,
+        message: error?.message,
+      });
+    }
     throw error;
   }
 };

@@ -40,7 +40,7 @@ export default function WithdrawlRequest() {
     search: debouncedSearch,
   });
   const withdrawalRequests = data?.response?.withdrawal_requests || [];
-    // pagination calculations
+  // pagination calculations
   const total = Number(data?.response?.total_records) || 0;
   const currentPage = Math.floor(offset / limit) + 1;
   return (
@@ -93,7 +93,7 @@ export default function WithdrawlRequest() {
                   >
                     {/* ID */}
                     <TableCell className="px-6 py-5 text-sm font-medium text-muted-foreground">
-                      {String(index + 1).padStart(2, "0")}
+                      {String(offset + index + 1).padStart(2, "0")}
                     </TableCell>
                     {/* NAME */}
                     <TableCell className="px-6 py-5">

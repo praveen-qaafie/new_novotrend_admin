@@ -1,6 +1,10 @@
 import { API_ENDPOINT } from "@/constants/endpoints";
 import { securePost } from "../../lib/axios/secureApi";
 
+const logDeprecatedUser = (label, value) => {
+  console.log(`[DEPRECATED USER DETAILS] ${label}:`, value);
+};
+
 // GET USER LIST
 export const getUserList = async ({ limit = 10, offset = 0, search }) => {
   const token = localStorage.getItem("token");
@@ -15,6 +19,7 @@ export const getUserList = async ({ limit = 10, offset = 0, search }) => {
   };
 
   const data = await securePost(API_ENDPOINT.USERS.USERLIST, payload);
+  console.log("LIST ALL USERS DECRYPTED RESPONSE:", data);
   // VALIDATION
   if (data?.status !== 200) {
     throw new Error(data?.result || "Unable to load users");
@@ -62,9 +67,13 @@ export const getUserDetails = async ({ user_id }) => {
     user_id: Number(user_id),
   };
 
+  logDeprecatedUser("payload", payload);
+
   const data = await securePost(API_ENDPOINT.USERS.GET_USER_DETAILS, payload, {
     logName: "GET USER DETAILS",
   });
+
+  logDeprecatedUser("response", data);
 
   if (data?.status !== 200) {
     throw new Error(data?.result || "Unable to fetch user details");
@@ -149,6 +158,32 @@ export const getMT5UserList = async ({ limit = 10, offset = 0, search = "" }) =>
   // VALIDATION
   if (data?.status !== 200) {
     throw new Error(data?.result || "Unable to load MT5 users");
+  }
+
+  return data;
+};
+
+// GET MT5 ACCOUNT DETAILS
+export const getMT5AccountDetails = async ({ accno }) => {
+  const token = localStorage.getItem("token");
+
+  if (!token) {
+    throw new Error("Session expired. Please login again.");
+  }
+
+  const payload = {
+    token,
+    accno: accno || "",
+  };
+
+  const data = await securePost(API_ENDPOINT.USERS.GET_MT5_ACCOUNT_DETAILS, payload, {
+    logName: "GET MT5 ACCOUNT DETAILS",
+  });
+
+  console.log("GET MT5 ACCOUNT DETAILS DECRYPTED RESPONSE:", data);
+
+  if (data?.status !== 200) {
+    throw new Error(data?.result || "Unable to fetch MT5 account details");
   }
 
   return data;
@@ -292,7 +327,7 @@ export const changeMT5Leverage = async ({ accno, leverage }) => {
   };
 
   const data = await securePost(API_ENDPOINT.USERS.CHANGE_MT5_LEVERAGE, payload);
-    // VALIDATION
+  // VALIDATION
   if (data?.status !== 200) {
     throw new Error(data?.result || "Unable to change leverage");
   }
@@ -309,8 +344,8 @@ export const sendVerificationMailMT5 = async ({ accountno }) => {
     token,
     accountno,
   };
-    const data = await securePost(API_ENDPOINT.USERS.SEND_VERIFICATION_MAIL_MT5, payload);
-    if (data?.status !== 200) {
+  const data = await securePost(API_ENDPOINT.USERS.SEND_VERIFICATION_MAIL_MT5, payload);
+  if (data?.status !== 200) {
     throw new Error(data?.result || "Unable to send verification mail");
   }
   return data;

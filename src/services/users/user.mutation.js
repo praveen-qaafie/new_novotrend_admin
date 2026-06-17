@@ -7,6 +7,7 @@ import {
   changeMT5PasswordRequestStatus,
   createMT5Account,
   getMT5AccountByEmail,
+  getMT5AccountDetails,
   getUserDetails,
   getUsernameByAccountNo,
   getUsernameByEmail,
@@ -44,6 +45,12 @@ export const useGetMT5AccountByEmailMutation = () => {
           },
     onError: error => {
           },
+  });
+};
+
+export const useGetMT5AccountDetailsMutation = () => {
+  return useMutation({
+    mutationFn: getMT5AccountDetails,
   });
 };
 

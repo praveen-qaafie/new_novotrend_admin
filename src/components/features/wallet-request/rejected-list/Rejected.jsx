@@ -12,6 +12,7 @@ import { TableCell, TableRow } from "@/components/ui/table";
 
 import { useRejectWalletRequestList } from "@/services/walletrequest/wallet.query";
 import { useState } from "react";
+import { useDebounce } from "use-debounce";
 
 const tableHeaders = [
   { label: "S.No", key: "id", sortable: false },
@@ -28,27 +29,30 @@ export default function RejectedList() {
   const [search, setSearch] = useState("");
   const [limit, setLimit] = useState(10);
   const [offset, setOffset] = useState(0);
+  const [debouncedSearch] = useDebounce(search, 500);
   // API FETCH
   const { data, isLoading, error } = useRejectWalletRequestList({
-    limit: 10,
-    offset: 0,
-    search: "",
+    limit,
+    offset,
+    search: debouncedSearch,
   });
   // pagination calculations
   const total = Number(data?.response?.total_records) || 0;
-  const currentPage = Math.floor(offset / limit) + 1;
+  const handleSearchChange = value => {
+    setSearch(value);
+    setOffset(0);
+  };
 
-  
   // SAFE ARRAY
   const rejectedDeposits = data?.response?.records || [];
-  
+
   return (
     <TableWrapper
       title="Rejected Deposit List"
       description="Manage and review all rejected deposit requests"
       actions={
         <>
-          <TableSearch value={search} onChange={setSearch} />
+          <TableSearch value={search} onChange={handleSearchChange} />
           <ExportDropdown />
         </>
       }
@@ -95,7 +99,7 @@ export default function RejectedList() {
             >
               {/* ID */}
               <TableCell className="px-6 py-5 text-sm font-medium text-muted-foreground">
-                {String(index + 1).padStart(2, "0")}
+                {String(offset + index + 1).padStart(2, "0")}
               </TableCell>
 
               {/* NAME */}
@@ -118,7 +122,7 @@ export default function RejectedList() {
 
               {/* DATE */}
               <TableCell className="whitespace-nowrap px-6 py-5 text-sm text-muted-foreground">
-                {item?.date || "-"}
+                {item?.accepted_date || "-"}
               </TableCell>
 
               {/* AMOUNT */}

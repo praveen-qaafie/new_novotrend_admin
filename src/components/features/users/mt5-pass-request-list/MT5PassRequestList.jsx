@@ -26,6 +26,7 @@ export default function MT5PassRequestList() {
   const [search, setSearch] = useState("");
   const [limit, setLimit] = useState(10);
   const [offset, setOffset] = useState(0);
+  const [pendingAction, setPendingAction] = useState(null);
 
   const [debouncedSearch] = useDebounce(search, 500);
 
@@ -42,17 +43,29 @@ export default function MT5PassRequestList() {
   const total = Number(data?.response?.total_records) || Passwordlist.length;
 
   const handleAccept = user => {
-    changeStatusMutation.mutate({
-      id: user.id,
-      status: 1,
-    });
+    setPendingAction({ id: user.id, status: 1 });
+    changeStatusMutation.mutate(
+      {
+        id: user.id,
+        status: 1,
+      },
+      {
+        onSettled: () => setPendingAction(null),
+      }
+    );
   };
 
   const handleReject = user => {
-    changeStatusMutation.mutate({
-      id: user.id,
-      status: 2,
-    });
+    setPendingAction({ id: user.id, status: 2 });
+    changeStatusMutation.mutate(
+      {
+        id: user.id,
+        status: 2,
+      },
+      {
+        onSettled: () => setPendingAction(null),
+      }
+    );
   };
 
   return (
@@ -111,7 +124,13 @@ export default function MT5PassRequestList() {
 
         {!isLoading &&
           !error &&
-          Passwordlist.map(user => (
+          Passwordlist.map(user => {
+            const isAcceptPending =
+              pendingAction?.id === user.id && pendingAction?.status === 1;
+            const isRejectPending =
+              pendingAction?.id === user.id && pendingAction?.status === 2;
+
+            return (
             <TableRow key={user.id} className="border-b border-border hover:bg-muted/40">
               {/* NAME */}
               <TableCell className="px-6 py-5 font-medium">{user.user_name}</TableCell>
@@ -143,7 +162,7 @@ export default function MT5PassRequestList() {
                       disabled:cursor-not-allowed disabled:opacity-50
                     "
                   >
-                    {changeStatusMutation.isPending ? (
+                    {isAcceptPending ? (
                       <Loader2 className="h-4 w-4 animate-spin" />
                     ) : (
                       <Check className="h-4 w-4" />
@@ -161,7 +180,7 @@ export default function MT5PassRequestList() {
                       disabled:cursor-not-allowed disabled:opacity-50
                     "
                   >
-                    {changeStatusMutation.isPending ? (
+                    {isRejectPending ? (
                       <Loader2 className="h-4 w-4 animate-spin" />
                     ) : (
                       <X className="h-4 w-4" />
@@ -170,7 +189,8 @@ export default function MT5PassRequestList() {
                 </div>
               </TableCell>
             </TableRow>
-          ))}
+          );
+          })}
       </DataTable>
     </TableWrapper>
   );

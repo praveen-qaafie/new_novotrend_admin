@@ -1,40 +1,20 @@
 "use client";
 
+import {
+  KycFilePreviewDialog,
+  KycFileThumbnail as KycThumbnail,
+} from "@/components/common/KycFilePreview";
 import DataTable from "@/components/common/tables/DataTable";
 import ExportDropdown from "@/components/common/tables/ExportDropdown";
 import TableFooter from "@/components/common/tables/TableFooter";
 import TableSearch from "@/components/common/tables/TableSearch";
 import TableWrapper from "@/components/common/tables/TableWrapper";
+import TruncatedCell from "@/components/common/TruncatedCell";
 import { useState } from "react";
-
-import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 
 import { TableCell, TableRow } from "@/components/ui/table";
 import { useRejectedKycHistoryListQuery } from "@/services/userkyc/userkyc.query";
-import Image from "next/image";
 import { useDebounce } from "use-debounce";
-
-const KycThumbnail = ({ src, alt, onPreview }) => {
-  if (!src) {
-    return (
-      <div className="flex h-16 w-24 items-center justify-center rounded-2xl border border-dashed border-border bg-muted/30 text-xs font-medium text-muted-foreground">
-        No image
-      </div>
-    );
-  }
-
-  return (
-    <button onClick={onPreview} className="overflow-hidden rounded-2xl border border-border">
-      <Image
-        src={src}
-        alt={alt}
-        width={96}
-        height={64}
-        className="h-16 w-24 object-cover transition-all hover:scale-105"
-      />
-    </button>
-  );
-};
 
 const tableHeaders = [
   { label: "Name", key: "name", sortable: true },
@@ -65,7 +45,7 @@ export default function RejectedKycHistory() {
     search: debouncedSearch,
   });
   const rejectedKyc = data?.response?.records || [];
-    const total = Number(data?.response?.total_records) || 0;
+  const total = Number(data?.response?.total_records) || 0;
 
   return (
     <>
@@ -193,7 +173,11 @@ export default function RejectedKycHistory() {
 
                 <TableCell className="px-6 py-5">
                   <span className="inline-flex rounded-xl bg-red-500/10 px-3 py-1.5 text-xs font-semibold text-red-500">
-                    {item.kyc_remark}
+                    <TruncatedCell
+                      text={item.kyc_remark}
+                      maxLength={30}
+                      className="!text-red-500"
+                    />
                   </span>
                 </TableCell>
               </TableRow>
@@ -202,28 +186,12 @@ export default function RejectedKycHistory() {
         </DataTable>
       </TableWrapper>
 
-      <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent className="max-w-5xl rounded-3xl border border-border bg-background p-4 overflow-hidden">
-          <DialogTitle className="sr-only">Rejected KYC Image Preview</DialogTitle>
-          <div className="overflow-hidden rounded-2xl">
-            {/* <Image
-              src={selectedImage}
-              alt="KYC Preview"
-              className="max-h-[80vh] w-full rounded-2xl object-cover"
-            /> */}
-
-            {selectedImage && (
-              <Image
-                src={selectedImage}
-                alt="KYC Preview"
-                width={1200}
-                height={800}
-                className="max-h-[80vh] w-full rounded-2xl object-contain"
-              />
-            )}
-          </div>
-        </DialogContent>
-      </Dialog>
+      <KycFilePreviewDialog
+        open={open}
+        onOpenChange={setOpen}
+        selectedFile={selectedImage}
+        fileName="Rejected KYC Document Preview"
+      />
     </>
   );
 }

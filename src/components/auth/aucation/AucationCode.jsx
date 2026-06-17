@@ -43,6 +43,7 @@ export default function AucationCode() {
   const [token, authSecret, isLoggedIn] = isSnapshotLoading ? ["", "", ""] : authSnapshot.split("|");
   const [qrSecret, setQrSecret] = useState("");
   const [qrCode, setQrCode] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
 
   const { register, handleSubmit } = useForm();
   const { mutate, isPending } = useAuthMutation();
@@ -91,6 +92,8 @@ export default function AucationCode() {
   };
 
   const onSubmit = values => {
+    setErrorMessage("");
+
     const payload = {
       token,
       authcode: values.code,
@@ -108,7 +111,8 @@ export default function AucationCode() {
         window.location.replace("/");
       },
       onError: error => {
-              },
+        setErrorMessage(error?.message || "Verification failed. Please try again.");
+      },
     });
   };
   if (isSnapshotLoading || !token) return null;
@@ -164,10 +168,17 @@ export default function AucationCode() {
             <input
               type="text"
               maxLength={6}
-              {...register("code")}
+              {...register("code", {
+                onChange: () => setErrorMessage(""),
+              })}
               placeholder="••••••"
               className="h-14 w-full rounded-2xl border border-white/10 bg-white/5 px-5 text-center text-2xl tracking-[10px] text-white"
             />
+            {errorMessage && (
+              <div className="rounded-xl bg-red-500/10 px-4 py-3 text-sm text-red-300">
+                {errorMessage}
+              </div>
+            )}
             <button
               type="submit"
               disabled={isPending}

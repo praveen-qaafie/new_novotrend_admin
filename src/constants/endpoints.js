@@ -11,6 +11,7 @@ export const API_ENDPOINT = {
     USERLIST: "/user/list_all_user.php",
     ADMINACTION: "/user/user_action.php",
     LISTMT5USER: "/user/list_all_mt5_user.php",
+    GET_MT5_ACCOUNT_DETAILS: "/user/get_mt5_account_details.php",
     CHANGE_MT5_PASSWORD: "/user/change_mt5_password.php",
     GET_MT5_ACCOUNT_BY_EMAIL: "/user/get_mt5_account_by_email.php",
     GET_USERNAME_BY_EMAIL: "/user/get_username_by_email.php",
@@ -19,8 +20,7 @@ export const API_ENDPOINT = {
     CHANGE_MT5_LEVERAGE: "/user/change_mt5_leverage.php",
     SEND_VERIFICATION_MAIL_MT5: "/user/send_verification_mail_mt5.php",
     MT5_MAIN_PASSWORD_REQUEST_LIST: "/user/mt5_main_password_request_list.php",
-    CHANGE_MT5_MAIN_PASSWORD_REQUEST_LIST:
-      "/user/change_mt5_main_password_action.php",
+    CHANGE_MT5_MAIN_PASSWORD_REQUEST_LIST: "/user/change_mt5_main_password_action.php",
     GET_USER_DETAILS: "/user_details/get_user_details.php",
     IB_DETAILS: "/user_details/ib_details.php",
     LIVE_TRADE: "/user_details/live_trade.php",
@@ -65,9 +65,9 @@ export const API_ENDPOINT = {
     IB_MOVE: "/ib/ib_move.php ",
   },
 
-  EXCHANGER: {
-    EXCHANGER_EDIT: "/exchanger/settlement_edit.php",
-  },
+  // EXCHANGER: {
+  //   EXCHANGER_EDIT: "/exchanger/settlement_edit.php",
+  // },
 
   BANK_INFO: {
     ADD_BANK: "/bank_info/edit_company_bank_details.php",
@@ -116,10 +116,8 @@ export const API_ENDPOINT = {
     WALLET_REPORT: "/reports/wallet_history.php",
     INTERNAL_TRANSFER_REPORT: "/reports/internal_transfer_report.php",
     WALLET_REQUEST_LIST_HISTORY: "/reports/wallet_req_list_history.php",
-    WITHDRAWAL_REQUEST_LIST_HISTORY:
-      "/reports/withdrawal_req_list_history_trx.php",
-    WITHDRAWAL_REQUEST_LIST_HISTORY_IB:
-      "/reports/withdrawal_req_list_history_ib.php",
+    WITHDRAWAL_REQUEST_LIST_HISTORY: "/reports/withdrawal_req_list_history_trx.php",
+    WITHDRAWAL_REQUEST_LIST_HISTORY_IB: "/reports/withdrawal_req_list_history_ib.php",
   },
   NOTIFICATION: {
     GET_ALL_NOTIFICATION: "/notification/get_all_notification.php",

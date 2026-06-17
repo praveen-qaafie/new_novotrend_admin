@@ -1,16 +1,18 @@
 "use client";
 
+import {
+  KycFilePreviewDialog,
+  KycFileThumbnail as KycThumbnail,
+} from "@/components/common/KycFilePreview";
 import UserActionKycModal from "@/components/common/modals/UserActionKycModal";
 import DataTable from "@/components/common/tables/DataTable";
 import ExportDropdown from "@/components/common/tables/ExportDropdown";
 import TableFooter from "@/components/common/tables/TableFooter";
 import TableSearch from "@/components/common/tables/TableSearch";
 import TableWrapper from "@/components/common/tables/TableWrapper";
-import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { TableCell, TableRow } from "@/components/ui/table";
 import { useNewBankKYCListQuery } from "@/services/userkyc/userkyc.query";
 import { Check, X } from "lucide-react";
-import Image from "next/image";
 import { useState } from "react";
 import { useDebounce } from "use-debounce";
 
@@ -119,21 +121,14 @@ export default function NewBankKyc() {
 
                   <TableCell className="px-6 py-5">
                     {bankImageSrc ? (
-                      <button
-                        onClick={() => {
+                      <KycThumbnail
+                        src={bankImageSrc}
+                        alt="Bank Proof"
+                        onPreview={() => {
                           setSelectedImage(bankImageSrc);
                           setImageOpen(true);
                         }}
-                        className="overflow-hidden rounded-2xl border border-border"
-                      >
-                        <Image
-                          src={bankImageSrc}
-                          alt="Bank Proof"
-                          width={96}
-                          height={64}
-                          className="h-16 w-24 object-cover transition-all hover:scale-105"
-                        />
-                      </button>
+                      />
                     ) : (
                       <span className="text-sm text-muted-foreground">No Image</span>
                     )}
@@ -223,23 +218,12 @@ export default function NewBankKyc() {
         type="bankKyc"
       />
 
-      <Dialog open={imageOpen} onOpenChange={setImageOpen}>
-        <DialogContent className="max-w-5xl overflow-hidden rounded-3xl border border-border bg-background p-4">
-          <DialogTitle className="sr-only">Bank KYC Image Preview</DialogTitle>
-
-          <div className="overflow-hidden rounded-2xl">
-            {selectedImage && (
-              <Image
-                src={selectedImage}
-                alt="Bank KYC Preview"
-                width={1200}
-                height={800}
-                className="max-h-[80vh] w-full rounded-2xl object-contain"
-              />
-            )}
-          </div>
-        </DialogContent>
-      </Dialog>
+      <KycFilePreviewDialog
+        open={imageOpen}
+        onOpenChange={setImageOpen}
+        selectedFile={selectedImage}
+        fileName="New Bank KYC Document Preview"
+      />
     </>
   );
 }

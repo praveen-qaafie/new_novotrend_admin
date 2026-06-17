@@ -42,7 +42,7 @@ export default function ListEmployee() {
 
   const employees = data?.response?.employee_list || [];
 
-    // pagination calculations
+  // pagination calculations
   const total = Number(data?.response?.total_records) || employees.length;
   const currentPage = Math.floor(offset / limit) + 1;
   const deleteEmployeeMutation = useDeleteEmployeeMutation();
@@ -102,7 +102,7 @@ export default function ListEmployee() {
               key={employee.id || employee._id || index}
               className="border-b border-border hover:bg-muted/40"
             >
-              <TableCell className="px-6 py-5">{index + 1}</TableCell>
+              <TableCell className="px-6 py-5">{offset + index + 1}</TableCell>
               <TableCell className="px-6 py-5">
                 <div className="flex items-center gap-3">
                   <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-primary/10 font-semibold text-primary">

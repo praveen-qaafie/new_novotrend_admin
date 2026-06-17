@@ -7,6 +7,7 @@ import ExportDropdown from "@/components/common/tables/ExportDropdown";
 import TableFooter from "@/components/common/tables/TableFooter";
 import TableSearch from "@/components/common/tables/TableSearch";
 import TableWrapper from "@/components/common/tables/TableWrapper";
+import TruncatedCell from "@/components/common/TruncatedCell";
 import { TableCell, TableRow } from "@/components/ui/table";
 
 import { useAcceptedIBWithdrawalList } from "@/services/ib-managment/ib-managment.query";
@@ -43,7 +44,7 @@ export default function AcceptedIBList() {
         <>
           <TableSearch
             value={search}
-            onChange={(value) => {
+            onChange={value => {
               setSearch(value);
               setOffset(0);
             }}
@@ -65,10 +66,7 @@ export default function AcceptedIBList() {
       <DataTable headers={tableHeaders}>
         {isLoading ? (
           <TableRow>
-            <TableCell
-              colSpan={7}
-              className="py-10 text-center text-muted-foreground"
-            >
+            <TableCell colSpan={7} className="py-10 text-center text-muted-foreground">
               Loading accepted withdrawal requests...
             </TableCell>
           </TableRow>
@@ -89,13 +87,9 @@ export default function AcceptedIBList() {
                   </div>
 
                   <div>
-                    <p className="text-sm font-semibold text-foreground">
-                      {item?.name || "-"}
-                    </p>
+                    <p className="text-sm font-semibold text-foreground">{item?.name || "-"}</p>
 
-                    <p className="text-xs text-muted-foreground">
-                      Accepted IB User
-                    </p>
+                    <p className="text-xs text-muted-foreground">Accepted IB User</p>
                   </div>
                 </div>
               </TableCell>
@@ -110,9 +104,7 @@ export default function AcceptedIBList() {
 
               <TableCell className="px-6 py-5">
                 <span className="rounded-xl bg-emerald-500/10 px-3 py-1.5 text-sm font-semibold text-emerald-600">
-                  {item?.amount
-                    ? `$${Number(item.amount).toFixed(2)}`
-                    : "$0.00"}
+                  {item?.amount ? `$${Number(item.amount).toFixed(2)}` : "$0.00"}
                 </span>
               </TableCell>
 
@@ -122,17 +114,14 @@ export default function AcceptedIBList() {
 
               <TableCell className="px-6 py-5">
                 <span className="inline-flex rounded-xl bg-emerald-500/10 px-3 py-1.5 text-xs font-semibold text-emerald-600">
-                  {item?.remark || "-"}
+                  <TruncatedCell text={item?.remark} maxLength={30} className="!text-emerald-600" />
                 </span>
               </TableCell>
             </TableRow>
           ))
         ) : (
           <TableRow>
-            <TableCell
-              colSpan={7}
-              className="py-10 text-center text-muted-foreground"
-            >
+            <TableCell colSpan={7} className="py-10 text-center text-muted-foreground">
               No accepted IB withdrawal requests found.
             </TableCell>
           </TableRow>

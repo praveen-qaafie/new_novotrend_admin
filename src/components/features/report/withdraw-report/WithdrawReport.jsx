@@ -7,6 +7,7 @@ import ExportDropdown from "@/components/common/tables/ExportDropdown";
 import TableFooter from "@/components/common/tables/TableFooter";
 import TableSearch from "@/components/common/tables/TableSearch";
 import TableWrapper from "@/components/common/tables/TableWrapper";
+import TruncatedCell from "@/components/common/TruncatedCell";
 import { TableCell, TableRow } from "@/components/ui/table";
 import { useWithdrawalRequestHistoryQuery } from "@/services/report/report.query";
 import { useState } from "react";
@@ -52,7 +53,7 @@ export default function WithdrawReport() {
   });
   const summary = data?.response?.summary || {};
   const reportData = data?.response?.withdraw_history || [];
-    const total = Number(data?.response?.total_records) || 0;
+  const total = Number(data?.response?.total_records) || 0;
 
   const handleChange = (field, value) => {
     setFilters(prev => ({
@@ -60,8 +61,7 @@ export default function WithdrawReport() {
       [field]: value,
     }));
   };
-  const handleFilter = () => {
-      };
+  const handleFilter = () => {};
   return (
     <div className="space-y-6">
       {/* STATS */}
@@ -127,7 +127,7 @@ export default function WithdrawReport() {
           {reportData.map((row, index) => (
             <TableRow key={row.id ?? index} className="border-b border-border hover:bg-muted/30">
               <TableCell className="px-6 py-5 text-sm text-muted-foreground">
-                {String(index + 1).padStart(2, "0")}
+                {String(offset + index + 1).padStart(2, "0")}
               </TableCell>
 
               <TableCell className="px-6 py-5 font-medium">{row.name}</TableCell>
@@ -150,7 +150,9 @@ export default function WithdrawReport() {
                 {row.wallet_address || "-"}
               </TableCell>
 
-              <TableCell className="px-6 py-5">{row.remark}</TableCell>
+              <TableCell className="px-6 py-5">
+                <TruncatedCell text={row.remark} maxLength={50} />
+              </TableCell>
 
               <TableCell className="px-6 py-5">{row.accepted_by || "-"}</TableCell>
 

@@ -1,11 +1,11 @@
-import api from "@/utils/axiosInstance";
-import { API_ENDPOINT } from "@/constants/endpoints";
+// import api from "@/utils/axiosInstance";
+// import { API_ENDPOINT } from "@/constants/endpoints";
 
-export const editExchangerValue = async (payload) => {
-  const response = await api.post(
-    API_ENDPOINT.EXCHANGER.EXCHANGER_EDIT,
-    payload,
-  );
+// export const editExchangerValue = async (payload) => {
+//   const response = await api.post(
+//     API_ENDPOINT.EXCHANGER.EXCHANGER_EDIT,
+//     payload,
+//   );
 
-  return response.data;
-};
+//   return response.data;
+// };
