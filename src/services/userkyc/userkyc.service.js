@@ -5,9 +5,8 @@ import { securePost } from "../../lib/axios/secureApi";
 
 // GET NEW KYC LIST
 export const getNewKycList = async ({ limit = 10, offset = 0, search = "" }) => {
-  
   const token = localStorage.getItem("token");
-    if (!token) {
+  if (!token) {
     throw new Error("Session Expired");
   }
   const payload = {
@@ -16,8 +15,8 @@ export const getNewKycList = async ({ limit = 10, offset = 0, search = "" }) => 
     offset,
     search,
   };
-    const data = await securePost(API_ENDPOINT.USER_KYC.UPLOAD_NEW_KEY_LIST, payload);
-  
+  const data = await securePost(API_ENDPOINT.USER_KYC.UPLOAD_NEW_KEY_LIST, payload);
+
   if (data?.status !== 200) {
     throw new Error(data?.result || "Unable to fetch new KYC list");
   }
@@ -27,9 +26,8 @@ export const getNewKycList = async ({ limit = 10, offset = 0, search = "" }) => 
 
 // NEW KYC APPROVE
 export const getNewKycApprove = async ({ limit = 10, offset = 0, search = "", sdate, edate }) => {
-  
   const token = localStorage.getItem("token");
-    if (!token) {
+  if (!token) {
     throw new Error("Session Expired");
   }
   const payload = {
@@ -40,8 +38,8 @@ export const getNewKycApprove = async ({ limit = 10, offset = 0, search = "", sd
     sdate,
     edate,
   };
-    const data = await securePost(API_ENDPOINT.USER_KYC.NEW_KYC_LIST_APPROVE, payload);
-    if (data?.status !== 200) {
+  const data = await securePost(API_ENDPOINT.USER_KYC.NEW_KYC_LIST_APPROVE, payload);
+  if (data?.status !== 200) {
     throw new Error(data?.result || "Unable to fetch new KYC Approve list");
   }
   return data;
@@ -49,9 +47,8 @@ export const getNewKycApprove = async ({ limit = 10, offset = 0, search = "", sd
 
 // NEW BANK KYC LIST
 export const getNewBankKycList = async ({ limit = 10, offset = 0, search = "" }) => {
-  
   const token = localStorage.getItem("token");
-    if (!token) {
+  if (!token) {
     throw new Error("Session Expired");
   }
   const payload = {
@@ -60,11 +57,11 @@ export const getNewBankKycList = async ({ limit = 10, offset = 0, search = "" })
     offset,
     search,
   };
-    const data = await securePost(API_ENDPOINT.USER_KYC.NEW_BANK_KYC_LIST, payload, {
-      logName: "NEW BANK KYC LIST",
-    });
-    console.log("NEW BANK KYC LIST DECRYPTED RESPONSE:", data);
-  
+  const data = await securePost(API_ENDPOINT.USER_KYC.NEW_BANK_KYC_LIST, payload, {
+    logName: "NEW BANK KYC LIST",
+  });
+  console.log("NEW BANK KYC LIST DECRYPTED RESPONSE:", data);
+
   if (data?.status !== 200) {
     throw new Error(data?.result || "Unable to fetch new KYC list");
   }
@@ -80,9 +77,8 @@ export const getBankKycAcceptedList = async ({
   sdate,
   edate,
 }) => {
-  
   const token = localStorage.getItem("token");
-    if (!token) {
+  if (!token) {
     throw new Error("Session Expired");
   }
   const payload = {
@@ -93,8 +89,8 @@ export const getBankKycAcceptedList = async ({
     sdate,
     edate,
   };
-    const data = await securePost(API_ENDPOINT.USER_KYC.ACCEPTED_BANK_KYC, payload);
-  
+  const data = await securePost(API_ENDPOINT.USER_KYC.ACCEPTED_BANK_KYC, payload);
+
   if (data?.status !== 200) {
     throw new Error(data?.result || "Unable to fetch new KYC approve list");
   }
@@ -104,9 +100,8 @@ export const getBankKycAcceptedList = async ({
 
 // REJECTED BANK HISTORY
 export const getBankRejectHistoryList = async ({ limit = 10, offset = 0, search = "" }) => {
-  
   const token = localStorage.getItem("token");
-    if (!token) {
+  if (!token) {
     throw new Error("Session Expired");
   }
   const payload = {
@@ -115,8 +110,8 @@ export const getBankRejectHistoryList = async ({ limit = 10, offset = 0, search 
     offset,
     search,
   };
-    const data = await securePost(API_ENDPOINT.USER_KYC.REJECTED_BANK_HISTORY, payload);
-  
+  const data = await securePost(API_ENDPOINT.USER_KYC.REJECTED_BANK_HISTORY, payload);
+
   if (data?.status !== 200) {
     throw new Error(data?.result || "Unable to fetch bank rejected history list");
   }
@@ -126,9 +121,8 @@ export const getBankRejectHistoryList = async ({ limit = 10, offset = 0, search 
 
 // REJECTED KYC HISTORY
 export const getRejectedKycHistoryList = async ({ limit = 10, offset = 0, search = "" }) => {
-  
   const token = localStorage.getItem("token");
-    if (!token) {
+  if (!token) {
     throw new Error("Session Expired");
   }
   const payload = {
@@ -137,8 +131,8 @@ export const getRejectedKycHistoryList = async ({ limit = 10, offset = 0, search
     offset,
     search,
   };
-    const data = await securePost(API_ENDPOINT.USER_KYC.REJECTED_KYC_HISTORY, payload);
-  
+  const data = await securePost(API_ENDPOINT.USER_KYC.REJECTED_KYC_HISTORY, payload);
+
   if (data?.status !== 200) {
     throw new Error(data?.result || "Unable to fetch rejected kyc history list");
   }
@@ -217,7 +211,6 @@ const formDataToPayloadAndFile = formData => {
 // ADD BANK ACCOUNT
 
 export const addBankAccount = async formData => {
-  
   const token = localStorage.getItem("token");
 
   if (!token) {
@@ -228,7 +221,6 @@ export const addBankAccount = async formData => {
 
   payload.token = token;
 
-    
   const requestBody = new FormData();
   const encryptedPayload = encryptData(payload);
 
@@ -238,7 +230,6 @@ export const addBankAccount = async formData => {
     requestBody.append("bankphoto", bankphoto);
   }
 
-  
   const response = await apiClient.post(API_ENDPOINT.USER_KYC.ADD_BANK_ACCOUNT, requestBody, {
     headers: {
       "Content-Type": "multipart/form-data",
@@ -246,7 +237,6 @@ export const addBankAccount = async formData => {
   });
   const data = normalizeEncryptedOrPlainResponse(response.data);
 
-  
   if (data?.status !== 200) {
     throw new Error(data?.result || "Unable to add bank account");
   }
@@ -255,7 +245,6 @@ export const addBankAccount = async formData => {
 };
 
 export const updateKycStatus = async ({ id, status, remark }) => {
-  
   const token = localStorage.getItem("token");
 
   const payload = {
@@ -265,10 +254,8 @@ export const updateKycStatus = async ({ id, status, remark }) => {
     remark,
   };
 
-  
   const data = await securePost(API_ENDPOINT.USER_KYC.UPDATE_KYC_STATUS, payload);
 
-  
   if (data?.status !== 200) {
     throw new Error(data?.result || "Unable to update KYC status");
   }
@@ -277,7 +264,6 @@ export const updateKycStatus = async ({ id, status, remark }) => {
 };
 
 export const updateBankKycStatus = async ({ kyc_id, status, remark = "" }) => {
-  
   const token = localStorage.getItem("token");
 
   const payload = {
@@ -287,10 +273,8 @@ export const updateBankKycStatus = async ({ kyc_id, status, remark = "" }) => {
     remark,
   };
 
-  
   const data = await securePost(API_ENDPOINT.USER_KYC.UPDATE_BANK_KYC_STATUS, payload);
 
-  
   if (data?.status !== 200) {
     throw new Error(data?.result || "Unable to update Bank KYC status");
   }

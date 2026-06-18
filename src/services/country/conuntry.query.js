@@ -5,6 +5,7 @@ export const useCountryListQuery = () => {
   return useQuery({
     queryKey: ["country-list"],
     queryFn: getCountryList,
-    staleTime: Infinity,
+    staleTime: 0,
+    refetchOnMount: "always",
   });
 };

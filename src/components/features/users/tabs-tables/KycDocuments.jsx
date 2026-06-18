@@ -85,6 +85,10 @@
 // }
 "use client";
 
+import {
+  KycFilePreviewDialog,
+  KycFileThumbnail,
+} from "@/components/common/KycFilePreview";
 import DataTable from "@/components/common/tables/DataTable";
 import ExportDropdown from "@/components/common/tables/ExportDropdown";
 import TableFooter from "@/components/common/tables/TableFooter";
@@ -92,7 +96,6 @@ import TableSearch from "@/components/common/tables/TableSearch";
 import TableWrapper from "@/components/common/tables/TableWrapper";
 import { TableCell, TableRow } from "@/components/ui/table";
 import { useClientPagination } from "@/hooks/useClientPagination";
-import Image from "next/image";
 import { useState } from "react";
 
 const tableHeaders = [
@@ -108,39 +111,10 @@ const tableHeaders = [
   { label: "Action", key: "action" },
 ];
 
-const getFileUrl = value => (typeof value === "string" ? value.trim() : "");
-
-const isPdfFile = value => getFileUrl(value).toLowerCase().split("?")[0].endsWith(".pdf");
-
-const DocumentPreview = ({ src, alt }) => {
-  const fileUrl = getFileUrl(src);
-
-  if (!fileUrl) {
-    return <span className="text-xs text-muted-foreground">No Image</span>;
-  }
-
-  if (isPdfFile(fileUrl)) {
-    return (
-      <a
-        href={fileUrl}
-        target="_blank"
-        rel="noreferrer"
-        className="inline-flex h-10 items-center rounded-xl bg-primary/10 px-3 text-xs font-semibold text-primary hover:bg-primary/20"
-      >
-        View PDF
-      </a>
-    );
-  }
-
-  return (
-    <a href={fileUrl} target="_blank" rel="noreferrer" className="inline-flex overflow-hidden rounded-lg border border-border">
-      <Image src={fileUrl} alt={alt} width={56} height={40} className="h-10 w-14 object-cover" />
-    </a>
-  );
-};
-
 export default function KycDocument({ userDetails }) {
   const [search, setSearch] = useState("");
+  const [previewOpen, setPreviewOpen] = useState(false);
+  const [selectedFile, setSelectedFile] = useState("");
   const documents = userDetails?.kyc_doc ?? [];
   const selectedUser = userDetails?.user ?? {};
   const { limit, setLimit, offset, setOffset, total, paginatedItems } =
@@ -194,19 +168,47 @@ export default function KycDocument({ userDetails }) {
             </TableCell>
 
             <TableCell>
-              <DocumentPreview src={row.front} alt="id-front" />
+              <KycFileThumbnail
+                src={row.front}
+                alt="id-front"
+                onPreview={() => {
+                  setSelectedFile(row.front || "");
+                  setPreviewOpen(true);
+                }}
+              />
             </TableCell>
 
             <TableCell>
-              <DocumentPreview src={row.back} alt="id-back" />
+              <KycFileThumbnail
+                src={row.back}
+                alt="id-back"
+                onPreview={() => {
+                  setSelectedFile(row.back || "");
+                  setPreviewOpen(true);
+                }}
+              />
             </TableCell>
 
             <TableCell>
-              <DocumentPreview src={row.address_front} alt="address-front" />
+              <KycFileThumbnail
+                src={row.address_front}
+                alt="address-front"
+                onPreview={() => {
+                  setSelectedFile(row.address_front || "");
+                  setPreviewOpen(true);
+                }}
+              />
             </TableCell>
 
             <TableCell>
-              <DocumentPreview src={row.address_back} alt="address-back" />
+              <KycFileThumbnail
+                src={row.address_back}
+                alt="address-back"
+                onPreview={() => {
+                  setSelectedFile(row.address_back || "");
+                  setPreviewOpen(true);
+                }}
+              />
             </TableCell>
 
             {/* UPLOADED DATE */}
@@ -237,6 +239,12 @@ export default function KycDocument({ userDetails }) {
           </TableRow>
         ))}
       </DataTable>
+      <KycFilePreviewDialog
+        open={previewOpen}
+        onOpenChange={setPreviewOpen}
+        selectedFile={selectedFile}
+        fileName="KYC Document Preview"
+      />
     </TableWrapper>
   );
 }

@@ -10,7 +10,16 @@ import { useState } from "react";
  */
 export const isPdfFile = url => {
   if (!url) return false;
-  return url.toLowerCase().endsWith(".pdf") || url.includes("pdf");
+  const cleanUrl = url.toLowerCase().split("?")[0].split("#")[0];
+  return cleanUrl.endsWith(".pdf");
+};
+
+export const isImageFile = url => {
+  if (!url) return false;
+  const cleanUrl = url.toLowerCase().split("?")[0].split("#")[0];
+  return [".jpg", ".jpeg", ".png", ".webp", ".gif", ".bmp", ".svg"].some(extension =>
+    cleanUrl.endsWith(extension)
+  );
 };
 
 /**
@@ -28,7 +37,7 @@ export const KycFileThumbnail = ({ src, alt, onPreview }) => {
     );
   }
 
-  const isImage = !isPdfFile(src) && failedImageSrc !== src;
+  const isImage = isImageFile(src) && failedImageSrc !== src;
 
   if (isImage) {
     return (
@@ -71,7 +80,7 @@ export const KycFilePreviewDialog = ({
 
   if (!selectedFile) return null;
 
-  const isImage = !isPdfFile(selectedFile) && failedPreviewSrc !== selectedFile;
+  const isImage = isImageFile(selectedFile) && failedPreviewSrc !== selectedFile;
 
   const handleOpen = () => {
     window.open(selectedFile, "_blank");

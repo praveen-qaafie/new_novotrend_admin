@@ -4,7 +4,12 @@ export const depositSchema = z
   .object({
     usercode: z.string().email("Please enter a valid email"),
     paymethod: z.string().min(1, "Please select a payment method"),
-    amount: z.string().min(1, "Please enter an amount"),
+    amount: z
+      .string()
+      .min(1, "Please enter an amount")
+      .refine(value => value.trim() === "" || Number(value) > 0, {
+        message: "Amount must be greater than 0",
+      }),
     comment: z.string().min(1, "Please enter a comment"),
     transid: z.string().optional(),
   })
@@ -26,7 +31,12 @@ export const withdrawalSchema = z
   .object({
     usercode: z.string().email("Please enter a valid email"),
     paymethod: z.string().min(1, "Please select a payment method"),
-    amount: z.string().min(1, "Please enter an amount"),
+    amount: z
+      .string()
+      .min(1, "Please enter an amount")
+      .refine(value => value.trim() === "" || Number(value) > 0, {
+        message: "Amount must be greater than 0",
+      }),
     comment: z.string().min(1, "Please enter a comment"),
     chainname: z.string().optional(),
     wallet_address: z.string().optional(),

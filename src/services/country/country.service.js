@@ -1,14 +1,24 @@
 import { API_ENDPOINT } from "@/constants/endpoints";
-import memberClient from "@/lib/axios/memberClient";
+import apiClient from "@/lib/axios/apiClient";
 import { decryptData } from "@/lib/utils";
 
 export const getCountryList = async () => {
-    const response = await memberClient.get(API_ENDPOINT.COUNTRY.COUNTRY_LIST);
-  
-  const decryptedResponse = decryptData(response?.data);
+  const response = await apiClient.get(API_ENDPOINT.COUNTRY.COUNTRY_LIST);
+  let data = response?.data;
 
-    if (decryptedResponse?.data?.status !== 200) {
-    throw new Error(decryptedResponse?.data?.result || "Unable to fetch country list");
+  console.log("COUNTRY LIST ENCRYPTED/RAW RESPONSE:", response?.data);
+
+  try {
+    const decryptedResponse = decryptData(response?.data);
+    data = decryptedResponse?.data ?? decryptedResponse;
+    console.log("COUNTRY LIST DECRYPTED RESPONSE:", data);
+  } catch {
+    console.log("COUNTRY LIST DECRYPT FAILED. USING RAW RESPONSE:", response?.data);
+    data = response?.data?.data ?? response?.data;
   }
-  return decryptedResponse?.data;
+
+  if (data?.status !== 200) {
+    throw new Error(data?.result || "Unable to fetch country list");
+  }
+  return data;
 };

@@ -110,7 +110,8 @@ export const API_ENDPOINT = {
   },
 
   COUNTRY: {
-    COUNTRY_LIST: "/get_country.php",
+    COUNTRY_LIST: "/country/get_country.php",
+    // COUNTRY_LIST: "/user/list_all_user_old.php",
   },
   REPORTS: {
     WALLET_REPORT: "/reports/wallet_history.php",

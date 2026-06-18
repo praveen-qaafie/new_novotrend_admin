@@ -1,14 +1,16 @@
 "use client";
 
+import {
+  KycFilePreviewDialog,
+  KycFileThumbnail,
+} from "@/components/common/KycFilePreview";
 import DataTable from "@/components/common/tables/DataTable";
 import ExportDropdown from "@/components/common/tables/ExportDropdown";
 import TableFooter from "@/components/common/tables/TableFooter";
 import TableSearch from "@/components/common/tables/TableSearch";
 import TableWrapper from "@/components/common/tables/TableWrapper";
-import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { TableCell, TableRow } from "@/components/ui/table";
 import { useClientPagination } from "@/hooks/useClientPagination";
-import Image from "next/image";
 import { useState } from "react";
 
 const tableHeaders = [
@@ -56,8 +58,8 @@ const getMediaUrl = (source, keys) => {
 
 export default function BankDetails({ userDetails, bankDetails = [] }) {
   const [search, setSearch] = useState("");
-  const [imageOpen, setImageOpen] = useState(false);
-  const [selectedImage, setSelectedImage] = useState("");
+  const [previewOpen, setPreviewOpen] = useState(false);
+  const [selectedFile, setSelectedFile] = useState("");
   const selectedUser = userDetails?.user ?? {};
   const { limit, setLimit, offset, setOffset, total, paginatedItems } =
     useClientPagination(bankDetails, 10, search, [selectedUser?.name, selectedUser?.email]);
@@ -100,26 +102,14 @@ export default function BankDetails({ userDetails, bankDetails = [] }) {
             <TableCell className="px-6 py-5">{selectedUser?.email || "-"}</TableCell>
 
             <TableCell className="px-6 py-5">
-              {getMediaUrl(row, ["bank_image", "kyc_bank_image"]) ? (
-                <button
-                  type="button"
-                  onClick={() => {
-                    setSelectedImage(getMediaUrl(row, ["bank_image", "kyc_bank_image"]));
-                    setImageOpen(true);
-                  }}
-                  className="overflow-hidden rounded-2xl border border-border"
-                >
-                  <Image
-                    src={getMediaUrl(row, ["bank_image", "kyc_bank_image"])}
-                    alt="Bank Proof"
-                    width={96}
-                    height={64}
-                    className="h-16 w-24 object-cover transition-all hover:scale-105"
-                  />
-                </button>
-              ) : (
-                <span className="text-xs text-muted-foreground">No Image</span>
-              )}
+              <KycFileThumbnail
+                src={getMediaUrl(row, ["bank_image", "kyc_bank_image"])}
+                alt="Bank Proof"
+                onPreview={() => {
+                  setSelectedFile(getMediaUrl(row, ["bank_image", "kyc_bank_image"]));
+                  setPreviewOpen(true);
+                }}
+              />
             </TableCell>
 
             <TableCell className="min-w-[520px] px-6 py-5">
@@ -142,22 +132,12 @@ export default function BankDetails({ userDetails, bankDetails = [] }) {
         ))}
       </DataTable>
 
-      <Dialog open={imageOpen} onOpenChange={setImageOpen}>
-        <DialogContent className="max-w-5xl overflow-hidden rounded-3xl border border-border bg-background p-4">
-          <DialogTitle className="sr-only">Bank Image Preview</DialogTitle>
-          <div className="overflow-hidden rounded-2xl">
-            {selectedImage && (
-              <Image
-                src={selectedImage}
-                alt="Bank Preview"
-                width={900}
-                height={700}
-                className="max-h-[80vh] w-full rounded-2xl object-contain"
-              />
-            )}
-          </div>
-        </DialogContent>
-      </Dialog>
+      <KycFilePreviewDialog
+        open={previewOpen}
+        onOpenChange={setPreviewOpen}
+        selectedFile={selectedFile}
+        fileName="Bank Proof Preview"
+      />
     </TableWrapper>
   );
 }

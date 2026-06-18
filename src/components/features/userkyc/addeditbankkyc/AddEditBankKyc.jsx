@@ -39,6 +39,12 @@ export default function AddEditBankKyc() {
 
   const countryList = data?.response || [];
 
+  useEffect(() => {
+    if (data) {
+      console.log("ADD EDIT BANK KYC COUNTRY LIST DECRYPTED RESPONSE:", data);
+    }
+  }, [data]);
+
   const countryOptions = countryList.map(country => ({
     label: country.country_name,
     value: String(country.country_id),

@@ -43,6 +43,11 @@ export default function ClientDeposit() {
 
   const handleChange = e => {
     const { name, value } = e.target;
+    const amountError =
+      name === "amount" && value !== "" && Number(value) <= 0
+        ? "Amount must be greater than 0"
+        : "";
+
     setFormData(prev => ({
       ...prev,
       [name]: value,
@@ -50,7 +55,7 @@ export default function ClientDeposit() {
 
     setErrors(prev => ({
       ...prev,
-      [name]: "",
+      [name]: amountError,
     }));
 
     if (name === "usercode") {
@@ -133,7 +138,7 @@ export default function ClientDeposit() {
           placeholder="Enter amount in usd"
           name="amount"
           type="number"
-          min="0"
+          min="1"
           onWheel={e => e.target.blur()}
           value={formData.amount}
           onChange={handleChange}

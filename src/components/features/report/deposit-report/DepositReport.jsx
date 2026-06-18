@@ -2,39 +2,19 @@
 
 import AllFilters from "@/components/common/report/filter/AllFilters";
 import AmountStats from "@/components/common/report/filter/AmountsStats";
+import {
+  KycFilePreviewDialog,
+  KycFileThumbnail,
+} from "@/components/common/KycFilePreview";
 import DataTable from "@/components/common/tables/DataTable";
 import ExportDropdown from "@/components/common/tables/ExportDropdown";
 import TableFooter from "@/components/common/tables/TableFooter";
 import TableSearch from "@/components/common/tables/TableSearch";
 import TableWrapper from "@/components/common/tables/TableWrapper";
 import TruncatedCell from "@/components/common/TruncatedCell";
-import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { TableCell, TableRow } from "@/components/ui/table";
 import { useWalletRequestHistoryQuery } from "@/services/report/report.query";
-import Image from "next/image";
 import { useState } from "react";
-
-const KycThumbnail = ({ src, alt, onPreview }) => {
-  if (!src) {
-    return (
-      <div className="flex h-16 w-24 items-center justify-center rounded-2xl border border-dashed border-border bg-muted/30 text-xs font-medium text-muted-foreground">
-        No image
-      </div>
-    );
-  }
-
-  return (
-    <button onClick={onPreview} className="overflow-hidden rounded-2xl border border-border">
-      <Image
-        src={src}
-        alt={alt}
-        width={96}
-        height={64}
-        className="h-16 w-24 object-cover transition-all hover:scale-105"
-      />
-    </button>
-  );
-};
 
 const tableHeaders = [
   { label: "S.No", key: "id" },
@@ -53,8 +33,8 @@ const tableHeaders = [
 
 export default function DepositReport() {
   const [search, setSearch] = useState("");
-  const [imageOpen, setImageOpen] = useState(false);
-  const [selectedImage, setSelectedImage] = useState(null);
+  const [previewOpen, setPreviewOpen] = useState(false);
+  const [selectedFile, setSelectedFile] = useState("");
   const [limit, setLimit] = useState(10);
   const [offset, setOffset] = useState(0);
 
@@ -231,12 +211,12 @@ export default function DepositReport() {
                 {/* <TableCell className="px-6 py-5">{row.image || "-"}</TableCell> */}
 
                 <TableCell className="px-6 py-5">
-                  <KycThumbnail
+                  <KycFileThumbnail
                     src={row.image}
-                    alt="bank_image"
+                    alt="Deposit Proof"
                     onPreview={() => {
-                      setSelectedImage(row.image);
-                      setImageOpen(true);
+                      setSelectedFile(row.image || "");
+                      setPreviewOpen(true);
                     }}
                   />
                 </TableCell>
@@ -264,22 +244,12 @@ export default function DepositReport() {
           )}
         </DataTable>
 
-        <Dialog open={imageOpen} onOpenChange={setImageOpen}>
-          <DialogContent className="max-w-5xl rounded-3xl border border-border bg-background p-4 overflow-hidden">
-            <DialogTitle className="sr-only">KYC Image Preview</DialogTitle>
-            <div className="overflow-hidden rounded-2xl">
-              {selectedImage && (
-                <Image
-                  src={selectedImage}
-                  alt="KYC Preview"
-                  className="max-h-[80vh] w-full rounded-2xl object-cover"
-                  width={94}
-                  height={94}
-                />
-              )}
-            </div>
-          </DialogContent>
-        </Dialog>
+        <KycFilePreviewDialog
+          open={previewOpen}
+          onOpenChange={setPreviewOpen}
+          selectedFile={selectedFile}
+          fileName="Deposit Proof Preview"
+        />
       </TableWrapper>
     </div>
   );
