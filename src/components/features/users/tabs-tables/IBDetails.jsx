@@ -9,6 +9,7 @@ import { TableCell, TableRow } from "@/components/ui/table";
 import { useClientPagination } from "@/hooks/useClientPagination";
 import { useUserIbDetailsQuery } from "@/services/users/user.query";
 import { ArrowRight } from "lucide-react";
+import { useState } from "react";
 
 const tableHeaders = [
   { label: "S.No", key: "id" },
@@ -24,12 +25,13 @@ const tableHeaders = [
 ];
 
 export default function IBDetails({ userDetails }) {
+  const [search, setSearch] = useState("");
   const { data } = useUserIbDetailsQuery({
     user_id: userDetails?.user?.user_id,
   });
   const ibDetails = Array.isArray(data?.response) ? data.response : [];
   const { limit, setLimit, offset, setOffset, total, paginatedItems } =
-    useClientPagination(ibDetails);
+    useClientPagination(ibDetails, 10, search);
 
   const handleDownline = row => {
         // later: navigate or modal open
@@ -41,7 +43,7 @@ export default function IBDetails({ userDetails }) {
       description="Manage IB users and their commission data"
       actions={
         <>
-          <TableSearch />
+          <TableSearch value={search} onChange={value => { setSearch(value); setOffset(0); }} />
           <ExportDropdown />
         </>
       }

@@ -1,7 +1,10 @@
 "use client";
 
+import {
+  KycFilePreviewDialog,
+  KycFileThumbnail,
+} from "@/components/common/KycFilePreview";
 import { Check, X } from "lucide-react";
-import Image from "next/image";
 
 import DataTable from "@/components/common/tables/DataTable";
 import ExportDropdown from "@/components/common/tables/ExportDropdown";
@@ -28,6 +31,8 @@ const tableHeaders = [
 ];
 
 export default function DepositRequest() {
+  const [previewFile, setPreviewFile] = useState("");
+  const [previewOpen, setPreviewOpen] = useState(false);
   const [search, setSearch] = useState("");
   const [limit, setLimit] = useState(10);
   const [offset, setOffset] = useState(0);
@@ -119,21 +124,15 @@ export default function DepositRequest() {
                   </span>
                 </TableCell>
 
-                {/* IMAGE */}
                 <TableCell className="px-6 py-5">
-                  {item?.image ? (
-                    <button className="overflow-hidden rounded-2xl border border-border">
-                      <Image
-                        src={item?.image}
-                        alt="Deposit Proof"
-                        width={96}
-                        height={64}
-                        className="h-16 w-24 object-cover transition-all hover:scale-105"
-                      />
-                    </button>
-                  ) : (
-                    <span className="text-sm text-muted-foreground">No Image</span>
-                  )}
+                  <KycFileThumbnail
+                    src={item?.image || item?.req_image}
+                    alt="Deposit Proof"
+                    onPreview={() => {
+                      setPreviewFile(item?.image || item?.req_image || "");
+                      setPreviewOpen(true);
+                    }}
+                  />
                 </TableCell>
 
                 {/* METHOD */}
@@ -192,6 +191,12 @@ export default function DepositRequest() {
         onOpenChange={setRemarkModalOpen}
         selectedRequest={selectedRequest}
         actionType={actionType}
+      />
+      <KycFilePreviewDialog
+        open={previewOpen}
+        onOpenChange={setPreviewOpen}
+        selectedFile={previewFile}
+        fileName="Deposit Proof Preview"
       />
     </>
   );

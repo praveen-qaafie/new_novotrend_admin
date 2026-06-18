@@ -152,6 +152,7 @@ export default function IBWithdrawReport() {
         onChange={handleChange}
         onSubmit={handleFilter}
         onReset={handleReset}
+        isLoading={isLoading}
         showEmail
         showStartDate
         showEndDate

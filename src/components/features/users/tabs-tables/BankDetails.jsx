@@ -55,11 +55,12 @@ const getMediaUrl = (source, keys) => {
 };
 
 export default function BankDetails({ userDetails, bankDetails = [] }) {
+  const [search, setSearch] = useState("");
   const [imageOpen, setImageOpen] = useState(false);
   const [selectedImage, setSelectedImage] = useState("");
   const selectedUser = userDetails?.user ?? {};
   const { limit, setLimit, offset, setOffset, total, paginatedItems } =
-    useClientPagination(bankDetails);
+    useClientPagination(bankDetails, 10, search, [selectedUser?.name, selectedUser?.email]);
 
   return (
     <TableWrapper
@@ -67,7 +68,7 @@ export default function BankDetails({ userDetails, bankDetails = [] }) {
       description="Manage user bank information"
       actions={
         <>
-          <TableSearch />
+          <TableSearch value={search} onChange={value => { setSearch(value); setOffset(0); }} />
           <ExportDropdown />
         </>
       }

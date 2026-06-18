@@ -30,11 +30,12 @@ const tableHeaders = [
 ];
 
 export default function Leverage({ userDetails }) {
+  const [search, setSearch] = useState("");
   const [selectedLeverage, setSelectedLeverage] = useState(null);
   const [leverageValue, setLeverageValue] = useState("");
   const leverages = userDetails?.mt5_leverage ?? [];
   const { limit, setLimit, offset, setOffset, total, paginatedItems } =
-    useClientPagination(leverages);
+    useClientPagination(leverages, 10, search);
   const { mutate: changeLeverage, isPending } = useChangeMT5LeverageMutation();
 
   const handleOpenModal = row => {
@@ -88,7 +89,7 @@ export default function Leverage({ userDetails }) {
         description="Update MT5 account leverage settings"
         actions={
           <>
-            <TableSearch />
+            <TableSearch value={search} onChange={value => { setSearch(value); setOffset(0); }} />
             <ExportDropdown />
           </>
         }

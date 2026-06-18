@@ -58,6 +58,18 @@ export default function InternalTransfer() {
   const handleChange = e => {
     const { name, value } = e.target;
 
+    if (name === "amount" && value !== "" && Number(value) <= 0) {
+      setFormData(prev => ({
+        ...prev,
+        [name]: value,
+      }));
+      setErrors(prev => ({
+        ...prev,
+        amount: "Amount must be greater than 0",
+      }));
+      return;
+    }
+
     setFormData(prev => ({
       ...prev,
       [name]: value,
@@ -140,10 +152,10 @@ export default function InternalTransfer() {
             error={errors.sender || (senderEmailVerified === false ? "Invalid Email" : "")}
           />
 
-          {senderVerifying && <p className="mt-1 text-xs text-blue-500">Verifying sender...</p>}
+          {senderVerifying && <p className="mt-2 text-sm text-blue-500">Verifying sender...</p>}
 
           {senderEmailVerified === true && (
-            <p className="mt-1 text-xs font-medium text-green-600">✓ {senderVerifiedUser}</p>
+            <p className="mt-2 text-sm font-medium text-green-600">✓ {senderVerifiedUser}</p>
           )}
         </div>
 
@@ -157,10 +169,10 @@ export default function InternalTransfer() {
             error={errors.receiver || (receiverEmailVerified === false ? "Invalid Email" : "")}
           />
 
-          {receiverVerifying && <p className="mt-1 text-xs text-blue-500">Verifying receiver...</p>}
+          {receiverVerifying && <p className="mt-2 text-sm text-blue-500">Verifying receiver...</p>}
 
           {receiverEmailVerified === true && (
-            <p className="mt-1 text-xs font-medium text-green-600">✓ {receiverVerifiedUser}</p>
+            <p className="mt-2 text-sm font-medium text-green-600">✓ {receiverVerifiedUser}</p>
           )}
         </div>
 

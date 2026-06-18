@@ -93,6 +93,7 @@ import TableWrapper from "@/components/common/tables/TableWrapper";
 import { TableCell, TableRow } from "@/components/ui/table";
 import { useClientPagination } from "@/hooks/useClientPagination";
 import Image from "next/image";
+import { useState } from "react";
 
 const tableHeaders = [
   { label: "S.No", key: "id" },
@@ -139,9 +140,11 @@ const DocumentPreview = ({ src, alt }) => {
 };
 
 export default function KycDocument({ userDetails }) {
+  const [search, setSearch] = useState("");
   const documents = userDetails?.kyc_doc ?? [];
+  const selectedUser = userDetails?.user ?? {};
   const { limit, setLimit, offset, setOffset, total, paginatedItems } =
-    useClientPagination(documents);
+    useClientPagination(documents, 10, search, [selectedUser?.name, selectedUser?.email]);
 
   return (
     <TableWrapper
@@ -149,7 +152,7 @@ export default function KycDocument({ userDetails }) {
       description="Manage user verification documents"
       actions={
         <>
-          <TableSearch />
+          <TableSearch value={search} onChange={value => { setSearch(value); setOffset(0); }} />
           <ExportDropdown />
         </>
       }

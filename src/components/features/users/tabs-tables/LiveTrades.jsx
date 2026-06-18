@@ -7,7 +7,7 @@ import TableSearch from "@/components/common/tables/TableSearch";
 import TableWrapper from "@/components/common/tables/TableWrapper";
 import { TableCell, TableRow } from "@/components/ui/table";
 import { useUserLiveTradeQuery } from "@/services/users/user.query";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 
 const tableHeaders = [
   { label: "S.No", key: "id" },
@@ -26,6 +26,7 @@ const tableHeaders = [
 ];
 
 export default function LiveTrades({ userDetails }) {
+  const [search, setSearch] = useState("");
   const [limit, setLimit] = useState(10);
   const [offset, setOffset] = useState(0);
   const { data } = useUserLiveTradeQuery({
@@ -33,8 +34,19 @@ export default function LiveTrades({ userDetails }) {
     limit,
     offset,
   });
-  const trades = data?.response?.trades ?? [];
-  const total = Number(data?.response?.count) || trades.length;
+  const trades = useMemo(() => data?.response?.trades ?? [], [data?.response?.trades]);
+  const filteredTrades = useMemo(() => {
+    const query = search.trim().toLowerCase();
+    if (!query) return trades;
+
+    return trades.filter(row =>
+      Object.values(row || {})
+        .join(" ")
+        .toLowerCase()
+        .includes(query)
+    );
+  }, [trades, search]);
+  const total = search ? filteredTrades.length : Number(data?.response?.count) || trades.length;
 
   return (
     <TableWrapper
@@ -42,7 +54,7 @@ export default function LiveTrades({ userDetails }) {
       description="Monitor all active and closed trading positions"
       actions={
         <>
-          <TableSearch />
+          <TableSearch value={search} onChange={value => { setSearch(value); setOffset(0); }} />
           <ExportDropdown />
         </>
       }
@@ -65,7 +77,7 @@ export default function LiveTrades({ userDetails }) {
           </TableRow>
         )}
 
-        {trades.map((row, index) => (
+        {filteredTrades.map((row, index) => (
           <TableRow key={`${row.orderId || row.order_id}-${index}`} className="border-b border-border hover:bg-muted/40">
             {/* # */}
             <TableCell>{offset + index + 1}</TableCell>

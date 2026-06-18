@@ -8,6 +8,7 @@ import TableWrapper from "@/components/common/tables/TableWrapper";
 import TruncatedCell from "@/components/common/TruncatedCell";
 import { TableCell, TableRow } from "@/components/ui/table";
 import { useClientPagination } from "@/hooks/useClientPagination";
+import { useState } from "react";
 
 const tableHeaders = [
   { label: "S.No", key: "id" },
@@ -18,9 +19,10 @@ const tableHeaders = [
 ];
 
 export default function IbWithdrawal({ userDetails }) {
+  const [search, setSearch] = useState("");
   const ibWithdrawals = userDetails?.ib_withdraw ?? [];
   const { limit, setLimit, offset, setOffset, total, paginatedItems } =
-    useClientPagination(ibWithdrawals);
+    useClientPagination(ibWithdrawals, 10, search);
 
   return (
     <TableWrapper
@@ -28,7 +30,7 @@ export default function IbWithdrawal({ userDetails }) {
       description="Manage IB withdrawal requests"
       actions={
         <>
-          <TableSearch />
+          <TableSearch value={search} onChange={value => { setSearch(value); setOffset(0); }} />
           <ExportDropdown />
         </>
       }

@@ -60,7 +60,10 @@ export const getNewBankKycList = async ({ limit = 10, offset = 0, search = "" })
     offset,
     search,
   };
-    const data = await securePost(API_ENDPOINT.USER_KYC.NEW_BANK_KYC_LIST, payload);
+    const data = await securePost(API_ENDPOINT.USER_KYC.NEW_BANK_KYC_LIST, payload, {
+      logName: "NEW BANK KYC LIST",
+    });
+    console.log("NEW BANK KYC LIST DECRYPTED RESPONSE:", data);
   
   if (data?.status !== 200) {
     throw new Error(data?.result || "Unable to fetch new KYC list");

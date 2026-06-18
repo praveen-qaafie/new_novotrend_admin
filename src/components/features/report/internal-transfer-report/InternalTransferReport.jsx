@@ -49,6 +49,14 @@ export default function InternalTransferReport() {
             edate,
           });
         }}
+        onClear={() => {
+          setOffset(0);
+          setFilters({
+            sdate: "",
+            edate: "",
+          });
+        }}
+        isLoading={isLoading}
       />
       <TableWrapper
         title="Internal Transfer History"

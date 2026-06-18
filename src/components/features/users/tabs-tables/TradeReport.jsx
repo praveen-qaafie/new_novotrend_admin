@@ -8,6 +8,7 @@ import TableWrapper from "@/components/common/tables/TableWrapper";
 import { TableCell, TableRow } from "@/components/ui/table";
 import { useClientPagination } from "@/hooks/useClientPagination";
 import { useUserTradingReportQuery } from "@/services/users/user.query";
+import { useState } from "react";
 
 const tableHeaders = [
   { label: "S.No", key: "id" },
@@ -26,12 +27,13 @@ const tableHeaders = [
 ];
 
 export default function TradeReport({ userDetails }) {
+  const [search, setSearch] = useState("");
   const { data } = useUserTradingReportQuery({
     user_id: userDetails?.user?.user_id,
   });
   const trades = data?.response?.trades ?? [];
   const { limit, setLimit, offset, setOffset, total, paginatedItems } =
-    useClientPagination(trades);
+    useClientPagination(trades, 10, search);
 
   return (
     <TableWrapper
@@ -39,7 +41,7 @@ export default function TradeReport({ userDetails }) {
       description="Complete record of all trading activity"
       actions={
         <>
-          <TableSearch />
+          <TableSearch value={search} onChange={value => { setSearch(value); setOffset(0); }} />
           <ExportDropdown />
         </>
       }

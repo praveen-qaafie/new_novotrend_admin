@@ -1,6 +1,9 @@
 "use client";
 
-import Image from "next/image";
+import {
+  KycFilePreviewDialog,
+  KycFileThumbnail,
+} from "@/components/common/KycFilePreview";
 
 import DataTable from "@/components/common/tables/DataTable";
 import ExportDropdown from "@/components/common/tables/ExportDropdown";
@@ -26,6 +29,8 @@ const tableHeaders = [
 ];
 
 export default function AcceptList() {
+  const [previewFile, setPreviewFile] = useState("");
+  const [previewOpen, setPreviewOpen] = useState(false);
   const [search, setSearch] = useState("");
   const [limit, setLimit] = useState(10);
   const [offset, setOffset] = useState(0);
@@ -47,26 +52,27 @@ export default function AcceptList() {
   };
 
   return (
-    <TableWrapper
-      title="Accepted Deposit List"
-      description="Manage and review all accepted deposit requests"
-      actions={
-        <>
-          <TableSearch value={search} onChange={handleSearchChange} />
-          <ExportDropdown />
-        </>
-      }
-      footer={
-        <TableFooter
-          limit={limit}
-          setLimit={setLimit}
-          offset={offset}
-          setOffset={setOffset}
-          total={total}
-        />
-      }
-    >
-      <DataTable headers={tableHeaders}>
+    <>
+      <TableWrapper
+        title="Accepted Deposit List"
+        description="Manage and review all accepted deposit requests"
+        actions={
+          <>
+            <TableSearch value={search} onChange={handleSearchChange} />
+            <ExportDropdown />
+          </>
+        }
+        footer={
+          <TableFooter
+            limit={limit}
+            setLimit={setLimit}
+            offset={offset}
+            setOffset={setOffset}
+            total={total}
+          />
+        }
+      >
+        <DataTable headers={tableHeaders}>
         {isLoading ? (
           <TableRow>
             <TableCell
@@ -134,21 +140,15 @@ export default function AcceptList() {
                 </span>
               </TableCell>
 
-              {/* IMAGE */}
               <TableCell className="px-6 py-5">
-                {item?.image ? (
-                  <button className="overflow-hidden rounded-2xl border border-border">
-                    <Image
-                      src={item.image}
-                      alt="Deposit Proof"
-                      width={96}
-                      height={64}
-                      className="h-16 w-24 object-cover transition-all hover:scale-105"
-                    />
-                  </button>
-                ) : (
-                  <span className="text-xs text-muted-foreground">No Image</span>
-                )}
+                <KycFileThumbnail
+                  src={item?.image || item?.req_image}
+                  alt="Deposit Proof"
+                  onPreview={() => {
+                    setPreviewFile(item?.image || item?.req_image || "");
+                    setPreviewOpen(true);
+                  }}
+                />
               </TableCell>
 
               {/* METHOD */}
@@ -165,7 +165,14 @@ export default function AcceptList() {
             </TableRow>
           ))
         )}
-      </DataTable>
-    </TableWrapper>
+        </DataTable>
+      </TableWrapper>
+      <KycFilePreviewDialog
+        open={previewOpen}
+        onOpenChange={setPreviewOpen}
+        selectedFile={previewFile}
+        fileName="Accepted Deposit Proof Preview"
+      />
+    </>
   );
 }

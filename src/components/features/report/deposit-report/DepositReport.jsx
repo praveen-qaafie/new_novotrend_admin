@@ -178,6 +178,7 @@ export default function DepositReport() {
         onChange={handleChange}
         onSubmit={handleFilter}
         onReset={handleReset}
+        isLoading={isLoading}
         showEmail
         showStartDate
         showEndDate

@@ -3,6 +3,7 @@
 import FormInput from "@/components/common/forms/FormInput";
 import FormSelect from "@/components/common/forms/FormSelect";
 import { Button } from "@/components/ui/button";
+import { useMemo } from "react";
 
 export default function AllFilters({
   values = {},
@@ -16,7 +17,17 @@ export default function AllFilters({
   showStatus = false,
   paymentOptions = [],
   statusOptions = [],
+  isLoading = false,
 }) {
+  const dateError = useMemo(() => {
+    if (!showStartDate || !showEndDate) return "";
+    if (!values.start_date && !values.end_date) return "";
+    if (!values.start_date || !values.end_date) return "Start date and end date both are required";
+    if (values.end_date < values.start_date) return "End date cannot be smaller than start date";
+    return "";
+  }, [showStartDate, showEndDate, values.start_date, values.end_date]);
+  const isApplyDisabled = isLoading || Boolean(dateError);
+
   return (
     <div className="rounded-4xl border border-border bg-card p-6 shadow-sm">
       {/* FILTER GRID */}
@@ -36,6 +47,7 @@ export default function AllFilters({
             label="Start Date"
             type="date"
             value={values.start_date || ""}
+            max={values.end_date || undefined}
             onChange={e => onChange?.("start_date", e.target.value)}
           />
         )}
@@ -45,6 +57,7 @@ export default function AllFilters({
             label="End Date"
             type="date"
             value={values.end_date || ""}
+            min={values.start_date || undefined}
             onChange={e => onChange?.("end_date", e.target.value)}
           />
         )}
@@ -70,17 +83,19 @@ export default function AllFilters({
         )}
       </div>
 
+      {dateError && <p className="mt-3 text-sm font-medium text-red-500">{dateError}</p>}
+
       {/* ACTION BUTTONS */}
       <div className="mt-6 flex justify-end gap-3">
         {onReset && (
-          <Button variant="outline" onClick={onReset}>
+          <Button variant="outline" onClick={onReset} disabled={isLoading}>
             Reset
           </Button>
         )}
 
         {onSubmit && (
-          <Button variant="default" onClick={onSubmit}>
-            Apply Filter
+          <Button variant="default" onClick={onSubmit} disabled={isApplyDisabled}>
+            {isLoading ? "Loading..." : "Apply Filter"}
           </Button>
         )}
       </div>

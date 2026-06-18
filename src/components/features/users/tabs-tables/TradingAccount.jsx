@@ -7,6 +7,7 @@ import TableSearch from "@/components/common/tables/TableSearch";
 import TableWrapper from "@/components/common/tables/TableWrapper";
 import { TableCell, TableRow } from "@/components/ui/table";
 import { useClientPagination } from "@/hooks/useClientPagination";
+import { useState } from "react";
 
 const tableHeaders = [
   { label: "S.No", key: "id" },
@@ -23,9 +24,10 @@ const tableHeaders = [
 ];
 
 export default function TradingAccount({ userDetails }) {
+  const [search, setSearch] = useState("");
   const accounts = userDetails?.mt5_accounts ?? [];
   const { limit, setLimit, offset, setOffset, total, paginatedItems } =
-    useClientPagination(accounts);
+    useClientPagination(accounts, 10, search);
 
   return (
     <TableWrapper
@@ -33,7 +35,7 @@ export default function TradingAccount({ userDetails }) {
       description="All MT5 trading accounts overview"
       actions={
         <>
-          <TableSearch />
+          <TableSearch value={search} onChange={value => { setSearch(value); setOffset(0); }} />
           <ExportDropdown />
         </>
       }

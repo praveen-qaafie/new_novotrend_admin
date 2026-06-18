@@ -104,12 +104,17 @@ export default function UserActionKycModal({ open, onOpenChange, actionData, typ
           <button
             type="button"
             onClick={() => onOpenChange(false)}
+            disabled={isPending}
             className="h-11 rounded-2xl border border-border bg-background px-6 text-sm font-semibold text-foreground transition-all hover:bg-muted cursor-pointer"
           >
             Cancel
           </button>
 
-          <FormSubmit title={isPending ? "Processing..." : "Sure"} onClick={handleSubmit} />
+          <FormSubmit
+            title={isPending ? "Processing..." : "Sure"}
+            onClick={handleSubmit}
+            disabled={isPending}
+          />
         </DialogFooter>
       </DialogContent>
     </Dialog>

@@ -39,17 +39,24 @@ export default function WithdrawReport() {
     payment: "",
     status: "All",
   });
+  const [appliedFilters, setAppliedFilters] = useState({
+    email: "",
+    start_date: "",
+    end_date: "",
+    payment: "",
+    status: "",
+  });
 
   // API CALL
   const { data, isLoading } = useWithdrawalRequestHistoryQuery({
     limit,
     offset,
     search,
-    useremail: filters.email,
-    sdate: filters.start_date,
-    edate: filters.end_date,
-    paytype: filters.payment,
-    status: filters.status === "All" ? "" : filters.status,
+    useremail: appliedFilters.email,
+    sdate: appliedFilters.start_date,
+    edate: appliedFilters.end_date,
+    paytype: appliedFilters.payment,
+    status: appliedFilters.status,
   });
   const summary = data?.response?.summary || {};
   const reportData = data?.response?.withdraw_history || [];
@@ -61,7 +68,42 @@ export default function WithdrawReport() {
       [field]: value,
     }));
   };
-  const handleFilter = () => {};
+
+  const handleFilter = () => {
+    setOffset(0);
+    setAppliedFilters({
+      email: filters.email,
+      start_date: filters.start_date,
+      end_date: filters.end_date,
+      payment: filters.payment,
+      status: filters.status === "All" ? "" : filters.status,
+    });
+  };
+
+  const handleReset = () => {
+    const reset = {
+      email: "",
+      start_date: "",
+      end_date: "",
+      payment: "",
+      status: "All",
+    };
+
+    setFilters(reset);
+    setAppliedFilters({
+      email: "",
+      start_date: "",
+      end_date: "",
+      payment: "",
+      status: "",
+    });
+    setOffset(0);
+  };
+
+  const handleSearchChange = value => {
+    setSearch(value);
+    setOffset(0);
+  };
   return (
     <div className="space-y-6">
       {/* STATS */}
@@ -95,6 +137,8 @@ export default function WithdrawReport() {
         values={filters}
         onChange={handleChange}
         onSubmit={handleFilter}
+        onReset={handleReset}
+        isLoading={isLoading}
         showEmail
         showStartDate
         showEndDate
@@ -109,7 +153,7 @@ export default function WithdrawReport() {
         description="Track and manage withdrawal requests"
         actions={
           <>
-            <TableSearch value={search} onChange={setSearch} />
+            <TableSearch value={search} onChange={handleSearchChange} />
             <ExportDropdown />
           </>
         }

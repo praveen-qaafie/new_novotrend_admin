@@ -7,6 +7,7 @@ import TableSearch from "@/components/common/tables/TableSearch";
 import TableWrapper from "@/components/common/tables/TableWrapper";
 import { TableCell, TableRow } from "@/components/ui/table";
 import { useClientPagination } from "@/hooks/useClientPagination";
+import { useState } from "react";
 
 const tableHeaders = [
   { label: "#", key: "id" },
@@ -20,10 +21,11 @@ const tableHeaders = [
 ];
 
 export default function InternalTransfer({ userDetails }) {
+  const [search, setSearch] = useState("");
   const transfers = userDetails?.internal_transfer ?? [];
   const selectedUser = userDetails?.user ?? {};
   const { limit, setLimit, offset, setOffset, total, paginatedItems } =
-    useClientPagination(transfers);
+    useClientPagination(transfers, 10, search, [selectedUser?.name, selectedUser?.email]);
 
   return (
     <TableWrapper
@@ -31,7 +33,7 @@ export default function InternalTransfer({ userDetails }) {
       description="Manage all internal wallet transfers"
       actions={
         <>
-          <TableSearch />
+          <TableSearch value={search} onChange={value => { setSearch(value); setOffset(0); }} />
           <ExportDropdown />
         </>
       }

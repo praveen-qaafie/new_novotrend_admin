@@ -28,6 +28,11 @@ export default function AddEditBankKyc() {
   const { register, watch, handleSubmit, reset } = useForm();
 
   const email = watch("email");
+  const bankname = watch("bankname");
+  const accnumber = watch("accnumber");
+  const ifsccode = watch("ifsccode");
+  const ibannumber = watch("ibannumber");
+  const bankaddress = watch("bankaddress");
   const [debouncedEmail] = useDebounce(email, 600);
 
   const { data } = useCountryListQuery();
@@ -40,6 +45,16 @@ export default function AddEditBankKyc() {
   }));
 
   const { mutate: addBankAccountMutation, isPending } = useAddBankAccountMutation();
+  const isFormComplete =
+    Boolean(email?.trim()) &&
+    Boolean(bankname?.trim()) &&
+    Boolean(accnumber?.trim()) &&
+    Boolean(ifsccode?.trim()) &&
+    Boolean(ibannumber?.trim()) &&
+    Boolean(bankaddress?.trim()) &&
+    Boolean(selectedCountry) &&
+    Boolean(bankImage) &&
+    emailVerified === true;
 
   useEffect(() => {
     setVerifiedUserData(null);
@@ -165,7 +180,7 @@ export default function AddEditBankKyc() {
         <div className="mt-8 flex justify-end">
           <FormSubmit
             type="submit"
-            disabled={isPending || !emailVerified}
+            disabled={isPending || !isFormComplete}
             title={isPending ? "Submitting..." : "Submit"}
           />
         </div>

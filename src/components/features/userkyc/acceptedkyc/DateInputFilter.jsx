@@ -7,7 +7,7 @@ import { format } from "date-fns";
 import { CalendarIcon } from "lucide-react";
 import { useState } from "react";
 
-export default function DateInputFilter({ onSubmit }) {
+export default function DateInputFilter({ onSubmit, onClear, isLoading = false }) {
   const [startDate, setStartDate] = useState();
   const [endDate, setEndDate] = useState();
   const today = new Date();
@@ -34,6 +34,12 @@ export default function DateInputFilter({ onSubmit }) {
       sdate: startDate ? format(startDate, "yyyy-MM-dd") : "",
       edate: endDate ? format(endDate, "yyyy-MM-dd") : "",
     });
+  };
+
+  const handleClear = () => {
+    setStartDate(undefined);
+    setEndDate(undefined);
+    onClear?.();
   };
 
   return (
@@ -106,13 +112,23 @@ export default function DateInputFilter({ onSubmit }) {
         </p>
       )}
 
-      <div className="mt-8">
+      <div className="mt-8 flex flex-wrap gap-3">
         <button
+          type="button"
+          onClick={handleClear}
+          disabled={isLoading}
+          className="flex h-12 items-center justify-center rounded-2xl border border-border bg-background px-8 text-sm font-semibold text-foreground transition-all hover:bg-muted"
+        >
+          Cancel
+        </button>
+
+        <button
+          type="button"
           onClick={handleSubmit}
-          disabled={isSubmitDisabled}
+          disabled={isSubmitDisabled || isLoading}
           className="flex h-12 items-center justify-center rounded-2xl bg-primary px-8 text-sm font-semibold text-white transition-all hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
         >
-          Submit
+          {isLoading ? "Loading..." : "Submit"}
         </button>
       </div>
     </div>

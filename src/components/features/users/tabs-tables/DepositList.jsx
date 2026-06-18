@@ -59,12 +59,13 @@ const getMediaUrl = (source, keys) => {
 };
 
 export default function DepositList({ userDetails }) {
+  const [search, setSearch] = useState("");
   const [imageOpen, setImageOpen] = useState(false);
   const [selectedImage, setSelectedImage] = useState("");
   const deposits = userDetails?.deposits ?? [];
   const selectedUser = userDetails?.user ?? {};
   const { limit, setLimit, offset, setOffset, total, paginatedItems } =
-    useClientPagination(deposits);
+    useClientPagination(deposits, 10, search, [selectedUser?.name, selectedUser?.email]);
 
   return (
     <TableWrapper
@@ -72,7 +73,7 @@ export default function DepositList({ userDetails }) {
       description="Manage all deposit requests"
       actions={
         <>
-          <TableSearch />
+          <TableSearch value={search} onChange={value => { setSearch(value); setOffset(0); }} />
           <ExportDropdown />
         </>
       }

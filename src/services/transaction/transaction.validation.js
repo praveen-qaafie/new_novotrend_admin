@@ -32,8 +32,8 @@ export const withdrawalSchema = z
     wallet_address: z.string().optional(),
   })
   .superRefine((data, ctx) => {
-    // Chain and wallet address are only required if payment method is not "Cash"
-    if (data.paymethod !== "Cash") {
+    // Chain and wallet address are only required for crypto withdrawals.
+    if (data.paymethod === "Crypto") {
       if (!data.chainname || data.chainname.trim() === "") {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,

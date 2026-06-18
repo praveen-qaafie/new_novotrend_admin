@@ -3,6 +3,7 @@
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { FileText } from "lucide-react";
 import Image from "next/image";
+import { useState } from "react";
 
 /**
  * Detect if file URL is a PDF
@@ -17,6 +18,8 @@ export const isPdfFile = url => {
  * Supports both images and PDFs
  */
 export const KycFileThumbnail = ({ src, alt, onPreview }) => {
+  const [failedImageSrc, setFailedImageSrc] = useState("");
+
   if (!src) {
     return (
       <div className="flex h-16 w-24 items-center justify-center rounded-2xl border border-dashed border-border bg-muted/30 text-xs font-medium text-muted-foreground">
@@ -25,7 +28,7 @@ export const KycFileThumbnail = ({ src, alt, onPreview }) => {
     );
   }
 
-  const isImage = !isPdfFile(src);
+  const isImage = !isPdfFile(src) && failedImageSrc !== src;
 
   if (isImage) {
     return (
@@ -35,6 +38,7 @@ export const KycFileThumbnail = ({ src, alt, onPreview }) => {
           alt={alt}
           width={96}
           height={64}
+          onError={() => setFailedImageSrc(src)}
           className="h-16 w-24 object-cover transition-all hover:scale-105"
         />
       </button>
@@ -63,15 +67,14 @@ export const KycFilePreviewDialog = ({
   selectedFile,
   fileName = "File Preview",
 }) => {
+  const [failedPreviewSrc, setFailedPreviewSrc] = useState("");
+
   if (!selectedFile) return null;
 
-  const isImage = !isPdfFile(selectedFile);
+  const isImage = !isPdfFile(selectedFile) && failedPreviewSrc !== selectedFile;
 
   const handleOpen = () => {
-    if (!isImage) {
-      // Open PDF in new tab
-      window.open(selectedFile, "_blank");
-    }
+    window.open(selectedFile, "_blank");
   };
 
   return (
@@ -86,6 +89,7 @@ export const KycFilePreviewDialog = ({
               alt={fileName}
               width={1200}
               height={800}
+              onError={() => setFailedPreviewSrc(selectedFile)}
               className="max-h-[80vh] w-full rounded-2xl object-contain"
             />
           </div>

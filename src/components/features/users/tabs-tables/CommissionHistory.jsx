@@ -7,6 +7,7 @@ import TableSearch from "@/components/common/tables/TableSearch";
 import TableWrapper from "@/components/common/tables/TableWrapper";
 import { TableCell, TableRow } from "@/components/ui/table";
 import { useClientPagination } from "@/hooks/useClientPagination";
+import { useState } from "react";
 
 const tableHeaders = [
   { label: "S.No", key: "id" },
@@ -18,9 +19,10 @@ const tableHeaders = [
 ];
 
 export default function CommissionHistory({ userDetails }) {
+  const [search, setSearch] = useState("");
   const commissions = userDetails?.commission_history ?? [];
   const { limit, setLimit, offset, setOffset, total, paginatedItems } =
-    useClientPagination(commissions);
+    useClientPagination(commissions, 10, search);
 
   return (
     <TableWrapper
@@ -28,7 +30,7 @@ export default function CommissionHistory({ userDetails }) {
       description="Track all MT5 commission records"
       actions={
         <>
-          <TableSearch />
+          <TableSearch value={search} onChange={value => { setSearch(value); setOffset(0); }} />
           <ExportDropdown />
         </>
       }

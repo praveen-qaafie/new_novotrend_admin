@@ -62,6 +62,13 @@ export default function AcceptedBankKyc() {
             edate,
           });
         }}
+        onClear={() => {
+          setOffset(0);
+          setFilters({
+            sdate: "",
+            edate: "",
+          });
+        }}
       />
       <TableWrapper
         title="Accepted Bank KYC"

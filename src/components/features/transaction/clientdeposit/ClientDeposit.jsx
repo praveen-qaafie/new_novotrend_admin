@@ -123,9 +123,9 @@ export default function ClientDeposit() {
             }
           />
 
-          {verifying && <p className="mt-1 text-xs text-blue-500">Verifying email...</p>}
+          {verifying && <p className="mt-2 text-sm text-blue-500">Verifying email...</p>}
 
-          {verifiedUser && <p className="mt-1 text-xs text-green-600">✓ {verifiedUser}</p>}
+          {verifiedUser && <p className="mt-2 text-sm text-green-600">✓ {verifiedUser}</p>}
         </div>
 
         <FormInput

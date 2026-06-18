@@ -35,6 +35,7 @@ export default function ClientWithDraw() {
   const withdrawalMutation = useCreateClientWithdrawalMutation();
 
   const [debouncedUsercode] = useDebounce(formData.usercode, 600);
+  const isCryptoPayment = formData.paymethod === "Crypto";
 
   useEffect(() => {
     verifyEmail(debouncedUsercode);
@@ -62,11 +63,15 @@ export default function ClientWithDraw() {
     setFormData(prev => ({
       ...prev,
       paymethod: value,
+      chainname: value === "Crypto" ? prev.chainname : "",
+      wallet_address: value === "Crypto" ? prev.wallet_address : "",
     }));
 
     setErrors(prev => ({
       ...prev,
       paymethod: "",
+      chainname: "",
+      wallet_address: "",
     }));
   };
 
@@ -137,10 +142,10 @@ export default function ClientWithDraw() {
             }
           />
 
-          {verifying && <p className="mt-1 text-xs text-blue-500">Verifying email...</p>}
+          {verifying && <p className="mt-2 text-sm text-blue-500">Verifying email...</p>}
 
           {verifiedEmailUser && (
-            <p className="mt-1 text-xs text-green-600">✓ {verifiedEmailUser}</p>
+            <p className="mt-2 text-sm text-green-600">✓ {verifiedEmailUser}</p>
           )}
         </div>
 
@@ -178,28 +183,32 @@ export default function ClientWithDraw() {
           ]}
         />
 
-        <FormSelect
-          label="Chain Select"
-          placeholder="Select Chain"
-          value={formData.chainname}
-          onValueChange={handleChainChange}
-          error={errors.chainname}
-          options={[
-            { label: "BSC", value: "BSC" },
-            { label: "TRC20", value: "TRC20" },
-            { label: "ETH", value: "ETH" },
-            { label: "Polygon", value: "Polygon" },
-          ]}
-        />
+        {isCryptoPayment && (
+          <>
+            <FormSelect
+              label="Chain Select"
+              placeholder="Select Chain"
+              value={formData.chainname}
+              onValueChange={handleChainChange}
+              error={errors.chainname}
+              options={[
+                { label: "BSC", value: "BSC" },
+                { label: "TRC20", value: "TRC20" },
+                { label: "ETH", value: "ETH" },
+                { label: "Polygon", value: "Polygon" },
+              ]}
+            />
 
-        <FormInput
-          label="Wallet Address"
-          placeholder="Enter Wallet Address"
-          name="wallet_address"
-          value={formData.wallet_address}
-          onChange={handleChange}
-          error={errors.wallet_address}
-        />
+            <FormInput
+              label="Wallet Address"
+              placeholder="Enter Wallet Address"
+              name="wallet_address"
+              value={formData.wallet_address}
+              onChange={handleChange}
+              error={errors.wallet_address}
+            />
+          </>
+        )}
       </div>
 
       <div className="mt-8 flex justify-end">

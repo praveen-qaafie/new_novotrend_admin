@@ -15,7 +15,7 @@ import {
 } from "@/services/users/user.mutation";
 import { useUsersQuery } from "@/services/users/user.query";
 import { useQueryClient } from "@tanstack/react-query";
-import { CheckCircle2, LogOut } from "lucide-react";
+import { CheckCircle2, Loader2, LogOut } from "lucide-react";
 import { useDebounce } from "use-debounce";
 
 import { useRouter } from "next/navigation";
@@ -39,6 +39,7 @@ export default function ListUserTable() {
   const [search, setSearch] = useState("");
   const [limit, setLimit] = useState(10);
   const [offset, setOffset] = useState(0);
+  const [loadingUserId, setLoadingUserId] = useState("");
 
   const [debouncedSearch] = useDebounce(search, 500);
 
@@ -50,7 +51,7 @@ export default function ListUserTable() {
 
   const queryClient = useQueryClient();
   const { mutate: userAction } = useAdminUserActionMutation();
-  const { mutate: getUserDetails } = useGetUserDetailsMutation();
+  const { mutate: getUserDetails, isPending: isDetailsLoading } = useGetUserDetailsMutation();
   // FINAL USERS ARRAY
   const users = data?.response?.users ?? [];
 
@@ -116,14 +117,22 @@ export default function ListUserTable() {
   };
 
   const handleUserDetails = user => {
+    const userId = user.user_id || user.id;
+
+    if (!userId || isDetailsLoading) return;
+
+    setLoadingUserId(userId);
     getUserDetails(
       {
-        user_id: user.user_id || user.id,
+        user_id: userId,
       },
       {
         onSuccess: response => {
           sessionStorage.setItem("selectedUserDetails", JSON.stringify(response));
           router.push("/users/user-details");
+        },
+        onError: () => {
+          setLoadingUserId("");
         },
       }
     );
@@ -149,6 +158,14 @@ export default function ListUserTable() {
         />
       }
     >
+      {isDetailsLoading && (
+        <div className="absolute inset-0 z-20 flex items-center justify-center bg-background/70 backdrop-blur-sm">
+          <div className="flex items-center gap-3 rounded-2xl border border-border bg-background px-5 py-4 shadow-xl">
+            <Loader2 className="h-5 w-5 animate-spin text-primary" />
+            <span className="text-sm font-semibold text-foreground">Loading user details...</span>
+          </div>
+        </div>
+      )}
       <DataTable headers={tableHeaders}>
         {/* Loading */}
         {isLoading && (
@@ -191,7 +208,9 @@ export default function ListUserTable() {
           <TableRow
             key={`${user.user_id}-${index}`}
             onClick={() => handleUserDetails(user)}
-            className="cursor-pointer border-b border-border transition-all hover:bg-muted/40"
+            className={`cursor-pointer border-b border-border transition-all hover:bg-muted/40 ${
+              loadingUserId === user.user_id ? "bg-primary/5" : ""
+            }`}
           >
             {/* ID */}
             <TableCell className="px-6 py-5 text-sm font-medium text-muted-foreground">
@@ -212,7 +231,11 @@ export default function ListUserTable() {
             <TableCell className="px-6 py-5">
               <div className="flex items-center gap-3">
                 <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-primary/10 text-sm font-semibold text-primary">
-                  {user.name?.charAt(0)}
+                  {loadingUserId === user.user_id && isDetailsLoading ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    user.name?.charAt(0)
+                  )}
                 </div>
 
                 <div>

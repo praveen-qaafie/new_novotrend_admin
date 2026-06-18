@@ -8,6 +8,7 @@ import TableWrapper from "@/components/common/tables/TableWrapper";
 import TruncatedCell from "@/components/common/TruncatedCell";
 import { TableCell, TableRow } from "@/components/ui/table";
 import { useClientPagination } from "@/hooks/useClientPagination";
+import { useState } from "react";
 
 const tableHeaders = [
   { label: "#", key: "id" },
@@ -50,10 +51,11 @@ const getStatusClassName = status => {
 };
 
 export default function WithdrawalList({ userDetails }) {
+  const [search, setSearch] = useState("");
   const withdrawals = userDetails?.withdrawals ?? [];
   const selectedUser = userDetails?.user ?? {};
   const { limit, setLimit, offset, setOffset, total, paginatedItems } =
-    useClientPagination(withdrawals);
+    useClientPagination(withdrawals, 10, search, [selectedUser?.name, selectedUser?.email]);
 
   return (
     <TableWrapper
@@ -61,7 +63,7 @@ export default function WithdrawalList({ userDetails }) {
       description="Manage all withdrawal requests"
       actions={
         <>
-          <TableSearch />
+          <TableSearch value={search} onChange={value => { setSearch(value); setOffset(0); }} />
           <ExportDropdown />
         </>
       }

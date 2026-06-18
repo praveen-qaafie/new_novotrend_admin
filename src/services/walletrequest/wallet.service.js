@@ -13,7 +13,10 @@ export const getWalletRequestList = async ({ limit = 10, offset = 0, search = ""
     offset,
     search,
   };
-  const data = await securePost(API_ENDPOINT.WALLET_REQUEST.LIST_WALLET_REQUEST, payload);
+  const data = await securePost(API_ENDPOINT.WALLET_REQUEST.LIST_WALLET_REQUEST, payload, {
+    logName: "WALLET REQUEST LIST",
+  });
+  console.log("WALLET REQUEST LIST DECRYPTED RESPONSE:", data);
   if (data?.status !== 200) {
     throw new Error(data?.result || "Unable to fetch wallet requests");
   }
@@ -32,7 +35,10 @@ export const acceptWalletRequest = async ({ limit = 10, offset = 0, search = "" 
     offset,
     search,
   };
-  const data = await securePost(API_ENDPOINT.WALLET_REQUEST.WALLET_ACCEPT_LIST, payload);
+  const data = await securePost(API_ENDPOINT.WALLET_REQUEST.WALLET_ACCEPT_LIST, payload, {
+    logName: "ACCEPT WALLET REQUEST LIST",
+  });
+  console.log("ACCEPT WALLET REQUEST LIST DECRYPTED RESPONSE:", data);
   if (data?.status !== 200) {
     throw new Error(data?.result || "Unable to accept wallet request");
   }
@@ -53,7 +59,7 @@ export const rejectWalletRequest = async ({ limit = 10, offset = 0, search = "" 
   const data = await securePost(API_ENDPOINT.WALLET_REQUEST.WALLET_REJECT_LIST, payload, {
     logName: "REJECT WALLET REQUEST LIST",
   });
-  console.log("REJECT WALLET REQUEST LIST RESPONSE:", data);
+  console.log("REJECT WALLET REQUEST LIST DECRYPTED RESPONSE:", data);
   if (data?.status !== 200) {
     throw new Error(data?.result || "Unable to rejected wallet request");
   }
