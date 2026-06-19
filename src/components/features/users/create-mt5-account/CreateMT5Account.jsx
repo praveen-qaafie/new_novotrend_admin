@@ -18,6 +18,29 @@ import { useGetMT5GroupListQuery } from "@/services/groups/group.query";
 import { useCreateMT5AccountMutation } from "@/services/users/user.mutation";
 
 const leverageOptions = ["10", "50", "100", "200", "300", "400", "500", "1000"];
+const defaultSuccessMessage = "MT5 Account created successfully";
+
+const getSuccessMessage = response => {
+  if (typeof response?.result !== "string") {
+    return response?.result?.result || response?.result?.message || defaultSuccessMessage;
+  }
+
+  try {
+    const decryptedResult = decryptData(response.result);
+
+    console.log("Create MT5 Account Decrypted Result:", decryptedResult);
+
+    return (
+      decryptedResult?.data?.result ||
+      decryptedResult?.result ||
+      decryptedResult?.message ||
+      (typeof decryptedResult === "string" ? decryptedResult : defaultSuccessMessage)
+    );
+  } catch (error) {
+    console.log("Create MT5 Account Decrypt Failed:", error);
+    return defaultSuccessMessage;
+  }
+};
 
 export default function CreateMT5Account() {
   const [showMainPassword, setShowMainPassword] = useState(false);
@@ -33,7 +56,7 @@ export default function CreateMT5Account() {
 
   const { register, watch, handleSubmit, setValue, reset } = useForm();
 
-  const email = watch("email");
+  const email = watch("mt5AccountEmail");
 
   const [debouncedEmail] = useDebounce(email, 600);
 
@@ -63,32 +86,19 @@ export default function CreateMT5Account() {
         email,
         selectgroup: values.selectgroup,
         accleverage: values.accleverage,
-        mainpassword: values.mainpassword,
-        investorpassword: values.investorpassword,
+        mainpassword: values.mt5MainPassword,
+        investorpassword: values.mt5InvestorPassword,
       },
       {
         onSuccess: response => {
-          
-          let successMessage = response?.result;
-
-          try {
-            if (typeof response?.result === "string") {
-              const decryptedResult = decryptData(response.result);
-
-              
-              successMessage = decryptedResult?.data?.result || decryptedResult;
-            }
-          } catch (err) {
-                      }
-
-          toast.success(successMessage || "MT5 Account created successfully");
+          console.log("Create MT5 Account Response:", response);
+          toast.success(getSuccessMessage(response));
 
           reset();
           resetVerification();
         },
 
         onError: error => {
-          
           toast.error(error?.message || "Failed to create MT5 account");
         },
       }
@@ -101,7 +111,7 @@ export default function CreateMT5Account() {
         title="Create MT5 Account"
         description="Generate and manage new MT5 trading accounts"
       >
-        <form onSubmit={handleSubmit(onSubmit)}>
+        <form onSubmit={handleSubmit(onSubmit)} autoComplete="off">
           <div className="grid gap-6 md:grid-cols-2">
             {/* EMAIL */}
             <div>
@@ -109,7 +119,10 @@ export default function CreateMT5Account() {
                 label="Enter Email"
                 type="email"
                 placeholder="Enter registered email"
-                {...register("email", {
+                autoComplete="off"
+                data-lpignore="true"
+                data-1p-ignore="true"
+                {...register("mt5AccountEmail", {
                   required: true,
                 })}
               />
@@ -151,6 +164,9 @@ export default function CreateMT5Account() {
               type={showMainPassword ? "text" : "password"}
               placeholder="Enter main password"
               disabled={!verifiedUser}
+              autoComplete="new-password"
+              data-lpignore="true"
+              data-1p-ignore="true"
               rightElement={
                 <button
                   type="button"
@@ -162,7 +178,7 @@ export default function CreateMT5Account() {
                   {showMainPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                 </button>
               }
-              {...register("mainpassword")}
+              {...register("mt5MainPassword")}
             />
 
             {/* INVESTOR PASSWORD */}
@@ -171,6 +187,9 @@ export default function CreateMT5Account() {
               type={showInvestorPassword ? "text" : "password"}
               placeholder="Enter investor password"
               disabled={!verifiedUser}
+              autoComplete="new-password"
+              data-lpignore="true"
+              data-1p-ignore="true"
               rightElement={
                 <button
                   type="button"
@@ -188,7 +207,7 @@ export default function CreateMT5Account() {
                   )}
                 </button>
               }
-              {...register("investorpassword")}
+              {...register("mt5InvestorPassword")}
             />
           </div>
 

@@ -163,6 +163,11 @@ export default function SupportTicketDetail() {
           queryClient.invalidateQueries({ queryKey: ["support-ticket-details", ticketId] });
           queryClient.invalidateQueries({ queryKey: ["open-support-ticket-list"] });
           queryClient.invalidateQueries({ queryKey: ["close-support-ticket-list"] });
+
+          if (closeTicket) {
+            queryClient.refetchQueries({ queryKey: ["open-support-ticket-list"] });
+            router.push("/support-ticket/open-support-ticket");
+          }
         },
         onError: mutationError => {
           toast.error(mutationError?.message || "Unable to send reply");

@@ -7,6 +7,7 @@ import QRCode from "qrcode";
 import { useEffect, useState, useSyncExternalStore } from "react";
 import { useForm } from "react-hook-form";
 
+import { AUTH_SESSION_KEY } from "@/context/AuthContext";
 import { useAuthMutation } from "@/services/auth/auth.mutation";
 
 const AUTH_SNAPSHOT_LOADING = "__auth_snapshot_loading__";
@@ -87,6 +88,8 @@ export default function AucationCode() {
     localStorage.removeItem("staff_name");
     localStorage.removeItem("staff_username");
     localStorage.removeItem("permission");
+    localStorage.removeItem("novotrend-last-activity");
+    sessionStorage.removeItem(AUTH_SESSION_KEY);
 
     window.location.replace("/login");
   };
@@ -105,6 +108,8 @@ export default function AucationCode() {
         mutate(payload, {
       onSuccess: () => {
         localStorage.setItem("isLoggedIn", "true");
+        localStorage.setItem("novotrend-last-activity", String(Date.now()));
+        sessionStorage.setItem(AUTH_SESSION_KEY, "true");
         localStorage.removeItem("qr_secret");
         localStorage.removeItem("qr_code");
 

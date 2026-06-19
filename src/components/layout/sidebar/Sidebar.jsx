@@ -10,8 +10,42 @@ import { ChevronDown } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import SidebarSkeleton from "./SidebarSkeleton";
+
+const getFirstPathSegment = href => href?.split("/").filter(Boolean)[0] || "";
+
+const isPathActive = (pathname, href) => {
+  if (!href) return false;
+
+  return pathname === href || pathname.startsWith(`${href}/`);
+};
+
+const isPathInSection = (pathname, href) => {
+  if (!href) return false;
+
+  const firstSegment = getFirstPathSegment(href);
+
+  return (
+    pathname === href ||
+    pathname.startsWith(`${href}/`) ||
+    (firstSegment && getFirstPathSegment(pathname) === firstSegment)
+  );
+};
+
+const getActiveSections = (items, pathname) => {
+  return items.reduce((sections, section) => {
+    section.items.forEach(item => {
+      const hasActiveChild = item.children?.some(subItem => isPathInSection(pathname, subItem.href));
+
+      if (hasActiveChild) {
+        sections[item.title] = true;
+      }
+    });
+
+    return sections;
+  }, {});
+};
 
 export default function Sidebar() {
   const pathname = usePathname();
@@ -28,10 +62,18 @@ export default function Sidebar() {
     window.location.href = "/login";
   };
   const { allowedPermissions, isLoading } = usePermissions();
+  const filteredSidebarItems = useMemo(
+    () => getAllowedSidebarItems(sidebarItems, allowedPermissions),
+    [allowedPermissions]
+  );
+  const activeSections = useMemo(
+    () => getActiveSections(filteredSidebarItems, pathname),
+    [filteredSidebarItems, pathname]
+  );
+
   if (isLoading) {
     return <SidebarSkeleton />;
   }
-  const filteredSidebarItems = getAllowedSidebarItems(sidebarItems, allowedPermissions);
 
   return (
     <aside className="group/sidebar hidden h-screen w-[280px] flex-col border-r border-border/40 bg-gradient-to-b from-background via-background to-background/95 md:flex sticky top-0 transition-all duration-300">
@@ -69,7 +111,7 @@ export default function Sidebar() {
                 {section.items.map(item => {
                     // Dropdown with modern design
                     if (item.children) {
-                      const isOpen = openSections[item.title] || false;
+                      const isOpen = openSections[item.title] ?? activeSections[item.title] ?? false;
                       return (
                         <Collapsible
                           key={item.title}
@@ -115,7 +157,7 @@ export default function Sidebar() {
                                     "group/sub relative flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-all duration-200",
                                     "hover:bg-primary/5 hover:text-primary hover:translate-x-0.5",
                                     "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/20",
-                                    pathname === subItem.href
+                                    isPathActive(pathname, subItem.href)
                                       ? "bg-primary/10 text-primary font-medium shadow-sm"
                                       : "text-muted-foreground/80"
                                   )}
@@ -127,7 +169,7 @@ export default function Sidebar() {
                                   )}
                                   <span className="text-sm">{subItem.title}</span>
 
-                                  {pathname === subItem.href && (
+                                  {isPathActive(pathname, subItem.href) && (
                                     <>
                                       <div className="ml-auto h-1.5 w-1.5 rounded-full bg-primary" />
                                       <div className="absolute left-0 h-full w-0.5 rounded-full bg-primary" />

@@ -1,10 +1,29 @@
 "use client";
 
-import { createContext, useContext, useMemo, useSyncExternalStore } from "react";
+import { createContext, useCallback, useContext, useEffect, useMemo, useSyncExternalStore } from "react";
 
 const AuthContext = createContext(null);
 const AUTH_CHANGE_EVENT = "novotrend-auth-change";
 const AUTH_LOADING_SNAPSHOT = "__auth_loading__";
+export const AUTH_SESSION_KEY = "novotrend-active-session";
+const LAST_ACTIVITY_KEY = "novotrend-last-activity";
+const IDLE_TIMEOUT_MS = 30 * 60 * 1000;
+const ACTIVITY_EVENTS = ["click", "keydown", "mousemove", "scroll", "touchstart"];
+
+const clearAuthStorage = () => {
+  localStorage.removeItem("adminUser");
+  localStorage.removeItem("token");
+  localStorage.removeItem("auth_secret");
+  localStorage.removeItem("qr_secret");
+  localStorage.removeItem("qr_code");
+  localStorage.removeItem("isLoggedIn");
+  localStorage.removeItem("staff_id");
+  localStorage.removeItem("staff_name");
+  localStorage.removeItem("staff_username");
+  localStorage.removeItem("permission");
+  localStorage.removeItem(LAST_ACTIVITY_KEY);
+  sessionStorage.removeItem(AUTH_SESSION_KEY);
+};
 
 const getStoredUserSnapshot = () => {
   if (typeof window === "undefined") return AUTH_LOADING_SNAPSHOT;
@@ -78,7 +97,8 @@ export const AuthProvider = ({ children }) => {
   const isVerified =
     !isAuthLoading && typeof window !== "undefined" && localStorage.getItem("isLoggedIn") === "true";
 
-  const login = userData => {
+  const login = useCallback(userData => {
+    sessionStorage.removeItem(AUTH_SESSION_KEY);
     localStorage.removeItem("isLoggedIn");
     localStorage.setItem("adminUser", JSON.stringify(userData));
     localStorage.setItem("token", userData.token);
@@ -87,22 +107,65 @@ export const AuthProvider = ({ children }) => {
     localStorage.setItem("staff_username", userData.staff_username || "");
     localStorage.setItem("permission", JSON.stringify(userData.permission || []));
     emitAuthChange();
-  };
+  }, []);
 
-  const logout = () => {
-    localStorage.removeItem("adminUser");
-    localStorage.removeItem("token");
-    localStorage.removeItem("auth_secret");
-    localStorage.removeItem("qr_secret");
-    localStorage.removeItem("qr_code");
-    localStorage.removeItem("isLoggedIn");
-    localStorage.removeItem("staff_id");
-    localStorage.removeItem("staff_name");
-    localStorage.removeItem("staff_username");
-    localStorage.removeItem("permission");
-
+  const logout = useCallback(() => {
+    clearAuthStorage();
     emitAuthChange();
-  };
+  }, []);
+
+  useEffect(() => {
+    if (isAuthLoading || typeof window === "undefined") return undefined;
+
+    const token = localStorage.getItem("token");
+    const verified = localStorage.getItem("isLoggedIn") === "true";
+
+    if (!token || !verified) return undefined;
+
+    if (sessionStorage.getItem(AUTH_SESSION_KEY) !== "true") {
+      logout();
+      window.location.replace("/login");
+      return undefined;
+    }
+
+    const logoutForIdle = () => {
+      logout();
+      window.location.replace("/login");
+    };
+
+    const checkIdle = () => {
+      const lastActivity = Number(localStorage.getItem(LAST_ACTIVITY_KEY) || Date.now());
+
+      if (Date.now() - lastActivity >= IDLE_TIMEOUT_MS) {
+        logoutForIdle();
+      }
+    };
+
+    const recordActivity = () => {
+      localStorage.setItem(LAST_ACTIVITY_KEY, String(Date.now()));
+    };
+
+    if (!localStorage.getItem(LAST_ACTIVITY_KEY)) {
+      recordActivity();
+    }
+
+    ACTIVITY_EVENTS.forEach(eventName => {
+      window.addEventListener(eventName, recordActivity, { passive: true });
+    });
+
+    const idleTimer = window.setInterval(checkIdle, 30 * 1000);
+    window.addEventListener("focus", checkIdle);
+    window.addEventListener("pageshow", checkIdle);
+
+    return () => {
+      ACTIVITY_EVENTS.forEach(eventName => {
+        window.removeEventListener(eventName, recordActivity);
+      });
+      window.clearInterval(idleTimer);
+      window.removeEventListener("focus", checkIdle);
+      window.removeEventListener("pageshow", checkIdle);
+    };
+  }, [isAuthLoading, logout]);
 
   const setUser = userData => {
     if (userData) {

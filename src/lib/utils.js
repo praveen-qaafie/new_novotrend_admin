@@ -30,9 +30,7 @@ export const encryptData = data => {
   const cipherTextBase64 = encrypted.ciphertext.toString(CryptoJS.enc.Base64);
   const ivBase64 = iv.toString(CryptoJS.enc.Base64);
 
-  return CryptoJS.enc.Base64.stringify(
-    CryptoJS.enc.Utf8.parse(`${cipherTextBase64}::${ivBase64}`),
-  );
+  return CryptoJS.enc.Base64.stringify(CryptoJS.enc.Utf8.parse(`${cipherTextBase64}::${ivBase64}`));
 };
 
 export const decryptData = encryptedText => {
@@ -64,7 +62,7 @@ export const decryptData = encryptedText => {
       iv: CryptoJS.enc.Base64.parse(ivBase64),
       mode: CryptoJS.mode.CBC,
       padding: CryptoJS.pad.Pkcs7,
-    },
+    }
   );
   let plainText = "";
 
@@ -77,5 +75,9 @@ export const decryptData = encryptedText => {
   if (!plainText) {
     throw new Error("Empty decrypted response");
   }
-  return JSON.parse(plainText);
+  try {
+    return JSON.parse(plainText);
+  } catch {
+    return plainText;
+  }
 };

@@ -1,31 +1,59 @@
 import { API_ENDPOINT } from "@/constants/endpoints";
 import apiClient from "@/lib/axios/apiClient";
-import { decryptData, encryptData } from "@/lib/utils";
 import { securePost } from "@/lib/axios/secureApi";
+import { decryptData, encryptData } from "@/lib/utils";
 
 const unwrapNestedEncryptedResult = data => {
   if (typeof data === "string") {
     try {
       const decryptedResult = decryptData(cleanEncryptedText(data));
 
-      return decryptedResult?.data ?? decryptedResult;
+      return flattenResultEnvelope(decryptedResult?.data ?? decryptedResult);
     } catch {
       return data;
     }
   }
 
   if (data?.response || typeof data?.result !== "string") {
-    return data;
+    return flattenResultEnvelope(data);
   }
 
   try {
     const encryptedResult = cleanEncryptedText(data.result);
     const decryptedResult = decryptData(encryptedResult);
 
-    return decryptedResult?.data ?? decryptedResult;
+    return flattenResultEnvelope(decryptedResult?.data ?? decryptedResult);
   } catch {
     return data;
   }
+};
+
+const flattenResultEnvelope = data => {
+  if (!data || typeof data !== "object" || typeof data.result === "string") {
+    return data;
+  }
+
+  const nestedData = data.result?.data ?? data.result;
+
+  if (!nestedData || typeof nestedData !== "object") {
+    return data;
+  }
+
+  const hasApiEnvelope =
+    Object.hasOwn(nestedData, "response") ||
+    Object.hasOwn(nestedData, "status") ||
+    Object.hasOwn(nestedData, "result");
+
+  if (!hasApiEnvelope) {
+    return data;
+  }
+
+  return {
+    ...data,
+    ...nestedData,
+    status: nestedData.status ?? data.status,
+    result: typeof nestedData.result === "string" ? nestedData.result : data.result,
+  };
 };
 
 const getRawErrorMessage = data => {
@@ -96,7 +124,6 @@ const getApiErrorMessage = data => {
 };
 
 const getSupportTicketList = async ({ endpoint, label, errorMessage, limit, offset, search }) => {
-  
   const token = localStorage.getItem("token");
 
   if (!token) {
@@ -110,10 +137,10 @@ const getSupportTicketList = async ({ endpoint, label, errorMessage, limit, offs
     search: search?.trim() || "",
   };
 
-  
   const data = unwrapNestedEncryptedResult(await securePost(endpoint, payload));
 
-  
+  console.log(`${label} - Response:`, data);
+
   if (data?.status !== 200) {
     throw new Error(data?.result || errorMessage);
   }
@@ -144,7 +171,6 @@ export const getCloseSupportTicketList = ({ limit = 10, offset = 0, search = "" 
 };
 
 export const getSupportTicketDetails = async ({ ticket_id }) => {
-  
   const token = localStorage.getItem("token");
 
   if (!token) {
@@ -156,12 +182,10 @@ export const getSupportTicketDetails = async ({ ticket_id }) => {
     ticket_id,
   };
 
-  
   const data = unwrapNestedEncryptedResult(
     await securePost(API_ENDPOINT.SUPPORT_TICKET.TICKET_DETAILS, payload)
   );
 
-  
   if (data?.status !== 200) {
     throw new Error(data?.result || "Unable to fetch support ticket details");
   }
@@ -170,7 +194,6 @@ export const getSupportTicketDetails = async ({ ticket_id }) => {
 };
 
 export const replySupportTicket = async ({ ticket_id, remark, close_ticket = "0" }) => {
-  
   const token = localStorage.getItem("token");
 
   if (!token) {
@@ -184,17 +207,19 @@ export const replySupportTicket = async ({ ticket_id, remark, close_ticket = "0"
     close_ticket,
   };
 
-  
   let data;
 
   try {
-    data = unwrapNestedEncryptedResult(await securePost(API_ENDPOINT.SUPPORT_TICKET.REPLY_TICKET, payload));
+    data = unwrapNestedEncryptedResult(
+      await securePost(API_ENDPOINT.SUPPORT_TICKET.REPLY_TICKET, payload, {
+        responseLogName: close_ticket === "1" ? "CLOSE SUPPORT TICKET" : undefined,
+      })
+    );
   } catch (error) {
     const errorData = unwrapNestedEncryptedResult(error?.response?.data ?? error);
     throw new Error(getApiErrorMessage(errorData) || error?.message);
   }
 
-  
   if (data?.status !== 200) {
     throw new Error(getApiErrorMessage(data));
   }
@@ -208,7 +233,6 @@ export const replySupportTicketWithAttachment = async ({
   close_ticket = "0",
   attachment,
 }) => {
-  
   const token = localStorage.getItem("token");
 
   if (!token) {
@@ -222,7 +246,6 @@ export const replySupportTicketWithAttachment = async ({
     close_ticket,
   };
 
-    
   const requestBody = new FormData();
   const encryptedPayload = encryptData(payload);
 
@@ -232,7 +255,6 @@ export const replySupportTicketWithAttachment = async ({
     requestBody.append("select_img", attachment, attachment.name);
   }
 
-  
   let response;
 
   try {
@@ -248,7 +270,11 @@ export const replySupportTicketWithAttachment = async ({
 
   const data = unwrapNestedEncryptedResult(response.data);
 
-  
+  if (close_ticket === "1") {
+    console.log("CLOSE SUPPORT TICKET ENCRYPTED RESPONSE:", response.data);
+    console.log("CLOSE SUPPORT TICKET DECRYPTED RESPONSE:", data);
+  }
+
   if (data?.status !== 200) {
     throw new Error(getApiErrorMessage(data));
   }
