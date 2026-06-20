@@ -3,10 +3,12 @@ export const API_ENDPOINT = {
     LOGIN: "/login/login.php",
     VERIFYAUTH: "/login/login_verify.php",
   },
+  
   DASHBOARD: {
     DASHBOARD: "/dashboard/dashboard.php",
     TICKET_ASSIGN: "/dashboard/ticket_asign.php",
   },
+
   USERS: {
     USERLIST: "/user/list_all_user.php",
     ADMINACTION: "/user/user_action.php",
@@ -120,6 +122,7 @@ export const API_ENDPOINT = {
     WITHDRAWAL_REQUEST_LIST_HISTORY: "/reports/withdrawal_req_list_history_trx.php",
     WITHDRAWAL_REQUEST_LIST_HISTORY_IB: "/reports/withdrawal_req_list_history_ib.php",
   },
+
   NOTIFICATION: {
     GET_ALL_NOTIFICATION: "/notification/get_all_notification.php",
     READ_NOTIFICATION_BY_ID: "/notification/read_notification_by_id.php",
@@ -130,6 +133,7 @@ export const API_ENDPOINT = {
     ADMIN_LOGIN_LOG: "/notification/user_admin_login_log.php",
     USER_LOGIN_LOGS: "/notification/user_login_logs.php",
   },
+
   SUPPORT_TICKET: {
     OPEN_TICKET_LIST: "/support/running_support_ticket_list.php",
     CLOSE_TICKET_LIST: "/support/close_support_ticket_list.php",
@@ -137,6 +141,7 @@ export const API_ENDPOINT = {
     REPLY_TICKET: "/support/admin_reply_support_ticket.php",
     // REPLY_TICKET: "/user/list_all_user_old.php",
   },
+
   STAFFLIST: {
     ADMIN_STAFF_LIST: "/staff/list_employee.php",
     GET_ALL_PERMISSION: "/staff/get_all_permission.php",
@@ -144,6 +149,7 @@ export const API_ENDPOINT = {
     EDIT_EMPLOYEE_DETAILS: "/staff/edit_employee.php",
     DELETE_EMPLOYEE_DETAILS: "/staff/delete_employee.php",
   },
+
   BOUNS: {
     BOUNS_LIST: "/user/list_bonus.php",
     DISCOUNT_LIST: "/user/discount_list.php",
