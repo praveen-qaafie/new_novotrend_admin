@@ -16,7 +16,6 @@ const getEncryptedText = payload => {
 
 export const encryptData = data => {
   if (!SECRET_KEY) throw new Error("NEXT_PUBLIC_ENCRYPTION_KEY missing");
-  if (!SECRET_KEY) throw new Error("NEXT_PUBLIC_ENCRYPTION_KEY missing");
 
   const key = CryptoJS.enc.Base64.parse(SECRET_KEY);
   const iv = CryptoJS.lib.WordArray.random(16);

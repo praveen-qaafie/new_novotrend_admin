@@ -6,14 +6,10 @@ export const getCountryList = async () => {
   const response = await apiClient.get(API_ENDPOINT.COUNTRY.COUNTRY_LIST);
   let data = response?.data;
 
-  console.log("COUNTRY LIST ENCRYPTED/RAW RESPONSE:", response?.data);
-
   try {
     const decryptedResponse = decryptData(response?.data);
     data = decryptedResponse?.data ?? decryptedResponse;
-    console.log("COUNTRY LIST DECRYPTED RESPONSE:", data);
   } catch {
-    console.log("COUNTRY LIST DECRYPT FAILED. USING RAW RESPONSE:", response?.data);
     data = response?.data?.data ?? response?.data;
   }
 

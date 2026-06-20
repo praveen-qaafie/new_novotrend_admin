@@ -26,6 +26,32 @@ const tableHeaders = [
   { label: "Swapcharge", key: "swapcharge" },
 ];
 
+const fallbackValue = "Unavailable";
+
+const getValue = (source, keys, fallback = fallbackValue) => {
+  const key = keys.find(
+    item => source?.[item] !== undefined && source?.[item] !== null && source?.[item] !== ""
+  );
+
+  return key ? source[key] : fallback;
+};
+
+const getTradeType = row => getValue(row, ["OpenAction", "CloseAction", "type", "action"]);
+
+const formatDate = value => {
+  if (!value || value === fallbackValue) return fallbackValue;
+
+  const date = new Date(String(value).replace(" ", "T"));
+
+  if (Number.isNaN(date.getTime())) return value;
+
+  return new Intl.DateTimeFormat("en-GB", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "2-digit",
+  }).format(date);
+};
+
 export default function TradeReport({ userDetails }) {
   const [search, setSearch] = useState("");
   const { data } = useUserTradingReportQuery({
@@ -65,57 +91,57 @@ export default function TradeReport({ userDetails }) {
         )}
 
         {paginatedItems.map((row, index) => (
-          <TableRow key={`${row.orderId || row.order_id}-${index}`} className="border-b border-border hover:bg-muted/40">
+          <TableRow key={`${getValue(row, ["order", "orderId", "order_id"], index)}-${index}`} className="border-b border-border hover:bg-muted/40">
             {/* # */}
             <TableCell>{offset + index + 1}</TableCell>
 
             {/* SYMBOL */}
-            <TableCell className="font-semibold">{row.symbol}</TableCell>
+            <TableCell className="font-semibold">{getValue(row, ["symbol"])}</TableCell>
 
             {/* TYPE */}
             <TableCell>
               <span
                 className={`px-3 py-1 rounded-xl text-xs font-semibold
                   ${
-                    row.type === "BUY"
+                    getTradeType(row) === "BUY"
                       ? "bg-green-500/10 text-green-600"
                       : "bg-red-500/10 text-red-500"
                   }
                 `}
               >
-                {row.type}
+                {getTradeType(row)}
               </span>
             </TableCell>
 
             {/* OPENING TIME */}
-            <TableCell className="whitespace-nowrap">{row.openingTime || row.opening_time || "-"}</TableCell>
+            <TableCell className="whitespace-nowrap">{formatDate(getValue(row, ["open_date", "openingTime", "opening_time"]))}</TableCell>
 
             {/* CLOSING TIME */}
-            <TableCell className="whitespace-nowrap">{row.closingTime || row.closing_time || "-"}</TableCell>
+            <TableCell className="whitespace-nowrap">{formatDate(getValue(row, ["close_date", "closingTime", "closing_time"]))}</TableCell>
 
             {/* OPEN PRICE */}
-            <TableCell>{row.openingPrice || row.opening_price || "-"}</TableCell>
+            <TableCell>{getValue(row, ["open_price", "openingPrice", "opening_price"])}</TableCell>
 
             {/* CLOSE PRICE */}
-            <TableCell>{row.closingPrice || row.closing_price || "-"}</TableCell>
+            <TableCell>{getValue(row, ["close_price", "closingPrice", "closing_price"])}</TableCell>
 
             {/* VOLUME */}
-            <TableCell>{row.volume}</TableCell>
+            <TableCell>{getValue(row, ["volume"])}</TableCell>
 
             {/* PROFIT */}
-            <TableCell className="font-semibold text-primary">{row.profit}</TableCell>
+            <TableCell className="font-semibold text-primary">{getValue(row, ["profit"])}</TableCell>
 
             {/* ORDER ID */}
-            <TableCell className="text-muted-foreground">{row.orderId || row.order_id || "-"}</TableCell>
+            <TableCell className="text-muted-foreground">{getValue(row, ["order", "orderId", "order_id"])}</TableCell>
 
             {/* MT5 ID */}
-            <TableCell>{row.mt5Id || row.mt5_id || "-"}</TableCell>
+            <TableCell>{getValue(row, ["mt5acc", "mt5Id", "mt5_id"])}</TableCell>
 
             {/* COMMISSION */}
-            <TableCell>{row.commission}</TableCell>
+            <TableCell>{getValue(row, ["commission"])}</TableCell>
 
             {/* SWAPCHARGE */}
-            <TableCell>{row.swapcharge}</TableCell>
+            <TableCell>{getValue(row, ["swap", "swapcharge"])}</TableCell>
           </TableRow>
         ))}
       </DataTable>

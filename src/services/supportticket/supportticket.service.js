@@ -139,8 +139,6 @@ const getSupportTicketList = async ({ endpoint, label, errorMessage, limit, offs
 
   const data = unwrapNestedEncryptedResult(await securePost(endpoint, payload));
 
-  console.log(`${label} - Response:`, data);
-
   if (data?.status !== 200) {
     throw new Error(data?.result || errorMessage);
   }
@@ -269,11 +267,6 @@ export const replySupportTicketWithAttachment = async ({
   }
 
   const data = unwrapNestedEncryptedResult(response.data);
-
-  if (close_ticket === "1") {
-    console.log("CLOSE SUPPORT TICKET ENCRYPTED RESPONSE:", response.data);
-    console.log("CLOSE SUPPORT TICKET DECRYPTED RESPONSE:", data);
-  }
 
   if (data?.status !== 200) {
     throw new Error(getApiErrorMessage(data));

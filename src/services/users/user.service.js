@@ -1,10 +1,6 @@
 import { API_ENDPOINT } from "@/constants/endpoints";
 import { securePost } from "../../lib/axios/secureApi";
 
-const logDeprecatedUser = (label, value) => {
-  console.log(`[DEPRECATED USER DETAILS] ${label}:`, value);
-};
-
 // GET USER LIST
 export const getUserList = async ({ limit = 10, offset = 0, search }) => {
   const token = localStorage.getItem("token");
@@ -19,7 +15,6 @@ export const getUserList = async ({ limit = 10, offset = 0, search }) => {
   };
 
   const data = await securePost(API_ENDPOINT.USERS.USERLIST, payload);
-  console.log("LIST ALL USERS DECRYPTED RESPONSE:", data);
   // VALIDATION
   if (data?.status !== 200) {
     throw new Error(data?.result || "Unable to load users");
@@ -67,13 +62,9 @@ export const getUserDetails = async ({ user_id }) => {
     user_id: Number(user_id),
   };
 
-  logDeprecatedUser("payload", payload);
-
   const data = await securePost(API_ENDPOINT.USERS.GET_USER_DETAILS, payload, {
     logName: "GET USER DETAILS",
   });
-
-  logDeprecatedUser("response", data);
 
   if (data?.status !== 200) {
     throw new Error(data?.result || "Unable to fetch user details");
@@ -179,8 +170,6 @@ export const getMT5AccountDetails = async ({ accno }) => {
   const data = await securePost(API_ENDPOINT.USERS.GET_MT5_ACCOUNT_DETAILS, payload, {
     logName: "GET MT5 ACCOUNT DETAILS",
   });
-
-  console.log("GET MT5 ACCOUNT DETAILS DECRYPTED RESPONSE:", data);
 
   if (data?.status !== 200) {
     throw new Error(data?.result || "Unable to fetch MT5 account details");

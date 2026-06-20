@@ -44,55 +44,26 @@ const decryptNestedResult = data => {
 
 export const securePost = async (url, payload, options = {}) => {
   const logName = options.logName;
-  const responseLogName = options.responseLogName || logName;
 
   try {
-    if (logName) {
-      console.log(`${logName} PAYLOAD:`, payload);
-    }
-
     // ENCRYPT PAYLOAD
     const encryptedPayload = encryptData(payload);
     const requestBody = {
       data: encryptedPayload,
     };
 
-    if (logName) {
-      console.log(`${logName} ENCRYPTED PAYLOAD:`, requestBody);
-      console.log(`${logName} DECRYPTED PAYLOAD:`, decryptData(encryptedPayload));
-    }
-
     // API CALL
     const response = await apiClient.post(url, requestBody);
-
-    if (responseLogName) {
-      console.log(`${responseLogName} ENCRYPTED RESPONSE:`, response.data);
-    } else if (logName) {
-      console.log(`${logName} ENCRYPTED RESPONSE:`, response.data);
-    }
 
     // DECRYPT RESPONSE
     try {
       const decrypted = decryptData(response.data);
-
-      // DECRYPTED RESPONSE
-      if (responseLogName) {
-        console.log(`${responseLogName} DECRYPTED RESPONSE:`, decryptNestedResult(decrypted.data));
-      } else if (logName) {
-        console.log(`${logName} DECRYPTED RESPONSE:`, decryptNestedResult(decrypted.data));
-      }
 
       return decryptNestedResult(decrypted.data);
     } catch {
       // NORMAL RESPONSE
       const plainResponse = normalizePlainResponse(response.data);
       const decryptedPlainResponse = decryptNestedResult(plainResponse);
-
-      if (responseLogName) {
-        console.log(`${responseLogName} DECRYPTED RESPONSE:`, decryptedPlainResponse);
-      } else if (logName) {
-        console.log(`${logName} DECRYPTED RESPONSE:`, decryptedPlainResponse);
-      }
 
       return decryptedPlainResponse;
     }

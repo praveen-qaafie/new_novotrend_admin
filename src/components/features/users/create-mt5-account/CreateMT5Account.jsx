@@ -28,16 +28,13 @@ const getSuccessMessage = response => {
   try {
     const decryptedResult = decryptData(response.result);
 
-    console.log("Create MT5 Account Decrypted Result:", decryptedResult);
-
     return (
       decryptedResult?.data?.result ||
       decryptedResult?.result ||
       decryptedResult?.message ||
       (typeof decryptedResult === "string" ? decryptedResult : defaultSuccessMessage)
     );
-  } catch (error) {
-    console.log("Create MT5 Account Decrypt Failed:", error);
+  } catch {
     return defaultSuccessMessage;
   }
 };
@@ -91,7 +88,6 @@ export default function CreateMT5Account() {
       },
       {
         onSuccess: response => {
-          console.log("Create MT5 Account Response:", response);
           toast.success(getSuccessMessage(response));
 
           reset();

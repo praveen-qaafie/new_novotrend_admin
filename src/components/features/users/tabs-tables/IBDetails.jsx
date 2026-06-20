@@ -14,15 +14,27 @@ import { useState } from "react";
 const tableHeaders = [
   { label: "S.No", key: "id" },
   { label: "Name", key: "name" },
-  { label: "Email", key: "email" },
+  { label: "Reg Code", key: "regCode" },
   { label: "Mobile", key: "mobile" },
   { label: "Country", key: "country" },
-  { label: "Date", key: "date" },
-  { label: "IB Name", key: "ibName" },
-  { label: "Total Commission", key: "totalCommission" },
-  { label: "Total Volume", key: "totalVolume" },
+  { label: "Reg Date", key: "regDate" },
+  { label: "Ref Name", key: "refName" },
+  { label: "Total IB Commission", key: "totalIbCommission" },
+  { label: "Total Lots", key: "totalLots" },
+  { label: "Remaining Commission", key: "remainingCommission" },
+  { label: "IB Status", key: "ibStatus" },
   { label: "Action", key: "action" },
 ];
+
+const fallbackValue = "Unavailable";
+
+const getValue = (source, keys, fallback = fallbackValue) => {
+  const key = keys.find(
+    item => source?.[item] !== undefined && source?.[item] !== null && source?.[item] !== ""
+  );
+
+  return key ? source[key] : fallback;
+};
 
 export default function IBDetails({ userDetails }) {
   const [search, setSearch] = useState("");
@@ -67,33 +79,41 @@ export default function IBDetails({ userDetails }) {
         )}
 
         {paginatedItems.map((row, index) => (
-          <TableRow key={`${row.email}-${index}`} className="border-b border-border hover:bg-muted/40">
+          <TableRow key={`${getValue(row, ["user_id"], index)}-${index}`} className="border-b border-border hover:bg-muted/40">
             {/* # */}
             <TableCell>{offset + index + 1}</TableCell>
 
             {/* NAME */}
-            <TableCell className="font-medium">{row.name}</TableCell>
+            <TableCell className="font-medium">{getValue(row, ["name", "user_name"])}</TableCell>
 
-            {/* EMAIL */}
-            <TableCell>{row.email}</TableCell>
+            {/* REG CODE */}
+            <TableCell>{getValue(row, ["reg_code", "user_reg_code", "email"])}</TableCell>
 
             {/* MOBILE */}
-            <TableCell>{row.mobile}</TableCell>
+            <TableCell>{getValue(row, ["mobile", "user_mobile"])}</TableCell>
 
             {/* COUNTRY */}
-            <TableCell>{row.country}</TableCell>
+            <TableCell>{getValue(row, ["country"])}</TableCell>
 
-            {/* DATE */}
-            <TableCell className="whitespace-nowrap">{row.date}</TableCell>
+            {/* REG DATE */}
+            <TableCell className="whitespace-nowrap">{getValue(row, ["reg_date", "date"])}</TableCell>
 
-            {/* IB NAME */}
-            <TableCell className="font-medium text-primary">{row.ib_name || row.ibName || "-"}</TableCell>
+            {/* REF NAME */}
+            <TableCell className="font-medium text-primary">{getValue(row, ["ref_name", "ib_name", "ibName"])}</TableCell>
 
-            {/* TOTAL COMMISSION */}
-            <TableCell className="font-semibold text-green-600">{row.total_commission || row.totalCommission || "-"}</TableCell>
+            {/* TOTAL IB COMMISSION */}
+            <TableCell className="font-semibold text-green-600">
+              {getValue(row, ["total_ib_commission", "total_commission", "totalCommission"])}
+            </TableCell>
 
-            {/* TOTAL VOLUME */}
-            <TableCell>{row.total_volume || row.totalVolume || "-"}</TableCell>
+            {/* TOTAL LOTS */}
+            <TableCell>{getValue(row, ["total_lots", "total_volume", "totalVolume"])}</TableCell>
+
+            {/* REMAINING COMMISSION */}
+            <TableCell>{getValue(row, ["remaining_commission", "remain"])}</TableCell>
+
+            {/* IB STATUS */}
+            <TableCell>{getValue(row, ["is_ib_complete"])}</TableCell>
 
             {/* ACTION */}
             <TableCell>

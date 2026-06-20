@@ -45,8 +45,6 @@ export default function WalletAcceptedRequest({ open, onOpenChange, selectedRequ
       },
       {
         onSuccess: async data => {
-          console.log("WALLET REQUEST ACTION RESPONSE:", data);
-
           let message = "Request updated successfully";
           try {
             const decryptedResult = decryptData(data?.result);
